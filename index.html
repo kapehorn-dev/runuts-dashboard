@@ -1543,7 +1543,7 @@ startAutoRefresh();
       <label>KPI Dashboard CSV URL</label>
       <input type="text" id="urlKpiDashboard" placeholder="https://docs.google.com/spreadsheets/d/e/...">
       <label>UGC Archive CSV URL</label>
-      <input type="text" id="urlContentCalendar" placeholder="https://docs.google.com/spreadsheets/d/e/...">
+      <input type="text" id="urlUGCArchive" placeholder="https://docs.google.com/spreadsheets/d/e/...">
       <button class="btn-save" onclick="saveSettings()">저장 후 데이터 갱신</button>
       <p class="help-text" style="margin-top:12px">설정은 브라우저 localStorage에 저장됩니다.</p>
     </div>
@@ -1560,12 +1560,12 @@ let chartMembersInstance, chartGrowthInstance;
 // ========== CONFIG ==========
 const SHEET_KEYS = [
   'urlUserMaster','urlDiscordDaily','urlYouTube','urlTikTok',
-  'urlTesterPipeline','urlFunnelTracker','urlKpiDashboard','urlContentCalendar'
+  'urlTesterPipeline','urlFunnelTracker','urlKpiDashboard','urlUGCArchive'
 ];
 let config = {};
 let data = {
   userMaster: [], discordDaily: [], youtube: [], tiktok: [],
-  testerPipeline: [], funnelTracker: [], kpiDashboard: [], contentCalendar: [], acquisitionEvents: []
+  testerPipeline: [], funnelTracker: [], kpiDashboard: [], ugcArchive: [], acquisitionEvents: []
 };
 let charts = {};
 let isLive = false;
@@ -1779,7 +1779,7 @@ const SHEET_LABELS = {
   urlTesterPipeline: 'Tester Pipeline',
   urlFunnelTracker: 'Funnel Tracker',
   urlKpiDashboard: 'KPI Dashboard',
-  urlContentCalendar: 'UGC Archive'
+  urlUGCArchive: 'UGC Archive'
 };
 
 function showLoading(show) {
@@ -1830,12 +1830,12 @@ async function loadAllData() {
   showLoading(true);
   showFetchError([]);
 
-  const sheetKeys = ['urlUserMaster','urlDiscordDaily','urlYouTube','urlTikTok','urlTesterPipeline','urlFunnelTracker','urlKpiDashboard','urlContentCalendar'];
+  const sheetKeys = ['urlUserMaster','urlDiscordDaily','urlYouTube','urlTikTok','urlTesterPipeline','urlFunnelTracker','urlKpiDashboard','urlUGCArchive'];
   const fetched = await Promise.all(
     sheetKeys.map(k => fetchSheetData(config[k]))
   );
 
-  const dataKeys = ['userMaster','discordDaily','youtube','tiktok','testerPipeline','funnelTracker','kpiDashboard','contentCalendar'];
+  const dataKeys = ['userMaster','discordDaily','youtube','tiktok','testerPipeline','funnelTracker','kpiDashboard','ugcArchive'];
   let anyLive = false;
   const failedSheets = [];
   const numericFields = new Set([
@@ -2328,10 +2328,7 @@ function renderSNS() {
       const d = v.published_date || v.collected_date;
       return !d || d >= RUNUTS_CUTOFF;
     });
-    tt = tt.filter(v => {
-      const d = v.published_date || v.collected_date;
-      return !d || d >= RUNUTS_CUTOFF;
-    });
+    // TikTok: @runutsvr 계정은 RUNuts 전용이므로 날짜 필터 불필요
   }
   const ytTotalViews = yt.reduce((s,r) => s + (r.views||0), 0);
   const ytTotalLikes = yt.reduce((s,r) => s + (r.likes||0), 0);
@@ -2936,10 +2933,7 @@ function renderInfo() {
       const d = v.published_date || v.collected_date;
       return !d || d >= RUNUTS_CUTOFF;
     });
-    tt = tt.filter(v => {
-      const d = v.published_date || v.collected_date;
-      return !d || d >= RUNUTS_CUTOFF;
-    });
+    // TikTok: @runutsvr 계정은 RUNuts 전용이므로 날짜 필터 불필요
   }
 
   const devCount = data.userMaster.filter(isDev).length;
@@ -3052,7 +3046,7 @@ function renderInfo() {
       <li><span class="val">일일 스냅샷</span> — 매일 자정(KST) Discord Daily에 서버 상태 기록</li>
       <li><span class="val">YouTube</span> — YouTube Data API로 영상 지표 수집</li>
       <li><span class="val">TikTok</span> — 수동 입력 (API 자동 수집 미구현)</li>
-      <li><span class="val">유입 경로 추정</span> — Content Calendar 기반 자동 추정 (youtube_est, tiktok_est 등)</li>
+      <li><span class="val">UGC Archive</span> — YouTube 검색 기반 외부 크리에이터 콘텐츠 자동 수집</li>
     </ul>
     <p style="margin-top:10px;font-size:12px;color:var(--muted)">Discord Daily에서 messages, voice, active 필드는 Bot 상시 구동 시에만 수집됩니다.<br>
     Bot 미구동 기간의 해당 필드는 복원 불가합니다.</p>
@@ -3181,7 +3175,7 @@ const SHEET_GID_MAP = {
   urlYouTube: 1514243540,
   urlTikTok: 427390181,
   urlTesterPipeline: 1495282760,
-  urlContentCalendar: 1398498854,
+  urlUGCArchive: 1398498854,
   urlFunnelTracker: 2053912229,
   urlKpiDashboard: 853056757
 };
