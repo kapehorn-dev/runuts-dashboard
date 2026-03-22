@@ -1320,7 +1320,7 @@ startAutoRefresh();
   function unlock() {
     document.getElementById('authGate').style.display = 'none';
     var root = document.getElementById('dashboardRoot');
-    if (root) root.style.display = '';
+    if (root) root.style.display = 'block';
   }
   if (isDev || sessionStorage.getItem('rn_auth') === HASH) {
     unlock();
