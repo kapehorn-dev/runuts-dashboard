@@ -1427,7 +1427,10 @@ startAutoRefresh();
       <div class="section-title">틱톡 영상별 지표</div>
       <table>
         <thead><tr>
-          <th>게시일</th><th>제목</th><th>조회수</th><th>좋아요</th><th>댓글</th>
+          <th class="sortable" onclick="sortTtTable('date')" id="ttSortDate">게시일 <span class="sort-arrow">▼</span></th>
+          <th>제목</th>
+          <th class="sortable" onclick="sortTtTable('views')" id="ttSortViews">조회수 <span class="sort-arrow"></span></th>
+          <th>좋아요</th><th>댓글</th>
           <th>공유</th><th>저장</th><th>팔로워</th>
         </tr></thead>
         <tbody id="ttTableBody"></tbody>
@@ -1575,6 +1578,8 @@ let showLSDData = true;
 let discordPeriod = 'all'; // values: '30', '90', 'all'
 let ytSortKey = 'date'; // 'date' or 'views'
 let ytSortDir = 'desc'; // 'asc' or 'desc'
+let ttSortKey = 'date'; // 'date' or 'views'
+let ttSortDir = 'desc'; // 'asc' or 'desc'
 let showLeftUsers = false; // Task 1: Toggle for left users view
 let userFilters = {
   group: '',
@@ -1958,10 +1963,11 @@ function renderKPI() {
     ddForWeekly = ddAll.filter(r => r.date >= RUNUTS_CUTOFF);
   }
 
-  // 현재 멤버: 항상 Discord total_members 그대로 (dev 포함 — 디스코드에서 보는 숫자와 동일)
-  const currentMembers = latestAll.total_members
+  // 현재 멤버: 전체 모드면 Discord total_members, RUNuts만 모드면 RUNuts active만
+  const discordTotal = latestAll.total_members
     ? parseInt(latestAll.total_members)
     : data.userMaster.filter(u => u.status === 'active').length;
+  const currentMembers = showLSDData ? discordTotal : null; // RUNuts만 모드에서는 아래에서 별도 계산
 
   // User Master 기준 그룹 분류 (dev 제외)
   const allRealUsers = data.userMaster.filter(isRealUser);
@@ -1986,10 +1992,11 @@ function renderKPI() {
   const runutsJoined = activeCount + leftRUNuts;
   const retentionPct = runutsJoined > 0 ? Math.round(activeCount / runutsJoined * 100) : 0;
 
-  // 서브텍스트: 현재 멤버 = 현재 서버에 남아있는 멤버 (활성)
+  // 현재 멤버 값 + 서브텍스트
+  const memberValue = showLSDData ? fmt(discordTotal) : fmt(activeCount);
   const memberSub = showLSDData
     ? `RUNuts ${fmt(activeCount)} / LSD ${fmt(lsdUsers.filter(u => u.status === 'active').length)} / DEV ${fmt(devCount)}`
-    : `누적 가입 ${fmt(runutsJoined)}명 중 잔존`;
+    : `활동 ${fmt(activeCount)} / 이탈 ${fmt(leftRUNuts)} / 사전등록 ${fmt(preRegCount)}`;
 
   // Generate sparkline SVG for current members (7-day total_members trend)
   const sparklineMembers = (() => {
@@ -2023,12 +2030,12 @@ function renderKPI() {
   })();
 
   const kpis = [
-    { label: '현재 멤버', value: fmt(currentMembers), change: memberSub, dir: 'flat', tooltip: '디스코드 서버의 실제 총 멤버 수 (Discord Server Insights 기준)', link: 'users', spark: sparklineMembers },
+    { label: showLSDData ? '현재 멤버' : 'RUNuts 멤버', value: memberValue, change: memberSub, dir: 'flat', tooltip: showLSDData ? '디스코드 서버의 실제 총 멤버 수 (Discord Server Insights 기준)' : 'RUNuts 유저 중 현재 디스코드에 남아있는 활동 멤버 수', link: 'users', spark: sparklineMembers },
     { label: '주간 가입', value: fmt(ddForWeekly.slice(-7).reduce((s,r) => s + (r.new_joins||0), 0)), change: '최근 7일', dir: 'flat', tooltip: '최근 7일간 새로 가입한 유저 수', link: 'discord', spark: sparklineWeekly },
     { label: '테스터 신청', value: fmt(applied), change: `현재 멤버 대비 ${activeCount > 0 ? Math.round(applied/activeCount*100) : 0}%`, dir: 'flat', tooltip: '현재 멤버 중 테스터 신청서를 작성한 유저 수', link: 'funnel' },
     { label: '테스터 승인', value: fmt(testers), change: `신청 대비 ${applied > 0 ? Math.round(testers/applied*100) : 0}%`, dir: 'flat', tooltip: '디스코드에서 테스터 역할을 부여받은 유저 수', link: 'funnel' },
     { label: 'Meta 매칭', value: fmt(linked), change: `승인 대비 ${testers > 0 ? Math.round(linked/testers*100) : 0}%`, dir: 'flat', tooltip: 'Meta Quest 계정과 디스코드 계정이 연동된 유저 수', link: 'funnel' },
-    { label: '잔존율', value: retentionPct + '%', change: `이탈 ${fmt(leftRUNuts)}명 (누적 ${fmt(runutsJoined)}명 중 ${fmt(activeCount)}명 잔존)`, dir: 'flat', tooltip: '누적 가입자 중 현재 서버에 남아있는 비율. 이탈자 = 서버를 떠난 유저', link: 'funnel' }
+    { label: '잔존율', value: retentionPct + '%', change: `${fmt(activeCount)}명 활동 / ${fmt(leftRUNuts)}명 이탈`, dir: 'flat', tooltip: `디스코드 가입 이력이 있는 RUNuts ${fmt(runutsJoined)}명 중 현재 서버에 남아있는 비율`, link: 'funnel' }
   ];
 
   document.getElementById('kpiGrid').innerHTML = kpis.map(k => `
@@ -2320,6 +2327,16 @@ function sortYtTable(key) {
   renderSNS();
 }
 
+function sortTtTable(key) {
+  if (ttSortKey === key) {
+    ttSortDir = ttSortDir === 'desc' ? 'asc' : 'desc';
+  } else {
+    ttSortKey = key;
+    ttSortDir = 'desc';
+  }
+  renderSNS();
+}
+
 function renderSNS() {
   let yt = data.youtube;
   let tt = data.tiktok;
@@ -2376,8 +2393,25 @@ function renderSNS() {
     </tr>
   `).join('');
 
-  // 틱톡
-  document.getElementById('ttTableBody').innerHTML = tt.map(r=>`
+  // 틱톡: 정렬
+  const ttSorted = [...tt].sort((a,b) => {
+    let cmp = 0;
+    if (ttSortKey === 'views') {
+      cmp = (a.views||0) - (b.views||0);
+    } else {
+      const da = a.published_date || a.collected_date || '';
+      const db = b.published_date || b.collected_date || '';
+      cmp = da.localeCompare(db);
+    }
+    return ttSortDir === 'desc' ? -cmp : cmp;
+  });
+
+  const ttDateArrow = document.querySelector('#ttSortDate .sort-arrow');
+  const ttViewsArrow = document.querySelector('#ttSortViews .sort-arrow');
+  if (ttDateArrow) ttDateArrow.textContent = ttSortKey === 'date' ? (ttSortDir === 'desc' ? '▼' : '▲') : '';
+  if (ttViewsArrow) ttViewsArrow.textContent = ttSortKey === 'views' ? (ttSortDir === 'desc' ? '▼' : '▲') : '';
+
+  document.getElementById('ttTableBody').innerHTML = ttSorted.map(r=>`
     <tr>
       <td>${r.published_date || r.collected_date}</td>
       <td>${r.video_title}${r.video_links ? ' <a href="' + r.video_links + '" target="_blank" title="TikTok 영상으로 이동" style="margin-left:6px;font-size:12px">🔗</a>' : (r.video_id ? ' <a href="https://www.tiktok.com/search?q=' + encodeURIComponent(r.video_title || '') + '" target="_blank" title="TikTok에서 검색" style="margin-left:6px;font-size:12px;opacity:0.5">🔗</a>' : '')}</td>
