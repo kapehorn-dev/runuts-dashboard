@@ -1996,7 +1996,7 @@ function renderKPI() {
   const memberValue = showLSDData ? fmt(discordTotal) : fmt(activeCount);
   const memberSub = showLSDData
     ? `RUNuts ${fmt(activeCount)} / LSD ${fmt(lsdUsers.filter(u => u.status === 'active').length)} / DEV ${fmt(devCount)}`
-    : `활동 ${fmt(activeCount)} / 이탈 ${fmt(leftRUNuts)} / 사전등록 ${fmt(preRegCount)}`;
+    : `활동 ${fmt(activeCount)} / 이탈 ${fmt(leftRUNuts)}`;
 
   // Generate sparkline SVG for current members (7-day total_members trend)
   const sparklineMembers = (() => {
