@@ -1366,6 +1366,10 @@ startAutoRefresh();
       <span class="status-label" id="statusLabel">로딩 중...</span>
       <span id="lastDataDate" style="color: var(--muted); font-size: 13px;"></span>
     </div>
+    <div class="lsd-toggle" id="tzToggle">
+      <button class="active" onclick="setTimezone('KST')">KST</button>
+      <button onclick="setTimezone('UTC')">UTC</button>
+    </div>
     <div class="lsd-toggle">
       <button onclick="setLSDToggle(false)">RUNuts만</button>
       <button class="active" onclick="setLSDToggle(true)">전체 (LSD 포함)</button>
@@ -1537,7 +1541,7 @@ startAutoRefresh();
         <thead><tr>
           <th class="sortable" onclick="sortUsersTable('discord_id')">Discord ID <span class="sort-indicator" id="sort-discord_id"></span></th>
           <th class="sortable" onclick="sortUsersTable('discord_username')">유저명 <span class="sort-indicator" id="sort-discord_username"></span></th>
-          <th class="sortable" onclick="sortUsersTable('join_date')">가입일 <span class="sort-indicator" id="sort-join_date"></span></th>
+          <th class="sortable" onclick="sortUsersTable('join_date')">가입일 <small style="color:var(--muted);font-weight:400">(KST)</small> <span class="sort-indicator" id="sort-join_date"></span></th>
           <th class="sortable" onclick="sortUsersTable('group')">그룹 <span class="sort-indicator" id="sort-group"></span></th>
           <th>상태</th>
           <th>유입 경로</th><th>테스터</th><th>Meta 매칭</th>
@@ -2539,7 +2543,7 @@ function filterUsersTable() {
     <tr onclick="openUserPanel('${u.discord_id}')" style="cursor:pointer${rowStyle}">
       <td>${u.discord_id}</td>
       <td>${u.discord_display_name || u.discord_username}${u.discord_display_name && u.discord_display_name !== u.discord_username ? '<br><small style=\"color:var(--muted);\">@' + u.discord_username + '</small>' : ''}${dev ? ' <span class=\"badge dev\">DEV</span>' : ''}</td>
-      <td>${u.join_date}</td>
+      <td>${toKST(u.join_date)}</td>
       <td><span class="badge ${grpClass}">${grp}</span></td>
       <td><span class="badge ${u.status}">${statusKo[u.status] || u.status}</span></td>
       <td>${u.estimated_source || 'unknown'}</td>
@@ -2596,8 +2600,8 @@ function openUserPanel(discordId) {
           <div class="detail-row"><span class="detail-label">Discord ID</span><span class="detail-value">${u.discord_id}</span></div>
           <div class="detail-row"><span class="detail-label">유저명</span><span class="detail-value">@${u.discord_username}</span></div>
           <div class="detail-row"><span class="detail-label">디스플레이 네임</span><span class="detail-value">${u.discord_display_name || u.discord_username}</span></div>
-          <div class="detail-row"><span class="detail-label">가입일</span><span class="detail-value">${u.join_date}</span></div>
-          ${u.left_date ? `<div class="detail-row"><span class="detail-label">탈퇴일</span><span class="detail-value">${u.left_date}</span></div>` : ''}
+          <div class="detail-row"><span class="detail-label">가입일</span><span class="detail-value">${toKST(u.join_date)}</span></div>
+          ${u.leave_date ? `<div class="detail-row"><span class="detail-label">탈퇴일</span><span class="detail-value">${toKST(u.leave_date)}</span></div>` : ''}
           <div class="detail-row"><span class="detail-label">유입 경로</span><span class="detail-value">${u.estimated_source || 'unknown'}</span></div>
           <div class="detail-row"><span class="detail-label">초대자</span><span class="detail-value">${u.invited_by || '-'}</span></div>
         </div>
@@ -2685,7 +2689,7 @@ function openFunnelModal(stageKey, stageName) {
         <div class="funnel-user-item">
           <div class="funnel-user-item-main">
             <div class="funnel-user-item-name">${u.discord_username || u.discord_display_name || 'Unknown'}</div>
-            <div class="funnel-user-item-meta">가입: ${u.join_date || '-'} | 그룹: ${grp}</div>
+            <div class="funnel-user-item-meta">가입: ${toKST(u.join_date)} | 그룹: ${grp}</div>
           </div>
           <div class="funnel-user-item-badge">${grp}</div>
         </div>
@@ -2975,6 +2979,49 @@ function fmt(n) {
   if (n === undefined || n === null || n === '') return '-';
   return Number(n).toLocaleString();
 }
+
+// 시간대 토글 상태 (기본: KST)
+let currentTZ = 'KST';
+
+function setTimezone(tz) {
+  currentTZ = tz;
+  // 버튼 상태 업데이트
+  const btns = document.querySelectorAll('#tzToggle button');
+  btns.forEach(b => {
+    b.classList.toggle('active', b.textContent === tz);
+  });
+  // 테이블 헤더 업데이트
+  const thLabel = document.querySelector('#sort-join_date')?.closest('th');
+  if (thLabel) {
+    const small = thLabel.querySelector('small');
+    if (small) small.textContent = `(${tz})`;
+  }
+  // 화면 다시 렌더링
+  renderAll();
+}
+
+// 날짜 표시 변환. 저장 데이터는 UTC, currentTZ에 따라 KST 또는 UTC 그대로 표시
+function displayDate(dateStr) {
+  if (!dateStr) return '-';
+  const s = String(dateStr).trim();
+  if (currentTZ === 'UTC') return s;  // UTC 모드면 원본 그대로
+  if (s.length <= 10) return s;  // 날짜만 있으면 그대로
+  try {
+    const utc = new Date(s.replace(' ', 'T') + 'Z');  // UTC로 파싱
+    if (isNaN(utc.getTime())) return s;
+    const kst = new Date(utc.getTime() + 9 * 60 * 60 * 1000);
+    const y = kst.getUTCFullYear();
+    const m = String(kst.getUTCMonth() + 1).padStart(2, '0');
+    const d = String(kst.getUTCDate()).padStart(2, '0');
+    const hh = String(kst.getUTCHours()).padStart(2, '0');
+    const mm = String(kst.getUTCMinutes()).padStart(2, '0');
+    const ss = String(kst.getUTCSeconds()).padStart(2, '0');
+    return `${y}-${m}-${d} ${hh}:${mm}:${ss}`;
+  } catch (e) { return s; }
+}
+
+// 하위 호환 (toKST → displayDate로 통합)
+function toKST(dateStr) { return displayDate(dateStr); }
 
 function chartOpts(yLabel) {
   const isLight = document.documentElement.getAttribute('data-theme') === 'light';
