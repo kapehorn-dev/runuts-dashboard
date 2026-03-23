@@ -3033,15 +3033,16 @@ function renderMultiDatasetChart() {
   };
 
   // 이탈 바 클릭 시 해당 날짜의 탈퇴 유저 목록 표시
+  // intersect:false 모드에서는 elements에 같은 x-index의 모든 데이터셋이 포함되므로
+  // 이탈 데이터셋을 찾아서 처리
   options.onClick = function(event, elements) {
     if (!elements || elements.length === 0) return;
-    const el = elements[0];
-    const dsIndex = el.datasetIndex;
-    const ds = datasets[dsIndex];
-    if (ds.label !== '일간 이탈') return;
-    const idx = el.index;
+    // 이탈 데이터셋 찾기
+    const leaveEl = elements.find(el => datasets[el.datasetIndex]?.label === '일간 이탈');
+    if (!leaveEl) return;
+    const idx = leaveEl.index;
     const fullDate = dd[idx]?.date;
-    if (!fullDate) return;
+    if (!fullDate || !(dd[idx].leaves > 0)) return;
     showLeaveUsersModal(fullDate);
   };
 
