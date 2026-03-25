@@ -2096,6 +2096,13 @@ function renderKPI() {
   const applied = runutsUsers.filter(u => u.tester_applied === 'O' || u.tester_applied === 'TRUE' || u.tester_applied === true).length;
   const testers = runutsUsers.filter(u => u.tester_approved === 'O' || u.tester_approved === 'TRUE' || u.tester_approved === true).length;
   const linked = runutsUsers.filter(u => u.playfab_matched === 'O').length;
+  // Meta 계정 매칭 통계 (UM 시트 데이터 기반)
+  // 전체 User Master 기준 (RUNuts 필터 아닌 전체)으로 Meta 계정 수 집계
+  const allMatched = data.userMaster.filter(u => u.playfab_matched === 'O').length;
+  const allHasMetaId = data.userMaster.filter(u => u.meta_id && u.meta_id !== '').length;
+  const allEstimatedNotMatched = data.userMaster.filter(u =>
+    (u.estimated_meta_username && u.estimated_meta_username !== '') && u.playfab_matched !== 'O'
+  ).length;
   const activeCount = runutsUsers.filter(u => u.status === 'active').length;
   const preRegCount = runutsUsers.filter(u => u.status === 'pre_registered').length;
   const leftRUNuts = runutsUsers.filter(u => u.status === 'left').length;
@@ -2146,7 +2153,7 @@ function renderKPI() {
     { label: '주간 가입', value: fmt(ddForWeekly.slice(-7).reduce((s,r) => s + (r.new_joins||0), 0)), change: '최근 7일', dir: 'flat', tooltip: '최근 7일간 새로 가입한 유저 수', link: 'discord', spark: sparklineWeekly },
     { label: '테스터 신청', value: fmt(applied), change: `현재 멤버 대비 ${activeCount > 0 ? Math.round(applied/activeCount*100) : 0}%`, dir: 'flat', tooltip: '현재 멤버 중 테스터 신청서를 작성한 유저 수', link: 'funnel' },
     { label: '테스터 승인', value: fmt(testers), change: `신청 대비 ${applied > 0 ? Math.round(testers/applied*100) : 0}%`, dir: 'flat', tooltip: '디스코드에서 테스터 역할을 부여받은 유저 수', link: 'funnel' },
-    { label: '계정 매칭', value: fmt(linked), change: `승인 대비 ${testers > 0 ? Math.round(linked/testers*100) : 0}%`, change2: `Meta 계정 ${fmt(linked + (testers - linked))}개 중 ${fmt(testers - linked)}개 미매칭`, dir: 'flat', tooltip: '디스코드 유저 중 Meta 계정 소유자가 식별된 수 (playfab_matched=O). 승인 테스터 기준.', link: 'funnel' },
+    { label: '계정 매칭', value: fmt(linked), change: `승인 대비 ${testers > 0 ? Math.round(linked/testers*100) : 0}%`, change2: `Meta 계정 ${fmt(allMatched)}개 매칭 / ${fmt(allEstimatedNotMatched)}개 미매칭`, dir: 'flat', tooltip: '디스코드 유저 중 Meta 계정 소유자가 식별된 수 (playfab_matched=O). 미매칭은 추정 Meta 유저명이 있으나 확인되지 않은 수.', link: 'funnel' },
     { label: '잔존율', value: retentionPct + '%', change: `${fmt(activeCount)}명 활동 / ${fmt(leftRUNuts)}명 이탈`, dir: 'flat', tooltip: `디스코드 가입 이력이 있는 RUNuts ${fmt(runutsJoined)}명 중 현재 서버에 남아있는 비율`, link: 'funnel' }
   ];
 
