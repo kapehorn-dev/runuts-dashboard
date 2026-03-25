@@ -2297,7 +2297,7 @@ function renderOverviewGrowthChart() {
   const tooltipBorder = isLight ? '#e0e3ea' : '#3a3d4a';
 
   const labels = dd.map(r => r.date.slice(5));
-  const memberData = dd.map(r => parseInt(r.total_members) || 0);
+  const memberData = getCorrectedMembers(dd);
 
   if (charts.overviewGrowth) charts.overviewGrowth.destroy();
   charts.overviewGrowth = new Chart(document.getElementById('chartOverviewGrowth'), {
@@ -3053,7 +3053,7 @@ function renderMultiDatasetChart() {
 
     switch (key) {
       case 'total':
-        dataArr = dd.map(r => parseInt(r.total_members) || 0);
+        dataArr = getCorrectedMembers(dd);
         break;
       case 'daily':
         dataArr = dd.map(r => r.new_joins || 0);
@@ -3217,6 +3217,23 @@ function renderMultiDatasetChart() {
     if (!entry || !(entry.leaves > 0)) return;
     showLeaveUsersModal(entry.date);
   };
+}
+
+// ========== 보정된 멤버 수 계산 ==========
+// total_members는 Discord API의 guild.member_count를 직접 기록한 값으로,
+// 봇 퍼지/대량 킥/API 캐시 불일치 등으로 net_growth와 맞지 않는 경우가 있음.
+// 최신 total_members를 앵커로 잡고 net_growth를 역산하여 일관된 추이를 생성.
+function getCorrectedMembers(dd) {
+  if (!dd || dd.length === 0) return [];
+  const corrected = new Array(dd.length);
+  // 최신 날짜의 total_members를 앵커로 사용
+  corrected[dd.length - 1] = parseInt(dd[dd.length - 1].total_members) || 0;
+  // 역순으로 net_growth를 빼서 이전 날짜 값 복원
+  for (let i = dd.length - 2; i >= 0; i--) {
+    const nextNet = parseInt(dd[i + 1].net_growth) || 0;
+    corrected[i] = corrected[i + 1] - nextNet;
+  }
+  return corrected;
 }
 
 // ========== UTILS ==========
