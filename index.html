@@ -1948,9 +1948,14 @@ function retryLoad() {
 async function fetchSheetData(url) {
   if (!url) return null;
   try {
-    const res = await fetch(url);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15초 타임아웃
+    const res = await fetch(url, { signal: controller.signal });
+    clearTimeout(timeoutId);
     if (!res.ok) return null;
     const text = await res.text();
+    // Google Sheets가 HTML 에러/로그인 페이지를 200으로 반환하는 경우 방어
+    if (text.trimStart().startsWith('<!') || text.trimStart().startsWith('<html')) return null;
     return parseCSV(text);
   } catch (e) {
     console.warn('Fetch 실패:', url, e);
