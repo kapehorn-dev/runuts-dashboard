@@ -3610,6 +3610,25 @@ function saveSettings() {
 
 // ========== INIT ==========
 loadSettings();
+
+// Config 마이그레이션: 기존 config에 누락된 시트 URL 자동 보충
+(function migrateConfig() {
+  const base = config.sheetsId || DEFAULT_PUB_BASE;
+  if (!base || !base.includes('/pub')) return;
+  let changed = false;
+  for (const [key, gid] of Object.entries(SHEET_GID_MAP)) {
+    if (!config[key]) {
+      config[key] = `${base}?gid=${gid}&single=true&output=csv`;
+      const el = document.getElementById(key);
+      if (el) el.value = config[key];
+      changed = true;
+    }
+  }
+  if (changed) {
+    localStorage.setItem('runuts_dashboard_config', JSON.stringify(config));
+  }
+})();
+
 // 설정된 URL이 없으면 기본값으로 자동 입력
 if (!config.urlUserMaster && !config.sheetsId) {
   document.getElementById('sheetsId').value = DEFAULT_PUB_BASE;
