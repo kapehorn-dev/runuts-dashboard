@@ -1429,7 +1429,7 @@ startAutoRefresh();
     <!-- Task 3: Funnel page header -->
     <div class="funnel-page-header">
       <h2>테스터 전환 퍼널 분석</h2>
-      <p>Discord 가입부터 게임 플레이까지 사용자 여정 추적. 각 단계를 클릭하면 해당 유저 목록을 확인할 수 있습니다.</p>
+      <p>Discord 가입부터 계정 매칭까지 사용자 여정 추적. 각 단계를 클릭하면 해당 유저 목록을 확인할 수 있습니다.</p>
     </div>
 
     <div class="funnel-container">
@@ -1559,7 +1559,7 @@ startAutoRefresh();
           <th class="sortable" onclick="sortUsersTable('group')">그룹 <span class="sort-indicator" id="sort-group"></span></th>
           <th>상태</th>
           <th class="sortable" onclick="sortUsersTable('leave_date')">탈퇴일 <span class="sort-indicator" id="sort-leave_date"></span></th>
-          <th>유입 경로</th><th>테스터</th><th>Meta 매칭</th>
+          <th>유입 경로</th><th>테스터</th><th>계정 매칭</th>
         </tr></thead>
         <tbody id="usersTableBody"></tbody>
       </table>
@@ -2113,7 +2113,7 @@ function renderKPI() {
     { label: '주간 가입', value: fmt(ddForWeekly.slice(-7).reduce((s,r) => s + (r.new_joins||0), 0)), change: '최근 7일', dir: 'flat', tooltip: '최근 7일간 새로 가입한 유저 수', link: 'discord', spark: sparklineWeekly },
     { label: '테스터 신청', value: fmt(applied), change: `현재 멤버 대비 ${activeCount > 0 ? Math.round(applied/activeCount*100) : 0}%`, dir: 'flat', tooltip: '현재 멤버 중 테스터 신청서를 작성한 유저 수', link: 'funnel' },
     { label: '테스터 승인', value: fmt(testers), change: `신청 대비 ${applied > 0 ? Math.round(testers/applied*100) : 0}%`, dir: 'flat', tooltip: '디스코드에서 테스터 역할을 부여받은 유저 수', link: 'funnel' },
-    { label: 'Meta 매칭', value: fmt(linked), change: `승인 대비 ${testers > 0 ? Math.round(linked/testers*100) : 0}%`, dir: 'flat', tooltip: 'Meta Quest 계정과 디스코드 계정이 연동된 유저 수', link: 'funnel' },
+    { label: '계정 매칭', value: fmt(linked), change: `매칭 ${fmt(linked)}명 / 미매칭 ${fmt(testers - linked)}명`, dir: 'flat', tooltip: '디스코드 유저 중 Meta 계정 소유자가 식별된 수 (playfab_matched=O). 승인 테스터 기준.', link: 'funnel' },
     { label: '잔존율', value: retentionPct + '%', change: `${fmt(activeCount)}명 활동 / ${fmt(leftRUNuts)}명 이탈`, dir: 'flat', tooltip: `디스코드 가입 이력이 있는 RUNuts ${fmt(runutsJoined)}명 중 현재 서버에 남아있는 비율`, link: 'funnel' }
   ];
 
@@ -2138,8 +2138,8 @@ function renderFunnel(containerId) {
   const totalEver = um.length;
   const approved = um.filter(u => u.tester_approved === 'O' || u.tester_approved === 'TRUE').length;
   const metaMatched = um.filter(u => u.playfab_matched === 'O').length;
-  const played = um.filter(u => u.first_play_date && u.first_play_date !== '').length;
-  const metaAndActive = um.filter(u => u.playfab_matched === 'O' && u.status === 'active').length;
+  // 잔존: 계정 매칭 완료자 중 현재 디스코드 활동 중 (향후 최근 1개월 플레이 기준으로 전환 예정)
+  const matchedAndActive = um.filter(u => u.playfab_matched === 'O' && u.status === 'active').length;
 
   const groupLabel = showLSDData ? '전체' : 'RUNuts';
   const stages = [
@@ -2151,14 +2151,11 @@ function renderFunnel(containerId) {
     { label: '테스터 승인', sublabel: '디스코드 테스터 역할', value: approved, color: 'var(--funnel2)',
       tip: `디스코드에서 테스터 역할(Role)을 부여받은 ${groupLabel} 유저 수`,
       stageKey: 'tester' },
-    { label: 'Meta 매칭', sublabel: '게임 채널 접근', value: metaMatched, color: 'var(--funnel3)',
-      tip: 'Meta Quest 계정과 디스코드 계정이 매칭된 유저 수. 실제 게임 빌드 다운로드 가능',
-      stageKey: 'meta' },
-    { label: '게임 플레이', sublabel: '플레이 경험', value: played, color: 'var(--funnel4)',
-      tip: '실제 게임을 1회 이상 플레이한 유저 수. 현재 플레이 데이터 수집 준비 중',
-      stageKey: 'play' },
-    { label: '잔존', sublabel: '매칭 후 활동 유지', value: metaAndActive, color: 'var(--funnel5)',
-      tip: `Meta 매칭 완료자 중 현재도 디스코드에서 활동 중인 ${groupLabel} 유저 수`,
+    { label: '계정 매칭', sublabel: 'PlayFab 계정 매칭', value: metaMatched, color: 'var(--funnel3)',
+      tip: '디스코드 유저 중 Meta 계정 소유자가 식별(매칭)된 수. PlayFab 데이터 기준.',
+      stageKey: 'matching' },
+    { label: '잔존', sublabel: '매칭 후 활동 유지', value: matchedAndActive, color: 'var(--funnel4)',
+      tip: `계정 매칭 완료자 중 현재 디스코드에서 활동 중인 ${groupLabel} 유저 수. 향후 최근 1개월 플레이 기준으로 전환 예정.`,
       stageKey: 'retain' }
   ];
   const maxVal = Math.max(...stages.map(s => s.value), 1);
@@ -2166,7 +2163,7 @@ function renderFunnel(containerId) {
   document.getElementById(containerId).innerHTML = stages.map((s, i) => {
     const pct = Math.round(s.value / maxVal * 100);
     const prevVal = stages[i-1]?.value || 0;
-    const noData = s.value === 0 && (s.label === '게임 플레이');
+    const noData = false;
     const cvr = i > 0 && prevVal > 0 ? Math.round(s.value / prevVal * 100) : (i === 0 ? 100 : 0);
     const clickHandler = `onclick="openFunnelModal('${s.stageKey}', '${s.label}')"`;
     return `
@@ -2593,13 +2590,11 @@ function openUserPanel(discordId) {
   if (!u) return;
 
   const statusKo = { active: '활동 중', left: '탈퇴', pre_registered: '사전등록' };
-  const hasPlayed = u.first_play_date && u.first_play_date !== '';
   const isLeft = u.status === 'left';
   const stages = [
     { name:'디스코드 가입', done: true },
     { name:'테스터 승인', done: u.tester_approved==='O'||u.tester_approved==='TRUE' },
-    { name:'PlayFab 매칭', done: u.playfab_matched==='O' },
-    { name:'게임 플레이', done: hasPlayed },
+    { name:'계정 매칭', done: u.playfab_matched==='O' },
     ...(isLeft
       ? [{ name:`탈퇴${u.leave_date ? ' (' + toKST(u.leave_date).substring(0,10) + ')' : ''}`, done: true, isLeave: true }]
       : [{ name:'잔존', done: u.status==='active' }]
@@ -2635,7 +2630,7 @@ function openUserPanel(discordId) {
           ${u.meta_id ? `<div class="detail-row"><span class="detail-label">Meta ID</span><span class="detail-value">${u.meta_id}</span></div>` : ''}
           ${u.playfab_id ? `<div class="detail-row"><span class="detail-label">PlayFab ID</span><span class="detail-value">${u.playfab_id}</span></div>` : ''}
           ${u.meta_username_prev ? `<div class="detail-row"><span class="detail-label">Meta 이전 유저명</span><span class="detail-value">${u.meta_username_prev}</span></div>` : ''}
-          <div class="detail-row"><span class="detail-label">PlayFab 매칭</span><span class="detail-value">${u.playfab_matched==='O' ? '✅ 완료' : '❌ 미완료'}</span></div>
+          <div class="detail-row"><span class="detail-label">계정 매칭</span><span class="detail-value">${u.playfab_matched==='O' ? '✅ 완료' : '❌ 미완료'}</span></div>
           <div class="detail-row"><span class="detail-label">첫 플레이</span><span class="detail-value">${u.first_play_date || '-'}</span></div>
           <div class="detail-row"><span class="detail-label">총 플레이테스트</span><span class="detail-value">${u.total_playtests || '-'}</span></div>
         </div>
@@ -2681,13 +2676,9 @@ function openFunnelModal(stageKey, stageName) {
       title = '테스터 승인';
       users = um.filter(u => u.tester_approved === 'O' || u.tester_approved === 'TRUE');
       break;
-    case 'meta':
-      title = 'Meta 매칭';
+    case 'matching':
+      title = '계정 매칭';
       users = um.filter(u => u.playfab_matched === 'O');
-      break;
-    case 'play':
-      title = '게임 플레이';
-      users = um.filter(u => u.first_play_date && u.first_play_date !== '');
       break;
     case 'retain':
       title = '잔존';
@@ -3238,12 +3229,12 @@ function renderInfo() {
   cards.push(`<div class="info-card">
     <h3><span class="icon">🔍</span> 데이터 필드 상태</h3>
     <ul>
-      <li>Meta 매칭률 (RUNuts 기준): <span class="val">${runutsUsers.length > 0 ? Math.round(runutsUsers.filter(u => u.playfab_matched === 'O').length/runutsUsers.length*100) : 0}%</span> (${fmt(runutsUsers.filter(u => u.playfab_matched === 'O').length)}/${fmt(runutsUsers.length)}) ${tag('ok','정상')}</li>
+      <li>계정 매칭률 (RUNuts 기준): <span class="val">${runutsUsers.length > 0 ? Math.round(runutsUsers.filter(u => u.playfab_matched === 'O').length/runutsUsers.length*100) : 0}%</span> (${fmt(runutsUsers.filter(u => u.playfab_matched === 'O').length)}/${fmt(runutsUsers.length)}) ${tag('ok','정상')}</li>
       <li>이탈일 기록: <span class="val">${fmt(hasLeaveDate)}건</span> ${hasLeaveDate < leftAll ? tag('gap','Bot 미구동 기간 누락') : tag('ok','정상')}</li>
-      <li>게임 플레이 기록 (first_play_date): ${hasFirstPlay ? tag('ok','데이터 있음') : tag('empty','전체 비어있음')}</li>
+      <li>첫 플레이 기록 (first_play_date): ${hasFirstPlay ? tag('ok','데이터 있음') : tag('empty','전체 비어있음')}</li>
       <li>플레이 횟수 (total_playtests): ${hasTotalPlay ? tag('ok','데이터 있음') : tag('empty','전체 비어있음')}</li>
     </ul>
-    <p style="margin-top:10px;font-size:12px;color:var(--muted)">게임 플레이 데이터는 PlayFab 연동 구현 후 수집 예정입니다.</p>
+    <p style="margin-top:10px;font-size:12px;color:var(--muted)">잔존 기준은 향후 최근 1개월 플레이 여부로 전환 예정입니다.</p>
   </div>`);
 
   // 5. 제외된 계정
@@ -3262,9 +3253,8 @@ function renderInfo() {
     <ul>
       <li><span class="val">디스코드 가입</span> — 서버에 입장한 RUNuts 유저 수 (LSD 제외, 탈퇴 포함 누적)</li>
       <li><span class="val">테스터 승인</span> — 디스코드에서 테스터 역할(Role)을 부여받은 유저. tester_approved = O</li>
-      <li><span class="val">Meta 매칭</span> — Meta Quest 계정과 디스코드가 연결된 유저. playfab_matched = O</li>
-      <li><span class="val">게임 플레이</span> — 실제 게임을 1회 이상 플레이한 유저. first_play_date 기준 (현재 수집 준비 중)</li>
-      <li><span class="val">잔존</span> — Meta 매칭 완료자 중 현재 디스코드 활동 중인 유저 (playfab_matched=O AND status=active)</li>
+      <li><span class="val">계정 매칭</span> — 디스코드 유저 중 Meta 계정 소유자가 식별된 유저. playfab_matched = O. PlayFab에 미매칭 Meta 계정이 별도 존재할 수 있음.</li>
+      <li><span class="val">잔존</span> — 계정 매칭 완료자 중 현재 디스코드 활동 중인 유저 (playfab_matched=O AND status=active). 향후 최근 1개월 플레이 기준으로 전환 예정.</li>
     </ul>
   </div>`);
 
@@ -3287,7 +3277,7 @@ function renderInfo() {
     <h3><span class="icon">⚠️</span> 알려진 제약사항</h3>
     <ul>
       <li>Bot 상시 구동 미설정 → 메시지/보이스 활동 데이터 수집 불완전</li>
-      <li>PlayFab 연동 미구현 → 게임 플레이 퍼널 단계 데이터 없음</li>
+      <li>잔존 기준 미전환 → 현재 디스코드 활동 기준, 향후 최근 1개월 플레이 기준으로 전환 예정</li>
       <li>TikTok API 자동 수집 미구현 → 수동 입력 필요</li>
       <li>leave_date 소급 불가 → Bot 꺼진 동안 이탈한 유저의 이탈일 기록 없음</li>
       <li>unknown 그룹 ${fmt(unknownUsers.length)}명 → 가입일 없어 LSD/RUNuts 분류 불가 (대부분 사전등록)</li>
