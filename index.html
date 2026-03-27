@@ -1650,6 +1650,8 @@ startAutoRefresh();
       <input type="text" id="urlUGCArchive" placeholder="https://docs.google.com/spreadsheets/d/e/...">
       <label>Matching Fail Users CSV URL</label>
       <input type="text" id="urlMatchingFail" placeholder="https://docs.google.com/spreadsheets/d/e/...">
+      <label>Sub Accounts CSV URL</label>
+      <input type="text" id="urlSubAccounts" placeholder="https://docs.google.com/spreadsheets/d/e/...">
       <button class="btn-save" onclick="saveSettings()">저장 후 데이터 갱신</button>
       <p class="help-text" style="margin-top:12px">설정은 브라우저 localStorage에 저장됩니다.</p>
     </div>
@@ -1666,13 +1668,14 @@ let chartMembersInstance, chartGrowthInstance;
 // ========== CONFIG ==========
 const SHEET_KEYS = [
   'urlUserMaster','urlDiscordDaily','urlYouTube','urlTikTok',
-  'urlTesterPipeline','urlFunnelTracker','urlKpiDashboard','urlUGCArchive','urlMatchingFail'
+  'urlTesterPipeline','urlFunnelTracker','urlKpiDashboard','urlUGCArchive','urlMatchingFail','urlSubAccounts'
 ];
 let config = {};
 let data = {
   userMaster: [], discordDaily: [], youtube: [], tiktok: [],
   testerPipeline: [], funnelTracker: [], kpiDashboard: [], ugcArchive: [], acquisitionEvents: [],
-  matchingFail: []
+  matchingFail: [],
+  subAccounts: []
 };
 let charts = {};
 let isLive = false;
@@ -1912,7 +1915,8 @@ const SHEET_LABELS = {
   urlFunnelTracker: 'Funnel Tracker',
   urlKpiDashboard: 'KPI Dashboard',
   urlUGCArchive: 'UGC Archive',
-  urlMatchingFail: 'Matching Fail Users'
+  urlMatchingFail: 'Matching Fail Users',
+  urlSubAccounts: 'Sub Accounts'
 };
 
 function showLoading(show) {
@@ -1968,12 +1972,12 @@ async function loadAllData() {
   showLoading(true);
   showFetchError([]);
 
-  const sheetKeys = ['urlUserMaster','urlDiscordDaily','urlYouTube','urlTikTok','urlTesterPipeline','urlFunnelTracker','urlKpiDashboard','urlUGCArchive','urlMatchingFail'];
+  const sheetKeys = ['urlUserMaster','urlDiscordDaily','urlYouTube','urlTikTok','urlTesterPipeline','urlFunnelTracker','urlKpiDashboard','urlUGCArchive','urlMatchingFail','urlSubAccounts'];
   const fetched = await Promise.all(
     sheetKeys.map(k => fetchSheetData(config[k]))
   );
 
-  const dataKeys = ['userMaster','discordDaily','youtube','tiktok','testerPipeline','funnelTracker','kpiDashboard','ugcArchive','matchingFail'];
+  const dataKeys = ['userMaster','discordDaily','youtube','tiktok','testerPipeline','funnelTracker','kpiDashboard','ugcArchive','matchingFail','subAccounts'];
   let anyLive = false;
   const failedSheets = [];
   const numericFields = new Set([
@@ -2688,6 +2692,46 @@ function toggleLeftUsers() {
   filterUsersTable();
 }
 
+// 서브 계정 섹션 빌드
+function buildSubAccountsSection(discordId) {
+  const subs = (data.subAccounts || []).filter(s => s.discord_id === discordId);
+  if (subs.length === 0) return '';
+
+  const discordSubs = subs.filter(s => s.account_type === 'discord' && s.sub_discord_id);
+  const metaSubs = subs.filter(s => s.account_type === 'meta' && (s.sub_meta_username || s.sub_meta_id));
+
+  let html = '';
+
+  if (discordSubs.length > 0) {
+    html += `<div class="user-detail-section">
+      <div class="section-header">🔗 서브 Discord 계정</div>
+      <div class="user-detail-grid">
+        ${discordSubs.map(s => `
+          <div class="detail-row"><span class="detail-label">유저명</span><span class="detail-value">@${s.sub_discord_username || '-'}</span></div>
+          <div class="detail-row"><span class="detail-label">디스플레이 네임</span><span class="detail-value">${s.sub_discord_display_name || '-'}</span></div>
+          ${s.notes ? `<div class="detail-row"><span class="detail-label">메모</span><span class="detail-value">${s.notes}</span></div>` : ''}
+        `).join('<hr style="border:none;border-top:1px solid var(--border);margin:8px 0;grid-column:1/-1">')}
+      </div>
+    </div>`;
+  }
+
+  if (metaSubs.length > 0) {
+    html += `<div class="user-detail-section">
+      <div class="section-header">🎮 서브 Meta 계정</div>
+      <div class="user-detail-grid">
+        ${metaSubs.map(s => `
+          <div class="detail-row"><span class="detail-label">Meta 유저명</span><span class="detail-value">${s.sub_meta_username || '-'}</span></div>
+          ${s.sub_playfab_id ? `<div class="detail-row"><span class="detail-label">PlayFab ID</span><span class="detail-value">${s.sub_playfab_id}</span></div>` : ''}
+          ${s.last_login ? `<div class="detail-row"><span class="detail-label">마지막 로그인</span><span class="detail-value">${s.last_login}</span></div>` : ''}
+          ${s.notes ? `<div class="detail-row"><span class="detail-label">메모</span><span class="detail-value">${s.notes}</span></div>` : ''}
+        `).join('<hr style="border:none;border-top:1px solid var(--border);margin:8px 0;grid-column:1/-1">')}
+      </div>
+    </div>`;
+  }
+
+  return html;
+}
+
 function openUserPanel(discordId) {
   const u = data.userMaster.find(x => x.discord_id === discordId);
   if (!u) return;
@@ -2745,6 +2789,7 @@ function openUserPanel(discordId) {
         </div>
       </div>
       ${isDev(u) ? '<div class="user-detail-section" style="background:rgba(234,88,12,0.1);border:1px solid rgba(234,88,12,0.2)"><div class="section-header">개발자 계정</div><div style="font-size:13px;color:var(--orange)">KPI·퍼널 집계에서 제외됨</div></div>' : ''}
+      ${buildSubAccountsSection(u.discord_id)}
     </div>
   `;
 
@@ -3578,7 +3623,8 @@ const SHEET_GID_MAP = {
   urlUGCArchive: 1398498854,
   urlFunnelTracker: 2053912229,
   urlKpiDashboard: 853056757,
-  urlMatchingFail: 1440181399
+  urlMatchingFail: 1440181399,
+  urlSubAccounts: 1351563527
 };
 
 const DEFAULT_PUB_BASE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR3QcezImsy5jV2Wm_XL29Y0r-tujiIUiBG6xsDaNfES2-CNnQZLp_40YWPOtnLR7vf3M_iN4OP6YLy/pub';
