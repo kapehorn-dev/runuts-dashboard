@@ -3284,6 +3284,14 @@ function renderMultiDatasetChart() {
       ds.pointHoverRadius = 6;
       ds.pointHoverBackgroundColor = cfg.color;
       ds.borderWidth = 2;
+      // 구간 전환(3/23→3/24) 점선 표시
+      if (key === 'total') {
+        const tIdx = dd.findIndex(r => r.date === '2026-03-24');
+        ds.segment = {
+          borderColor: ctx => (tIdx > 0 && ctx.p0DataIndex === tIdx - 1) ? 'rgba(99,102,241,0.35)' : undefined,
+          borderDash: ctx => (tIdx > 0 && ctx.p0DataIndex === tIdx - 1) ? [6, 4] : undefined
+        };
+      }
     } else {
       // daily bar
       ds.borderColor = cfg.color;
@@ -3373,6 +3381,11 @@ function renderMultiDatasetChart() {
               return ` ${ctx.dataset.label}: ${Math.abs(val).toLocaleString()}명`;
             }
             return ` ${ctx.dataset.label}: ${Number(val).toLocaleString()}명`;
+          },
+          afterBody: function(tooltipItems) {
+            if (tooltipItems.length > 0 && dd[tooltipItems[0].dataIndex]?.date === '2026-03-24') {
+              return '\n⚠ 소스 전환 (Insights→봇 API, opt-out ~37명 차이)';
+            }
           }
         }
       }
