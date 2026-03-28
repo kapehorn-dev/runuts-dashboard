@@ -2372,23 +2372,15 @@ const sourceTransitionPlugin = {
     const { top, bottom } = chart.chartArea;
     const ctx = chart.ctx;
 
-    // 세로 점선
+    // 얇은 세로 점선 (은은하게)
     ctx.save();
-    ctx.setLineDash([4, 4]);
-    ctx.strokeStyle = 'rgba(234,179,8,0.6)';
-    ctx.lineWidth = 1.5;
+    ctx.setLineDash([3, 5]);
+    ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+    ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(x, top);
     ctx.lineTo(x, bottom);
     ctx.stroke();
-
-    // 라벨
-    ctx.setLineDash([]);
-    ctx.font = '10px sans-serif';
-    ctx.fillStyle = 'rgba(234,179,8,0.8)';
-    ctx.textAlign = 'center';
-    ctx.fillText('소스 전환', x, top + 12);
-    ctx.fillText('Insights → 봇', x, top + 24);
     ctx.restore();
   }
 };
