@@ -1540,20 +1540,50 @@ startAutoRefresh();
         <canvas id="chartMembers"></canvas>
       </div>
     </div>
+    <!-- 이탈 패턴 분석 (Server Insights) -->
     <div class="chart-container">
-      <div class="section-title">일간 활동 (메시지 & 보이스)</div>
-      <div class="period-filter" id="periodFilter2"></div>
+      <div class="section-title">이탈 패턴 분석 <span style="font-size:11px;color:var(--muted);font-weight:400">Server Insights 기반 · opt-out ~37명 제외</span></div>
+      <div class="period-filter" id="insightsPeriodFilter1">
+        <button class="active" onclick="setInsightsPeriod('daily',this)">일간</button>
+        <button onclick="setInsightsPeriod('weekly',this)">주간</button>
+        <button onclick="setInsightsPeriod('monthly',this)">월간</button>
+      </div>
       <div class="chart-canvas-wrap">
-        <canvas id="chartDiscordActivity"></canvas>
+        <canvas id="chartLeaverPattern"></canvas>
       </div>
     </div>
+    <!-- 커뮤니티 건강도 (Server Insights) -->
+    <div class="chart-container">
+      <div class="section-title">커뮤니티 건강도 <span style="font-size:11px;color:var(--muted);font-weight:400">Server Insights 기반</span></div>
+      <div class="period-filter" id="insightsPeriodFilter2">
+        <button class="active" onclick="setInsightsPeriod('daily',this)">일간</button>
+        <button onclick="setInsightsPeriod('weekly',this)">주간</button>
+        <button onclick="setInsightsPeriod('monthly',this)">월간</button>
+      </div>
+      <div class="chart-canvas-wrap">
+        <canvas id="chartCommunityHealth"></canvas>
+      </div>
+    </div>
+    <!-- 메시지 활동 (Server Insights) -->
+    <div class="chart-container">
+      <div class="section-title">메시지 활동 <span style="font-size:11px;color:var(--muted);font-weight:400">Server Insights 기반</span></div>
+      <div class="period-filter" id="insightsPeriodFilter3">
+        <button class="active" onclick="setInsightsPeriod('daily',this)">일간</button>
+        <button onclick="setInsightsPeriod('weekly',this)">주간</button>
+        <button onclick="setInsightsPeriod('monthly',this)">월간</button>
+      </div>
+      <div class="chart-canvas-wrap">
+        <canvas id="chartMessageActivity"></canvas>
+      </div>
+    </div>
+    <!-- 일간 기록 테이블 -->
     <div class="table-container">
       <div class="section-title">일간 기록</div>
       <div class="period-filter" id="periodFilter3"></div>
       <table>
         <thead><tr>
           <th>날짜</th><th>총 멤버</th><th>가입</th><th>탈퇴</th><th>순증</th>
-          <th>메시지</th><th>보이스</th><th>테스터</th>
+          <th>테스터</th><th>방문자</th><th>메시지</th><th>신규이탈</th><th>장기이탈</th>
         </tr></thead>
         <tbody id="discordTableBody"></tbody>
       </table>
@@ -1721,6 +1751,8 @@ startAutoRefresh();
       <input type="text" id="urlMatchingFail" placeholder="https://docs.google.com/spreadsheets/d/e/...">
       <label>Sub Accounts CSV URL</label>
       <input type="text" id="urlSubAccounts" placeholder="https://docs.google.com/spreadsheets/d/e/...">
+      <label>Discord Insights CSV URL</label>
+      <input type="text" id="urlDiscordInsights" placeholder="https://docs.google.com/spreadsheets/d/e/...">
       <button class="btn-save" onclick="saveSettings()">저장 후 데이터 갱신</button>
       <p class="help-text" style="margin-top:12px">설정은 브라우저 localStorage에 저장됩니다.</p>
     </div>
@@ -1737,14 +1769,15 @@ let chartMembersInstance, chartGrowthInstance;
 // ========== CONFIG ==========
 const SHEET_KEYS = [
   'urlUserMaster','urlDiscordDaily','urlYouTube','urlTikTok',
-  'urlTesterPipeline','urlFunnelTracker','urlKpiDashboard','urlUGCArchive','urlMatchingFail','urlSubAccounts'
+  'urlTesterPipeline','urlFunnelTracker','urlKpiDashboard','urlUGCArchive','urlMatchingFail','urlSubAccounts','urlDiscordInsights'
 ];
 let config = {};
 let data = {
   userMaster: [], discordDaily: [], youtube: [], tiktok: [],
   testerPipeline: [], funnelTracker: [], kpiDashboard: [], ugcArchive: [], acquisitionEvents: [],
   matchingFail: [],
-  subAccounts: []
+  subAccounts: [],
+  discordInsights: []
 };
 let charts = {};
 let isLive = false;
@@ -1983,7 +2016,8 @@ const SHEET_LABELS = {
   urlKpiDashboard: 'KPI Dashboard',
   urlUGCArchive: 'UGC Archive',
   urlMatchingFail: 'Matching Fail Users',
-  urlSubAccounts: 'Sub Accounts'
+  urlSubAccounts: 'Sub Accounts',
+  urlDiscordInsights: 'Discord Insights'
 };
 
 function showLoading(show) {
@@ -2039,12 +2073,12 @@ async function loadAllData() {
   showLoading(true);
   showFetchError([]);
 
-  const sheetKeys = ['urlUserMaster','urlDiscordDaily','urlYouTube','urlTikTok','urlTesterPipeline','urlFunnelTracker','urlKpiDashboard','urlUGCArchive','urlMatchingFail','urlSubAccounts'];
+  const sheetKeys = ['urlUserMaster','urlDiscordDaily','urlYouTube','urlTikTok','urlTesterPipeline','urlFunnelTracker','urlKpiDashboard','urlUGCArchive','urlMatchingFail','urlSubAccounts','urlDiscordInsights'];
   const fetched = await Promise.all(
     sheetKeys.map(k => fetchSheetData(config[k]))
   );
 
-  const dataKeys = ['userMaster','discordDaily','youtube','tiktok','testerPipeline','funnelTracker','kpiDashboard','ugcArchive','matchingFail','subAccounts'];
+  const dataKeys = ['userMaster','discordDaily','youtube','tiktok','testerPipeline','funnelTracker','kpiDashboard','ugcArchive','matchingFail','subAccounts','discordInsights'];
   let anyLive = false;
   const failedSheets = [];
   const numericFields = new Set([
@@ -2055,7 +2089,9 @@ async function loadAllData() {
     'eng_active_discord','eng_voice_participants','ret_member_retention','ref_invite_joins',
     'cvr_join_to_apply','cvr_apply_to_approve','cvr_approve_to_link',
     'current_value','target_value','achievement_rate',
-    'estimated_joins','days_to_approve','days_to_play'
+    'estimated_joins','days_to_approve','days_to_play',
+    'visitors','pct_communicated','messages','messages_per_communicator','speaking_minutes',
+    'leavers_new','leavers_old','total_leavers','muters_new','muters_existing'
   ]);
   dataKeys.forEach((k, i) => {
     if (fetched[i] && fetched[i].length > 0) {
@@ -2499,6 +2535,220 @@ function renderOverviewGrowthChart() {
   charts.netGrowth = netChart;
 }
 
+// ========== Insights 기간 토글 ==========
+let insightsPeriod = 'daily';
+function setInsightsPeriod(period, btn) {
+  insightsPeriod = period;
+  // 모든 Insights 필터 버튼 상태 동기화
+  document.querySelectorAll('[id^="insightsPeriodFilter"] button').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('[id^="insightsPeriodFilter"] button').forEach(b => {
+    if ((period === 'daily' && b.textContent === '일간') ||
+        (period === 'weekly' && b.textContent === '주간') ||
+        (period === 'monthly' && b.textContent === '월간')) b.classList.add('active');
+  });
+  renderInsightsCharts();
+}
+
+function aggregateInsights(di, period) {
+  if (period === 'daily') return di.map(r => ({ ...r, label: r.date.slice(5) }));
+
+  const buckets = {};
+  di.forEach(r => {
+    let key;
+    if (period === 'weekly') {
+      const d = new Date(r.date);
+      const weekStart = new Date(d);
+      weekStart.setDate(d.getDate() - d.getDay());
+      key = weekStart.toISOString().slice(0, 10);
+    } else {
+      key = r.date.slice(0, 7); // YYYY-MM
+    }
+    if (!buckets[key]) buckets[key] = { dates: [], visitors: 0, pct_communicated: [], messages: 0, messages_per_communicator: [], speaking_minutes: 0, leavers_new: 0, leavers_old: 0, total_leavers: 0 };
+    const b = buckets[key];
+    b.dates.push(r.date);
+    b.visitors += (r.visitors || 0);
+    if (r.pct_communicated) b.pct_communicated.push(r.pct_communicated);
+    b.messages += (r.messages || 0);
+    if (r.messages_per_communicator) b.messages_per_communicator.push(r.messages_per_communicator);
+    b.speaking_minutes += (r.speaking_minutes || 0);
+    b.leavers_new += (r.leavers_new || 0);
+    b.leavers_old += (r.leavers_old || 0);
+    b.total_leavers += (r.total_leavers || 0);
+  });
+
+  return Object.entries(buckets).sort().map(([key, b]) => ({
+    date: key,
+    label: period === 'weekly' ? key.slice(5) + 'w' : key.slice(2),
+    visitors: period === 'weekly' ? Math.round(b.visitors / b.dates.length) : b.visitors,
+    pct_communicated: b.pct_communicated.length ? +(b.pct_communicated.reduce((a,c)=>a+c,0)/b.pct_communicated.length).toFixed(1) : 0,
+    messages: b.messages,
+    messages_per_communicator: b.messages_per_communicator.length ? +(b.messages_per_communicator.reduce((a,c)=>a+c,0)/b.messages_per_communicator.length).toFixed(1) : 0,
+    speaking_minutes: b.speaking_minutes,
+    leavers_new: b.leavers_new,
+    leavers_old: b.leavers_old,
+    total_leavers: b.total_leavers
+  }));
+}
+
+function renderInsightsCharts() {
+  const di = data.discordInsights || [];
+  if (di.length === 0) return;
+
+  const agg = aggregateInsights(di, insightsPeriod);
+  const labels = agg.map(r => r.label);
+
+  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  const tickColor = isLight ? '#6c7389' : '#9ca3af';
+  const gridColor = isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.04)';
+  const tooltipBg = isLight ? '#ffffff' : '#2a2d3a';
+  const tooltipText = isLight ? '#1e2130' : '#e4e4e7';
+  const tooltipBorder = isLight ? '#e0e3ea' : '#3a3d4a';
+
+  // --- 이탈 패턴 차트 ---
+  if (charts.leaverPattern) charts.leaverPattern.destroy();
+  charts.leaverPattern = new Chart(document.getElementById('chartLeaverPattern'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label: '신규 이탈 (<1개월)', data: agg.map(r => r.leavers_new), backgroundColor: 'rgba(239,68,68,0.7)', borderColor: '#ef4444', borderWidth: 1, borderRadius: 2 },
+        { label: '장기 이탈 (1개월+)', data: agg.map(r => r.leavers_old), backgroundColor: 'rgba(251,146,60,0.7)', borderColor: '#fb923c', borderWidth: 1, borderRadius: 2 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { labels: { color: tickColor, font: { size: 11 }, usePointStyle: true, pointStyle: 'circle', padding: 14 } },
+        tooltip: { backgroundColor: tooltipBg, titleColor: tooltipText, bodyColor: tooltipText, borderColor: tooltipBorder, borderWidth: 1, padding: 12,
+          callbacks: {
+            afterBody: function(items) {
+              if (items.length < 2) return '';
+              const n = items[0].parsed.y || 0;
+              const o = items[1].parsed.y || 0;
+              const total = n + o;
+              if (total === 0) return '';
+              return `\n전체 이탈: ${total}명 | 신규 비율: ${Math.round(n/total*100)}%`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: { ticks: { color: tickColor, maxTicksLimit: 15, maxRotation: 0, font: { size: 11 } }, grid: { color: gridColor } },
+        y: { ticks: { color: tickColor, font: { size: 11 } }, grid: { color: gridColor }, beginAtZero: true }
+      }
+    }
+  });
+
+  // --- 커뮤니티 건강도 차트 ---
+  if (charts.communityHealth) charts.communityHealth.destroy();
+  charts.communityHealth = new Chart(document.getElementById('chartCommunityHealth'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label: '방문자', data: agg.map(r => r.visitors), backgroundColor: 'rgba(99,102,241,0.5)', borderColor: '#6366f1', borderWidth: 1, borderRadius: 2, yAxisID: 'y', order: 1 },
+        { label: '소통자 비율 (%)', data: agg.map(r => r.pct_communicated), borderColor: '#22c55e', backgroundColor: 'rgba(34,197,94,0.1)', type: 'line', tension: 0.3, pointRadius: 3, pointHoverRadius: 6, borderWidth: 2, yAxisID: 'y1', order: 0 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { labels: { color: tickColor, font: { size: 11 }, usePointStyle: true, pointStyle: 'circle', padding: 14 } },
+        tooltip: { backgroundColor: tooltipBg, titleColor: tooltipText, bodyColor: tooltipText, borderColor: tooltipBorder, borderWidth: 1, padding: 12,
+          callbacks: {
+            afterBody: function(items) {
+              const pct = items.find(i => i.dataset.label.includes('소통자'));
+              if (!pct) return '';
+              const v = pct.parsed.y;
+              const status = v >= 25 ? '🟢 건강' : v >= 10 ? '🟡 보통' : '🔴 주의';
+              return `\n건강도: ${status} (벤치마크 25%)`;
+            }
+          }
+        },
+        // 벤치마크 라인 (소통자 25%)
+        annotation: undefined
+      },
+      scales: {
+        x: { ticks: { color: tickColor, maxTicksLimit: 15, maxRotation: 0, font: { size: 11 } }, grid: { color: gridColor } },
+        y: { type: 'linear', position: 'left', ticks: { color: '#6366f1', font: { size: 11 } }, grid: { color: gridColor }, title: { display: true, text: '방문자', color: '#6366f1', font: { size: 11 } }, beginAtZero: true },
+        y1: { type: 'linear', position: 'right', ticks: { color: '#22c55e', font: { size: 11 }, callback: v => v + '%' }, grid: { drawOnChartArea: false }, title: { display: true, text: '소통자 %', color: '#22c55e', font: { size: 11 } }, min: 0, max: 50 }
+      }
+    },
+    plugins: [{
+      id: 'benchmarkLine',
+      afterDraw(chart) {
+        const y1 = chart.scales.y1;
+        if (!y1) return;
+        const yPos = y1.getPixelForValue(25);
+        const ctx = chart.ctx;
+        ctx.save();
+        ctx.setLineDash([6, 4]);
+        ctx.strokeStyle = 'rgba(34,197,94,0.4)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(chart.chartArea.left, yPos);
+        ctx.lineTo(chart.chartArea.right, yPos);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.font = '10px sans-serif';
+        ctx.fillStyle = 'rgba(34,197,94,0.6)';
+        ctx.fillText('벤치마크 25%', chart.chartArea.right - 75, yPos - 4);
+        ctx.restore();
+      }
+    }]
+  });
+
+  // --- 메시지 활동 차트 ---
+  if (charts.messageActivity) charts.messageActivity.destroy();
+  charts.messageActivity = new Chart(document.getElementById('chartMessageActivity'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label: '메시지 수', data: agg.map(r => r.messages), backgroundColor: 'rgba(6,182,212,0.5)', borderColor: '#06b6d4', borderWidth: 1, borderRadius: 2, yAxisID: 'y', order: 1 },
+        { label: '소통자당 평균', data: agg.map(r => r.messages_per_communicator), borderColor: '#f97316', backgroundColor: 'rgba(249,115,22,0.1)', type: 'line', tension: 0.3, pointRadius: 3, pointHoverRadius: 6, borderWidth: 2, yAxisID: 'y1', order: 0 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { labels: { color: tickColor, font: { size: 11 }, usePointStyle: true, pointStyle: 'circle', padding: 14 } },
+        tooltip: { backgroundColor: tooltipBg, titleColor: tooltipText, bodyColor: tooltipText, borderColor: tooltipBorder, borderWidth: 1, padding: 12 }
+      },
+      scales: {
+        x: { ticks: { color: tickColor, maxTicksLimit: 15, maxRotation: 0, font: { size: 11 } }, grid: { color: gridColor } },
+        y: { type: 'linear', position: 'left', ticks: { color: '#06b6d4', font: { size: 11 } }, grid: { color: gridColor }, title: { display: true, text: '메시지', color: '#06b6d4', font: { size: 11 } }, beginAtZero: true },
+        y1: { type: 'linear', position: 'right', ticks: { color: '#f97316', font: { size: 11 } }, grid: { drawOnChartArea: false }, title: { display: true, text: '소통자당', color: '#f97316', font: { size: 11 } }, beginAtZero: true }
+      }
+    },
+    plugins: [{
+      id: 'msgBenchmark',
+      afterDraw(chart) {
+        const y1 = chart.scales.y1;
+        if (!y1) return;
+        const yPos = y1.getPixelForValue(10);
+        const ctx = chart.ctx;
+        ctx.save();
+        ctx.setLineDash([6, 4]);
+        ctx.strokeStyle = 'rgba(249,115,22,0.4)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(chart.chartArea.left, yPos);
+        ctx.lineTo(chart.chartArea.right, yPos);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.font = '10px sans-serif';
+        ctx.fillStyle = 'rgba(249,115,22,0.6)';
+        ctx.fillText('벤치마크 10', chart.chartArea.right - 65, yPos - 4);
+        ctx.restore();
+      }
+    }]
+  });
+}
+
 function renderDiscordPage() {
   const dd = getFilteredDiscordData();
   const latest = dd[dd.length-1] || {};
@@ -2507,8 +2757,8 @@ function renderDiscordPage() {
   const weekLeaves = week7.reduce((s,r)=>s+(r.leaves||0),0);
   const weekNet = weekJoins - weekLeaves;
 
-  // Render period filter buttons (활동 차트 + 테이블)
-  ['periodFilter2', 'periodFilter3'].forEach(id => {
+  // 테이블 기간 필터
+  ['periodFilter3'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.innerHTML = `
       <button onclick="setDiscordPeriod('all')" class="active">전체</button>
@@ -2517,7 +2767,16 @@ function renderDiscordPage() {
     `;
   });
 
-  // KPI 카드 — 모두 7일 기준으로 단위 통일
+  // Insights 최신 데이터
+  const di = data.discordInsights || [];
+  const latestInsight = di[di.length-1] || {};
+  const insightsWeek = di.slice(-7);
+  const weekNewLeavers = insightsWeek.reduce((s,r) => s + (r.leavers_new||0), 0);
+  const weekTotalLeavers = insightsWeek.reduce((s,r) => s + (r.total_leavers||0), 0);
+  const newLeaveRate = weekTotalLeavers > 0 ? Math.round(weekNewLeavers / weekTotalLeavers * 100) : 0;
+  const healthColor = newLeaveRate >= 60 ? 'var(--red)' : newLeaveRate >= 30 ? 'var(--yellow)' : 'var(--green)';
+
+  // KPI 카드 (7개)
   const netColor = weekNet >= 0 ? 'var(--green)' : 'var(--red)';
   const netPrefix = weekNet >= 0 ? '+' : '';
   document.getElementById('discordKpi').innerHTML = [
@@ -2525,32 +2784,28 @@ function renderDiscordPage() {
     { label:'7일 가입', value:'+'+fmt(weekJoins), color: 'var(--green)' },
     { label:'7일 이탈', value: weekLeaves > 0 ? '-'+fmt(weekLeaves) : '-', color: weekLeaves > 0 ? 'var(--red)' : '' },
     { label:'7일 순증', value: netPrefix+fmt(weekNet), color: netColor },
-    { label:'테스터', value:fmt(latest.tester_role_count) || '-' }
+    { label:'테스터', value:fmt(latest.tester_role_count) || '-' },
+    { label:'일간 방문자', value:fmt(latestInsight.visitors) || '-' },
+    { label:'신규 이탈률', value: weekTotalLeavers > 0 ? newLeaveRate+'%' : '-', color: healthColor }
   ].map(k=>`<div class="kpi-card"><div class="label">${k.label}</div><div class="value"${k.color?' style="color:'+k.color+'"':''}>${k.value}</div></div>`).join('');
 
-  // 활동 차트
-  const labels = dd.map(r=>r.date.slice(5));
-  if (charts.discActivity) charts.discActivity.destroy();
-  charts.discActivity = new Chart(document.getElementById('chartDiscordActivity'), {
-    type:'line',
-    data:{
-      labels,
-      datasets:[
-        { label:'메시지', data:dd.map(r=>r.messages_count), borderColor:'#06b6d4', tension:0.3, pointRadius:3, pointHoverRadius:7 },
-        { label:'보이스 참여', data:dd.map(r=>r.voice_participants), borderColor:'#f97316', tension:0.3, pointRadius:3, pointHoverRadius:7 }
-      ]
-    },
-    options:chartOpts('횟수')
-  });
+  // Insights 차트 렌더
+  renderInsightsCharts();
 
-  // 테이블
-  document.getElementById('discordTableBody').innerHTML = dd.slice().reverse().map(r=>`
-    <tr>
+  // 테이블 — Discord Daily + Insights JOIN
+  const insightsMap = {};
+  di.forEach(r => { insightsMap[r.date] = r; });
+
+  document.getElementById('discordTableBody').innerHTML = dd.slice().reverse().map(r => {
+    const ins = insightsMap[r.date] || {};
+    return `<tr>
       <td>${r.date}</td><td>${fmt(r.total_members)}</td><td>${r.new_joins||'-'}</td><td>${r.leaves||'-'}</td>
       <td style="color:${Number(r.net_growth)>=0?'var(--green)':'var(--red)'}">${r.net_growth!=null&&r.net_growth!==''?(Number(r.net_growth)>=0?'+':'')+r.net_growth:'-'}</td>
-      <td>${r.messages_count||'-'}</td><td>${r.voice_participants||'-'}</td><td>${r.tester_role_count||'-'}</td>
-    </tr>
-  `).join('');
+      <td>${fmt(ins.visitors)||'-'}</td><td>${fmt(ins.messages)||'-'}</td>
+      <td>${ins.leavers_new||'-'}</td><td>${ins.leavers_old||'-'}</td>
+      <td>${r.tester_role_count||'-'}</td>
+    </tr>`;
+  }).join('');
 }
 
 function renderFunnelTable() {
@@ -3881,7 +4136,8 @@ const SHEET_GID_MAP = {
   urlFunnelTracker: 2053912229,
   urlKpiDashboard: 853056757,
   urlMatchingFail: 1440181399,
-  urlSubAccounts: 1351563527
+  urlSubAccounts: 1351563527,
+  urlDiscordInsights: 1530041356
 };
 
 const DEFAULT_PUB_BASE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR3QcezImsy5jV2Wm_XL29Y0r-tujiIUiBG6xsDaNfES2-CNnQZLp_40YWPOtnLR7vf3M_iN4OP6YLy/pub';
