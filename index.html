@@ -1611,6 +1611,7 @@ startAutoRefresh();
           <th class="sortable" onclick="sortYtTable('views')" id="ytSortViews">조회수 <span class="sort-arrow"></span></th>
           <th>좋아요</th><th>댓글</th>
           <th>평균 시청</th>
+          <th>참여도</th>
           <th>구독자↑</th>
         </tr></thead>
         <tbody id="ytTableBody"></tbody>
@@ -2094,7 +2095,7 @@ async function loadAllData() {
   const numericFields = new Set([
     'total_members','new_joins','leaves','net_growth','messages_count','voice_participants',
     'voice_minutes','active_members','tester_role_count','reactions_count',
-    'views','likes','comments','shares','saves','subscribers_gained','impressions','channel_subscribers','account_followers','avg_view_pct',
+    'views','likes','comments','shares','saves','subscribers_gained','impressions','channel_subscribers','account_followers','avg_view_pct','viewer_retention',
     'acq_discord_joins','acq_youtube_views','acq_tiktok_views','act_tester_applied','act_tester_approved','act_game_linked',
     'eng_active_discord','eng_voice_participants','ret_member_retention','ref_invite_joins',
     'cvr_join_to_apply','cvr_apply_to_approve','cvr_approve_to_link',
@@ -2983,6 +2984,7 @@ function renderSNS() {
       <td>${fmt(r.likes)}</td>
       <td>${r.comments || '-'}</td>
       <td style="white-space:nowrap">${r.avg_view_duration ? r.avg_view_duration + (r.avg_view_pct ? ' <span style="color:var(--muted);font-size:11px">(' + r.avg_view_pct + '%)</span>' : '') : '-'}</td>
+      <td>${r.viewer_retention ? r.viewer_retention + '%' : '-'}</td>
       <td>${r.subscribers_gained ? '+' + fmt(r.subscribers_gained) : '-'}</td>
     </tr>
   `).join('');
