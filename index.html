@@ -803,9 +803,24 @@ startAutoRefresh();
 
   /* Info page */
   .info-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+  .info-section-title {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--muted);
+    margin: 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .info-section-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-    gap: 20px;
+    gap: 16px;
   }
   .info-card {
     background: var(--card);
@@ -814,22 +829,22 @@ startAutoRefresh();
     padding: 20px 24px;
   }
   .info-card h3 {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 700;
-    margin-bottom: 14px;
+    margin-bottom: 12px;
     color: var(--accent2);
     display: flex;
     align-items: center;
     gap: 8px;
   }
-  .info-card h3 .icon { font-size: 18px; }
+  .info-card h3 .icon { font-size: 16px; }
   .info-card p, .info-card li {
-    font-size: 13px;
+    font-size: 12.5px;
     color: var(--muted);
     line-height: 1.7;
   }
-  .info-card ul { list-style: none; padding: 0; }
-  .info-card li { padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  .info-card ul { list-style: none; padding: 0; margin: 0; }
+  .info-card li { padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
   .info-card li:last-child { border: none; }
   .info-card .val { color: var(--text); font-weight: 600; }
   .info-card .warn { color: var(--yellow); }
@@ -846,6 +861,53 @@ startAutoRefresh();
   .info-card .tag.ok { background: rgba(34,197,94,0.15); color: var(--green); }
   .info-card .tag.gap { background: rgba(234,179,8,0.15); color: var(--yellow); }
   .info-card .tag.empty { background: rgba(239,68,68,0.15); color: var(--red); }
+  .info-card details { margin-top: 8px; }
+  .info-card details summary {
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent);
+    padding: 6px 0;
+    user-select: none;
+  }
+  .info-card details summary:hover { opacity: 0.8; }
+  .info-card details[open] summary { margin-bottom: 12px; }
+  .info-card .info-table {
+    width: 100%;
+    font-size: 12px;
+    border-collapse: collapse;
+  }
+  .info-card .info-table td {
+    padding: 6px 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    vertical-align: top;
+  }
+  .info-card .info-table tr:last-child td { border-bottom: none; }
+  .info-card .info-table td:first-child {
+    font-weight: 600;
+    color: var(--text);
+    white-space: nowrap;
+    width: 120px;
+  }
+  .info-card .cmd-block {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-family: monospace;
+    font-size: 11px;
+    line-height: 1.9;
+    overflow-x: auto;
+    white-space: pre;
+    color: var(--muted);
+  }
+  .info-card .cmd-block .cmd-comment { color: rgba(255,255,255,0.25); }
+  .info-card .sub-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent);
+    margin: 0 0 8px 0;
+  }
 
   .empty-state {
     text-align: center;
@@ -3413,100 +3475,204 @@ function renderInfo() {
 
   const cards = [];
 
-  // 1. 데이터 범위
-  cards.push(`<div class="info-card">
-    <h3><span class="icon">📊</span> 데이터 범위</h3>
-    <ul>
-      <li>User Master: <span class="val">${fmt(um.length)}명</span> (전체 누적, 개발자 ${devCount}명 포함)</li>
-      <li>Discord Daily: <span class="val">${fmt(dd.length)}일</span> (${ddFirst} ~ ${ddLast})</li>
-      <li>활동 지표 있는 날: <span class="val">${fmt(ddWithActivity)}일</span> ${ddWithActivity < dd.length ? tag('gap','Bot 미구동 기간 공백') : tag('ok','정상')}</li>
-      <li>YouTube 영상: <span class="val">${fmt(yt.length)}개</span></li>
-      <li>TikTok 영상: <span class="val">${fmt(tt.length)}개</span></li>
-    </ul>
+  // ━━━ 섹션 1: 데이터 현황 ━━━
+  cards.push(`<div>
+    <h2 class="info-section-title">데이터 현황</h2>
+    <div class="info-section-grid" style="margin-top:12px">
+
+      <div class="info-card">
+        <h3><span class="icon">📊</span> 데이터 범위</h3>
+        <ul>
+          <li>User Master: <span class="val">${fmt(um.length)}명</span> (전체 누적, 개발자 ${devCount}명 포함)</li>
+          <li>Discord Daily: <span class="val">${fmt(dd.length)}일</span> (${ddFirst} ~ ${ddLast})</li>
+          <li>활동 지표 있는 날: <span class="val">${fmt(ddWithActivity)}일</span> ${ddWithActivity < dd.length ? tag('gap','Bot 미구동 기간 공백') : tag('ok','정상')}</li>
+          <li>YouTube 영상: <span class="val">${fmt(yt.length)}개</span></li>
+          <li>TikTok 영상: <span class="val">${fmt(tt.length)}개</span></li>
+        </ul>
+      </div>
+
+      <div class="info-card">
+        <h3><span class="icon">🔍</span> 데이터 필드 상태</h3>
+        <ul>
+          <li>Playfab 등록률 (RUNuts): <span class="val">${runutsUsers.length > 0 ? Math.round(runutsUsers.filter(u => u.playfab_matched === 'O').length/runutsUsers.length*100) : 0}%</span> (${fmt(runutsUsers.filter(u => u.playfab_matched === 'O').length)}/${fmt(runutsUsers.length)}) ${tag('ok','정상')}</li>
+          <li>Matching Fail Users: <span class="val">${fmt(data.matchingFail.length)}건</span> ${data.matchingFail.length > 0 ? tag('gap','PlayFab에 있지만 디스코드 미연결') : tag('ok','없음')}</li>
+          <li>이탈일 기록: <span class="val">${fmt(hasLeaveDate)}건</span> ${hasLeaveDate < leftAll ? tag('gap','Bot 미구동 기간 누락') : tag('ok','정상')}</li>
+          <li>첫 플레이 기록: ${hasFirstPlay ? tag('ok','데이터 있음') : tag('empty','전체 비어있음')}</li>
+          <li>플레이 횟수: ${hasTotalPlay ? tag('ok','데이터 있음') : tag('empty','전체 비어있음')}</li>
+        </ul>
+      </div>
+
+    </div>
   </div>`);
 
-  // 2. 유저 그룹 구성
-  cards.push(`<div class="info-card">
-    <h3><span class="icon">👥</span> 유저 그룹 구성</h3>
-    <ul>
-      <li><span class="badge runuts_grp">RUNuts</span> <span class="val">${fmt(runutsUsers.length)}명</span> — 2025-11-17 이후 가입 (현재 게임 유저)</li>
-      <li><span class="badge lsd">LSD</span> <span class="val">${fmt(lsdUsers.length)}명</span> — 2025-11-17 이전 가입 (Lift Shift Drift 시절)</li>
-      <li>unknown: <span class="val">${fmt(unknownUsers.length)}명</span> — 가입일 기록 없음 (주로 pre_registered)</li>
-    </ul>
-    <p style="margin-top:10px">KPI, 퍼널, 잔존율은 <strong>RUNuts 유저 기준</strong>으로 계산됩니다.<br>
-    LSD 유저 이탈은 별도 표기되며 성과 지표에 부정적으로 반영하지 않습니다.</p>
+  // ━━━ 섹션 2: 유저 ━━━
+  cards.push(`<div>
+    <h2 class="info-section-title">유저</h2>
+    <div class="info-section-grid" style="margin-top:12px">
+
+      <div class="info-card">
+        <h3><span class="icon">👥</span> 유저 그룹 구성</h3>
+        <ul>
+          <li><span class="badge runuts_grp">RUNuts</span> <span class="val">${fmt(runutsUsers.length)}명</span> — 2025-11-17 이후 가입</li>
+          <li><span class="badge lsd">LSD</span> <span class="val">${fmt(lsdUsers.length)}명</span> — 2025-11-17 이전 가입</li>
+          <li>unknown: <span class="val">${fmt(unknownUsers.length)}명</span> — 가입일 기록 없음</li>
+        </ul>
+        <p style="margin-top:10px;font-size:11.5px">KPI/퍼널/잔존율은 <strong>RUNuts 유저 기준</strong>으로 계산됩니다.</p>
+      </div>
+
+      <div class="info-card">
+        <h3><span class="icon">📋</span> 유저 상태 분포</h3>
+        <ul>
+          <li><span class="badge active">활동 중</span> <span class="val">${fmt(activeAll)}명</span> (${Math.round(activeAll/um.length*100)}%)</li>
+          <li><span class="badge pre_registered">사전등록</span> <span class="val">${fmt(preRegAll)}명</span></li>
+          <li><span class="badge left">탈퇴</span> <span class="val">${fmt(leftAll)}명</span> (RUNuts ${runutsUsers.filter(u=>u.status==='left').length} / LSD ${lsdUsers.filter(u=>u.status==='left').length})</li>
+        </ul>
+      </div>
+
+      <div class="info-card">
+        <h3><span class="icon">🚫</span> 제외된 계정</h3>
+        ${devAccounts.length > 0
+          ? `<p>다음 <span class="val">${devAccounts.length}개</span> 개발/운영 계정은 <code>is_dev=TRUE</code>로 태깅:</p>
+             <ul>${devAccounts.map(a => `<li style="font-family:monospace;font-size:11.5px">${a}</li>`).join('')}</ul>
+             <p style="margin-top:8px;font-size:11.5px">퍼널 KPI에서 dev ${devAccounts.length}명 제외. 현재 멤버 수는 dev 포함.</p>`
+          : `<p style="color:var(--yellow)">is_dev=TRUE로 태깅된 계정이 없습니다.</p>`}
+      </div>
+
+    </div>
   </div>`);
 
-  // 3. 유저 상태 분포
-  cards.push(`<div class="info-card">
-    <h3><span class="icon">📋</span> 유저 상태 분포</h3>
-    <ul>
-      <li><span class="badge active">활동 중</span> <span class="val">${fmt(activeAll)}명</span> (${Math.round(activeAll/um.length*100)}%)</li>
-      <li><span class="badge pre_registered">사전등록</span> <span class="val">${fmt(preRegAll)}명</span> — Playtest 폼 제출 후 디스코드 미가입, 또는 가입일 미확인 유저</li>
-      <li><span class="badge left">탈퇴</span> <span class="val">${fmt(leftAll)}명</span> (RUNuts ${runutsUsers.filter(u=>u.status==='left').length} / LSD ${lsdUsers.filter(u=>u.status==='left').length})</li>
-    </ul>
+  // ━━━ 섹션 3: 정의 ━━━
+  cards.push(`<div>
+    <h2 class="info-section-title">용어 및 정의</h2>
+    <div class="info-section-grid" style="margin-top:12px">
+
+      <div class="info-card">
+        <h3><span class="icon">🔄</span> 퍼널 단계 정의</h3>
+        <table class="info-table">
+          <tr><td>현재 멤버</td><td>디스코드 서버에 있는 멤버 수</td></tr>
+          <tr><td>테스터 승인</td><td>테스터 역할(Role)을 부여받은 유저</td></tr>
+          <tr><td>Playfab 등록</td><td>테스터 중 PlayFab 계정이 매칭된 수</td></tr>
+          <tr><td>잔존</td><td>등록 유저 중 최근 1개월 활동 유저</td></tr>
+          <tr><td>테스터 미매칭</td><td>승인됐지만 PlayFab 미매칭 유저 수</td></tr>
+          <tr><td>Playfab 미매칭</td><td>PlayFab에 있지만 디스코드 미연결 Meta 계정 수</td></tr>
+        </table>
+      </div>
+
+      <div class="info-card">
+        <h3><span class="icon">⚙️</span> 데이터 수집 체계</h3>
+        <table class="info-table">
+          <tr><td>Discord Bot</td><td>Oracle Cloud VM에서 24/7 구동. 가입/이탈/역할/활동 기록</td></tr>
+          <tr><td>일일 스냅샷</td><td>매일 자정(UTC) 서버 상태 기록 (봇 + GitHub Actions 이중)</td></tr>
+          <tr><td>YouTube</td><td>YouTube Data API로 영상 지표 수집</td></tr>
+          <tr><td>TikTok</td><td>수동 입력 (API 미구현)</td></tr>
+          <tr><td>UGC Archive</td><td>YouTube 검색 기반 외부 콘텐츠 수집</td></tr>
+        </table>
+        <p style="margin-top:8px;font-size:11.5px;color:var(--muted)">messages, voice, active는 Bot 구동 시에만 수집. 미구동 기간 복원 불가.</p>
+      </div>
+
+    </div>
   </div>`);
 
-  // 4. 데이터 필드 상태
-  cards.push(`<div class="info-card">
-    <h3><span class="icon">🔍</span> 데이터 필드 상태</h3>
-    <ul>
-      <li>Playfab 등록률 (RUNuts 기준): <span class="val">${runutsUsers.length > 0 ? Math.round(runutsUsers.filter(u => u.playfab_matched === 'O').length/runutsUsers.length*100) : 0}%</span> (${fmt(runutsUsers.filter(u => u.playfab_matched === 'O').length)}/${fmt(runutsUsers.length)}) ${tag('ok','정상')}</li>
-      <li>Matching Fail Users (Playfab 미매칭): <span class="val">${fmt(data.matchingFail.length)}건</span> ${data.matchingFail.length > 0 ? tag('gap','PlayFab에 있지만 디스코드 미연결') : tag('ok','없음')}</li>
-      <li>이탈일 기록: <span class="val">${fmt(hasLeaveDate)}건</span> ${hasLeaveDate < leftAll ? tag('gap','Bot 미구동 기간 누락') : tag('ok','정상')}</li>
-      <li>첫 플레이 기록 (first_play_date): ${hasFirstPlay ? tag('ok','데이터 있음') : tag('empty','전체 비어있음')}</li>
-      <li>플레이 횟수 (total_playtests): ${hasTotalPlay ? tag('ok','데이터 있음') : tag('empty','전체 비어있음')}</li>
-    </ul>
-    <p style="margin-top:10px;font-size:12px;color:var(--muted)">잔존 기준은 향후 최근 1개월 플레이 여부로 전환 예정입니다.</p>
+  // ━━━ 섹션 4: 봇 관리 ━━━
+  cards.push(`<div>
+    <h2 class="info-section-title">봇 관리</h2>
+    <div class="info-section-grid" style="margin-top:12px;grid-template-columns:1fr">
+
+      <div class="info-card">
+        <h3><span class="icon">🤖</span> Discord Bot — Oracle Cloud VM (24/7)</h3>
+        <p style="margin-bottom:16px;font-size:12.5px">Discord Bot은 Oracle Cloud Free Tier VM에서 24시간 운영됩니다. 봇이 죽으면 systemd가 10초 후 자동 재시작하고, 서버가 재부팅되면 자동으로 시작됩니다.</p>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div>
+            <p class="sub-title">봇이 하는 일</p>
+            <table class="info-table">
+              <tr><td>실시간 이벤트</td><td>가입/퇴장/이름변경/역할변경 → User Master</td></tr>
+              <tr><td>일일 스냅샷</td><td>매일 자정(UTC) 멤버/가입/퇴장 → Discord Daily</td></tr>
+              <tr><td>메시지/보이스</td><td>일일 카운트 (봇 가동 중에만)</td></tr>
+              <tr><td>초대 추적</td><td>어떤 링크로, 누가 초대했는지</td></tr>
+              <tr><td>슬래시 커맨드</td><td>/stats /myinfo /snapshot /backfill /sync_testers</td></tr>
+            </table>
+          </div>
+          <div>
+            <p class="sub-title">데이터 저장 위치</p>
+            <table class="info-table">
+              <tr><td>가입/퇴장/역할</td><td><strong>User Master</strong> 시트</td></tr>
+              <tr><td>일일 통계</td><td><strong>Discord Daily</strong> 시트</td></tr>
+              <tr><td>이름 변경</td><td><strong>User Change History</strong> 시트</td></tr>
+              <tr><td>테스터 현황</td><td><strong>Tester Pipeline</strong> 시트</td></tr>
+              <tr><td>YouTube/KPI</td><td>GitHub Actions (봇과 독립)</td></tr>
+            </table>
+          </div>
+        </div>
+
+        <details style="margin-top:16px">
+          <summary>정상 작동 확인법 / 문제 해결</summary>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <div>
+              <p class="sub-title">확인법</p>
+              <ol style="font-size:12px;margin:0;padding-left:18px;line-height:2">
+                <li>Discord에서 <code>/stats</code> → 봇 응답하면 정상</li>
+                <li>User Master에 최근 가입자 행이 있는지</li>
+                <li>Discord Daily에 오늘 날짜 행이 있는지</li>
+              </ol>
+            </div>
+            <div>
+              <p class="sub-title">문제 발생 시</p>
+              <table class="info-table">
+                <tr><td>봇 응답 없음</td><td>SSH → systemctl status → 로그 확인</td></tr>
+                <tr><td>SSH 타임아웃</td><td>Oracle Console → Force Reboot</td></tr>
+                <tr><td>서비스 dead</td><td>journalctl로 원인 확인 → 재시작</td></tr>
+                <tr><td>데이터 누락</td><td>로그에서 해당 시간 [JOIN]/[LEAVE]</td></tr>
+              </table>
+            </div>
+          </div>
+        </details>
+
+        <details>
+          <summary>주요 터미널 명령어</summary>
+          <div class="cmd-block"><span class="cmd-comment"># 봇 상태 확인</span>
+ssh -i "key/ssh-key-2026-03-27.key" opc@134.185.103.73 "sudo systemctl status runuts-bot --no-pager | head -5"
+
+<span class="cmd-comment"># 봇 재시작</span>
+ssh -i "key/ssh-key-2026-03-27.key" opc@134.185.103.73 "sudo systemctl restart runuts-bot"
+
+<span class="cmd-comment"># 최근 로그 30줄</span>
+ssh -i "key/ssh-key-2026-03-27.key" opc@134.185.103.73 "journalctl -u runuts-bot -n 30 --no-pager"
+
+<span class="cmd-comment"># 봇 코드 업데이트 후 배포</span>
+scp -i "key/ssh-key-2026-03-27.key" discord_bot/bot.py opc@134.185.103.73:~/runuts-bot/
+ssh -i "key/ssh-key-2026-03-27.key" opc@134.185.103.73 "sudo systemctl restart runuts-bot"</div>
+        </details>
+
+        <details>
+          <summary>서버 구성 정보</summary>
+          <table class="info-table">
+            <tr><td>호스팅</td><td>Oracle Cloud Free Tier (Always Free, $0/월)</td></tr>
+            <tr><td>사양</td><td>VM.Standard.E2.1.Micro — 1 OCPU, 1GB RAM, 30GB</td></tr>
+            <tr><td>OS</td><td>Oracle Linux 9.7</td></tr>
+            <tr><td>IP / 유저</td><td>134.185.103.73 / opc</td></tr>
+            <tr><td>자동 관리</td><td>systemd — 크래시 시 10초 후 재시작, 부팅 시 자동 시작</td></tr>
+            <tr><td>상세 가이드</td><td>ORACLE_VM_SETUP.md (프로젝트 루트)</td></tr>
+          </table>
+        </details>
+      </div>
+
+    </div>
   </div>`);
 
-  // 5. 제외된 계정
-  cards.push(`<div class="info-card">
-    <h3><span class="icon">🚫</span> 제외된 계정</h3>
-    ${devAccounts.length > 0
-      ? `<p>다음 <span class="val">${devAccounts.length}개</span> 개발/운영 계정은 <code>is_dev=TRUE</code>로 태깅되어 있습니다:</p>
-         <ul>${devAccounts.map(a => `<li style="font-family:monospace;font-size:12px;color:var(--muted)">${a}</li>`).join('')}</ul>
-         <p style="margin-top:8px;font-size:12px;color:var(--muted)">📌 "현재 멤버"는 디스코드 서버 총원(dev 포함)을 표시합니다. 테스터 신청·승인·매칭 등 퍼널 KPI에서는 dev ${devAccounts.length}명이 제외됩니다.</p>`
-      : `<p style="color:var(--yellow)">is_dev=TRUE로 태깅된 계정이 없습니다. User Master에서 개발 계정을 태깅해 주세요.</p>`}
-  </div>`);
-
-  // 6. 퍼널 단계 정의
-  cards.push(`<div class="info-card">
-    <h3><span class="icon">🔄</span> 퍼널 단계 정의</h3>
-    <ul>
-      <li><span class="val">현재 디스코드 멤버</span> — 현재 디스코드 서버에 있는 멤버 수. 전체 모드: Discord Server Insights 기준 / RUNuts 모드: UM 기준 active 유저</li>
-      <li><span class="val">테스터 승인</span> — 디스코드에서 테스터 역할(Role)을 부여받은 유저. tester_approved = O</li>
-      <li><span class="val">Playfab 등록</span> — 테스터 승인 유저 중 PlayFab 계정이 디스코드 유저와 매칭된 수. playfab_matched = O</li>
-      <li><span class="val">잔존</span> — Playfab 등록 유저 중 최근 1개월 이내 플레이한 유저 (Unity Analytics / PlayFab 데이터 연결 전이므로 현재 디스코드 활동 기준으로 대체)</li>
-      <li><span class="val">테스터 미매칭</span> — 테스터 승인을 받았지만 PlayFab 계정이 매칭되지 않은 유저 수</li>
-      <li><span class="val">Playfab 미매칭</span> — PlayFab에 계정이 존재하지만 디스코드 유저와 연결되지 않은 Meta 계정 수 (Matching Fail Users 시트 기준)</li>
-    </ul>
-  </div>`);
-
-  // 7. 데이터 수집 체계
-  cards.push(`<div class="info-card">
-    <h3><span class="icon">⚙️</span> 데이터 수집 체계</h3>
-    <ul>
-      <li><span class="val">Discord Bot</span> — 멤버 가입/이탈, 역할 변경, 메시지/보이스 활동 자동 기록</li>
-      <li><span class="val">일일 스냅샷</span> — 매일 자정(KST) Discord Daily에 서버 상태 기록</li>
-      <li><span class="val">YouTube</span> — YouTube Data API로 영상 지표 수집</li>
-      <li><span class="val">TikTok</span> — 수동 입력 (API 자동 수집 미구현)</li>
-      <li><span class="val">UGC Archive</span> — YouTube 검색 기반 외부 크리에이터 콘텐츠 자동 수집</li>
-    </ul>
-    <p style="margin-top:10px;font-size:12px;color:var(--muted)">Discord Daily에서 messages, voice, active 필드는 Bot 상시 구동 시에만 수집됩니다.<br>
-    Bot 미구동 기간의 해당 필드는 복원 불가합니다.</p>
-  </div>`);
-
-  // 8. 알려진 제약사항
-  cards.push(`<div class="info-card">
-    <h3><span class="icon">⚠️</span> 알려진 제약사항</h3>
-    <ul>
-      <li>Bot 상시 구동 미설정 → 메시지/보이스 활동 데이터 수집 불완전</li>
-      <li>잔존 기준 미전환 → 현재 디스코드 활동 기준, 향후 최근 1개월 플레이 기준으로 전환 예정</li>
-      <li>TikTok API 자동 수집 미구현 → 수동 입력 필요</li>
-      <li>leave_date 소급 불가 → Bot 꺼진 동안 이탈한 유저의 이탈일 기록 없음</li>
-      <li>unknown 그룹 ${fmt(unknownUsers.length)}명 → 가입일 없어 LSD/RUNuts 분류 불가 (대부분 사전등록)</li>
-    </ul>
+  // ━━━ 섹션 5: 제약사항 ━━━
+  cards.push(`<div>
+    <h2 class="info-section-title">알려진 제약사항</h2>
+    <div class="info-section-grid" style="margin-top:12px;grid-template-columns:1fr">
+      <div class="info-card">
+        <ul>
+          <li>잔존 기준 미전환 → 현재 디스코드 활동 기준, 향후 최근 1개월 플레이 기준으로 전환 예정</li>
+          <li>TikTok API 자동 수집 미구현 → 수동 입력 필요</li>
+          <li>leave_date 소급 불가 → Bot 이전 시점에 이탈한 유저의 이탈일 기록 없음</li>
+          <li>unknown 그룹 ${fmt(unknownUsers.length)}명 → 가입일 없어 LSD/RUNuts 분류 불가 (대부분 사전등록)</li>
+        </ul>
+      </div>
+    </div>
   </div>`);
 
   document.getElementById('infoGrid').innerHTML = cards.join('');
