@@ -2357,33 +2357,9 @@ function renderFunnel(containerId) {
 
 // ========== 개요 탭: 멤버 성장 추이 + 일일 순증감 ==========
 
-// 구간 전환 마커 플러그인 (3/24 세로 점선)
-const sourceTransitionPlugin = {
-  id: 'sourceTransition',
-  afterDraw(chart) {
-    const dd = chart._ddRef;
-    if (!dd) return;
-    const transitionIdx = dd.findIndex(r => r.date === '2026-03-24');
-    if (transitionIdx < 0) return;
-
-    const meta = chart.getDatasetMeta(0);
-    if (!meta.data[transitionIdx]) return;
-    const x = meta.data[transitionIdx].x;
-    const { top, bottom } = chart.chartArea;
-    const ctx = chart.ctx;
-
-    // 얇은 세로 점선 (은은하게)
-    ctx.save();
-    ctx.setLineDash([3, 5]);
-    ctx.strokeStyle = 'rgba(255,255,255,0.12)';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(x, top);
-    ctx.lineTo(x, bottom);
-    ctx.stroke();
-    ctx.restore();
-  }
-};
+// 구간 전환: 3/23→3/24 사이를 점선으로 표시하는 플러그인
+const sourceTransitionPlugin = { id: 'sourceTransition' };
+// (실제 점선 처리는 datasets segment로 구현, 플러그인은 빈 껍데기로 유지)
 
 function renderOverviewGrowthChart() {
   let dd = data.discordDaily.filter(r => r.date >= DATA_CUTOFF);
@@ -2402,6 +2378,9 @@ function renderOverviewGrowthChart() {
   const labels = dd.map(r => r.date.slice(5));
   const memberData = getCorrectedMembers(dd);
 
+  // 3/23→3/24 전환 인덱스 찾기
+  const transIdx = dd.findIndex(r => r.date === '2026-03-24');
+
   if (charts.overviewGrowth) charts.overviewGrowth.destroy();
   const chartInstance = new Chart(document.getElementById('chartOverviewGrowth'), {
     type: 'line',
@@ -2417,7 +2396,11 @@ function renderOverviewGrowthChart() {
         pointRadius: 0,
         pointHoverRadius: 5,
         pointHoverBackgroundColor: '#6366f1',
-        borderWidth: 2.5
+        borderWidth: 2.5,
+        segment: {
+          borderColor: ctx => (transIdx > 0 && ctx.p0DataIndex === transIdx - 1) ? 'rgba(99,102,241,0.35)' : undefined,
+          borderDash: ctx => (transIdx > 0 && ctx.p0DataIndex === transIdx - 1) ? [6, 4] : undefined
+        }
       }]
     },
     options: {
