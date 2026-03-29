@@ -236,6 +236,15 @@ startAutoRefresh();
   .hp-badge.hp-active .hp-icon svg { filter: drop-shadow(0 0 3px rgba(34,197,94,0.5)); }
   /* 다이아몬드 글로우 효과 (Core) */
   .tier-badge.tier-core .tier-icon svg { filter: drop-shadow(0 0 3px rgba(245,158,11,0.5)); }
+  /* 테이블 셀 내 컴팩트 표시 */
+  .hp-cell, .tier-cell {
+    display: inline-flex; align-items: center; gap: 4px; cursor: default;
+  }
+  .hp-cell .hp-icon, .tier-cell .tier-icon { width: 15px; height: 15px; }
+  .hp-cell-label, .tier-cell-label { font-size: 11px; font-weight: 600; }
+  /* Active 글로우 (테이블) */
+  .hp-cell .hp-icon svg { vertical-align: middle; }
+  .tier-cell .tier-icon svg { vertical-align: middle; }
 
   /* Loading Overlay */
   .loading-overlay {
@@ -3279,8 +3288,8 @@ function filterUsersTable() {
       <td>${u.discord_display_name || u.discord_username}${u.discord_display_name && u.discord_display_name !== u.discord_username ? '<br><small style=\"color:var(--muted);\">@' + u.discord_username + '</small>' : ''}${dev ? ' <span class=\"badge dev\">DEV</span>' : ''}</td>
       <td>${toKST(u.join_date)}</td>
       <td><span class="badge ${grpClass}">${grp}</span></td>
-      <td><span data-tooltip="${healthTip}">${healthBadge(u)}</span></td>
-      <td><span data-tooltip="${tierTip}">${tierBadge(u)}</span></td>
+      <td><span data-tooltip="${healthTip}" class="hp-cell">${healthIcon(health)}<span class="hp-cell-label" style="color:${health.color}">${health.name}</span></span></td>
+      <td><span data-tooltip="${tierTip}" class="tier-cell">${tierIcon(tier)}<span class="tier-cell-label" style="color:${tier.color}">${tier.name}</span></span></td>
       <td>${u.estimated_source || 'unknown'}</td>
       <td>${(u.tester_applied==='O'||u.tester_applied==='TRUE') ? ((u.tester_approved==='O'||u.tester_approved==='TRUE') ? '<span class="badge approved">승인</span>' : '<span class="badge applied">신청</span>') : '-'}</td>
       <td>${u.playfab_matched==='O' ? '<span class="badge linked">매칭</span>' : '-'}</td>
