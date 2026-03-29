@@ -1388,9 +1388,8 @@ startAutoRefresh();
     .filter-pill, .filter-pill-toggle { padding: 3px 8px; font-size: 10px; }
     .search-bar input { font-size: 13px; }
     .lsd-toggle button { padding: 5px 8px; font-size: 10px; }
-    /* 테이블: Discord ID + 유입경로 숨기기 */
+    /* 테이블: Discord ID 숨기기 */
     table th:first-child, table td:first-child { display: none; }
-    table th:nth-child(7), table td:nth-child(7) { display: none; }
     table th, table td { padding: 8px 6px; font-size: 12px; }
     /* 툴팁 모바일 대응 */
     [data-tooltip]::after { max-width: 280px; font-size: 11px; left: 0; right: auto; }
@@ -1400,8 +1399,8 @@ startAutoRefresh();
     .kpi-grid { grid-template-columns: 1fr; }
     .header-status .status-label { display: none; }
     .header-status { gap: 4px; }
-    /* 테이블: Meta 매칭도 숨기기 */
-    table th:nth-child(9), table td:nth-child(9) { display: none; }
+    /* 테이블: Meta 매칭 숨기기 (6번째 열) */
+    table th:nth-child(6), table td:nth-child(6) { display: none; }
     /* 필터바: 시간대 행 숨기기 */
     .filter-group:last-child { display: none; }
     /* 상세 패널 내부 여백 */
@@ -1772,7 +1771,7 @@ startAutoRefresh();
           <th class="sortable" onclick="sortUsersTable('discord_username')">유저명 <span class="sort-indicator" id="sort-discord_username"></span></th>
           <th class="sortable" onclick="sortUsersTable('join_date')">가입일 <small style="color:var(--muted);font-weight:400">(UTC)</small> <span class="sort-indicator" id="sort-join_date"></span></th>
           <th class="sortable" onclick="sortUsersTable('group')">그룹 <span class="sort-indicator" id="sort-group"></span></th>
-          <th>유입 경로</th><th>테스터</th><th>Meta 매칭</th>
+          <th>테스터</th><th>Meta 매칭</th>
         </tr></thead>
         <tbody id="usersTableBody"></tbody>
       </table>
@@ -3324,7 +3323,6 @@ function filterUsersTable() {
       <td>${u.discord_display_name || u.discord_username}${u.discord_display_name && u.discord_display_name !== u.discord_username ? '<br><small style=\"color:var(--muted);\">@' + u.discord_username + '</small>' : ''}${dev ? ' <span class=\"badge dev\">DEV</span>' : ''} <span style="margin-left:4px;white-space:nowrap"><span data-tooltip="${healthTip}">${healthIcon(health)}</span><span data-tooltip="${tierTip}" style="margin-left:2px">${tierIcon(tier)}</span></span></td>
       <td>${toKST(u.join_date)}</td>
       <td><span class="badge ${grpClass}">${grp}</span></td>
-      <td>${u.estimated_source || 'unknown'}</td>
       <td>${(u.tester_applied==='O'||u.tester_applied==='TRUE') ? ((u.tester_approved==='O'||u.tester_approved==='TRUE') ? '<span class="badge approved">승인</span>' : '<span class="badge applied">신청</span>') : '-'}</td>
       <td>${u.playfab_matched==='O' ? '<span class="badge linked">매칭</span>' : '-'}</td>
     </tr>`;
