@@ -3250,6 +3250,7 @@ function openUserPanel(discordId) {
           <div>
             <div style="font-size:16px;font-weight:700;color:${health.color}">${health.label.split(' ')[1] || health.label}</div>
             <div style="font-size:12px;color:var(--muted)">${u.last_active_date ? '마지막 활동: ' + u.last_active_date + (health.days !== undefined ? ' (' + health.days + '일 전)' : '') : '활동 기록 없음'}</div>
+            ${u.total_messages ? '<div style="font-size:12px;color:var(--muted)">총 메시지: ' + Number(u.total_messages).toLocaleString() + '개</div>' : ''}
           </div>
         </div>
         <div style="font-size:12px;color:var(--muted);line-height:1.8;border-top:1px solid var(--border);padding-top:8px">
