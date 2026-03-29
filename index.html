@@ -1342,70 +1342,124 @@ startAutoRefresh();
   }
 
   /* Mobile Responsive */
+  /* ==================== 모바일 (768px 이하) ==================== */
   @media (max-width: 768px) {
-    .header {
-      flex-wrap: wrap;
-      padding: 10px 12px;
-      gap: 8px;
-    }
-    .header h1 { font-size: 15px; }
-    .header-right {
-      flex-wrap: wrap;
-      width: 100%;
-      justify-content: space-between;
-      gap: 6px;
-    }
-    .header-status { font-size: 11px; gap: 8px; }
+    /* 헤더: 컴팩트 1줄 */
+    .header { padding: 8px 12px; gap: 6px; }
+    .header h1 { font-size: 14px; }
+    .header-right { flex-wrap: wrap; width: 100%; justify-content: space-between; gap: 4px; }
+    .header-status { font-size: 10px; gap: 6px; }
+    .lsd-toggle button { padding: 5px 8px; font-size: 10px; }
+
+    /* 네비게이션: 하단 고정 탭바 */
     .nav {
-      overflow-x: auto;
-      flex-wrap: nowrap;
-      -webkit-overflow-scrolling: touch;
-      padding: 0 12px;
-      gap: 0;
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: var(--card); border-top: 1px solid var(--border); border-bottom: none;
+      padding: 0; margin: 0; z-index: 900;
+      display: flex; justify-content: space-around; gap: 0;
+      box-shadow: 0 -2px 12px rgba(0,0,0,0.3);
     }
     .nav button {
-      padding: 8px 10px;
-      font-size: 11px;
-      white-space: nowrap;
+      flex: 1; padding: 10px 4px; font-size: 10px;
+      white-space: nowrap; border-bottom: none;
+      border-top: 2px solid transparent;
+      min-height: 44px;
     }
+    .nav button.active { border-bottom: none; border-top-color: var(--accent); }
     .nav-divider { display: none; }
-    .main { padding: 12px; }
-    .kpi-grid {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
-    }
-    .kpi-card { padding: 12px; }
-    .kpi-card .value { font-size: 20px; }
-    .info-grid { grid-template-columns: 1fr; }
+    .nav-right { margin-left: 0; }
+    /* 하단 탭바 공간 확보 */
+    body { padding-bottom: 56px; }
+
+    /* 메인 컨텐츠 */
+    .main { padding: 10px; }
+
+    /* KPI 카드 */
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+    .kpi-card { padding: 10px; }
+    .kpi-card .label { font-size: 11px; }
+    .kpi-card .value { font-size: 18px; }
+    .kpi-card .change { font-size: 10px; }
+    .kpi-card .sparkline { display: none; }
+
+    /* 차트 */
+    .chart-container { padding: 12px; }
+    .section-title { font-size: 14px; margin-bottom: 12px; }
+
+    /* 퍼널 */
+    .funnel-label { width: 70px; font-size: 10px; }
+    .funnel-bar-value { font-size: 11px; }
+    .funnel-pct { font-size: 10px; }
+
+    /* 성장 단계 카드 */
+    .growth-stats-row { grid-template-columns: repeat(2, 1fr); gap: 6px; }
+
+    /* 테이블 */
     .table-container { padding: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-    .funnel-label { width: 80px; font-size: 11px; }
-    /* 유저 상세 패널: 모바일 전체화면 */
-    .user-detail-panel { width: 100% !important; max-width: 100% !important; }
-    /* 필터바 컴팩트 */
-    .user-filter-bar { padding: 8px; gap: 4px; }
-    .filter-group { gap: 4px; }
-    .filter-group label { min-width: 42px; font-size: 10px; }
-    .filter-pill, .filter-pill-toggle { padding: 3px 8px; font-size: 10px; }
-    .search-bar input { font-size: 13px; }
-    .lsd-toggle button { padding: 5px 8px; font-size: 10px; }
-    /* 테이블: Discord ID 숨기기 */
-    table th:first-child, table td:first-child { display: none; }
-    table th, table td { padding: 8px 6px; font-size: 12px; }
-    /* 툴팁 모바일 대응 */
-    [data-tooltip]::after { max-width: 280px; font-size: 11px; left: 0; right: auto; }
+    table th:first-child, table td:first-child { display: none; } /* Discord ID */
+    table th, table td { padding: 6px 5px; font-size: 11px; }
+
+    /* 범례 */
+    .table-legend { font-size: 10px !important; padding: 4px 8px !important; gap: 8px !important; }
+
+    /* 필터바: 접기 가능하도록 */
+    .user-filter-bar { padding: 8px; gap: 3px; }
+    .filter-group { gap: 3px; }
+    .filter-group label { min-width: 38px; font-size: 9px; }
+    .filter-pill, .filter-pill-toggle { padding: 4px 8px; font-size: 10px; min-height: 28px; }
+    .search-bar input { font-size: 14px; padding: 10px 12px; } /* 모바일 입력 편의 */
+
+    /* 유저 상세 패널: 전체화면 */
+    .user-detail-panel {
+      width: 100% !important; max-width: 100% !important;
+      right: -100% !important;
+    }
+    .user-detail-panel.active { right: 0 !important; }
+    .user-detail-panel-header { padding: 12px 16px; }
+    .user-detail-panel-header h3 { font-size: 14px; }
+    .user-detail-panel-close { font-size: 24px; padding: 8px; min-width: 44px; min-height: 44px; }
+
+    /* 툴팁: 모바일에서는 터치 불편하므로 숨김 */
+    [data-tooltip]::after { display: none; }
+
+    /* 정보/설정 카드 */
+    .info-grid { grid-template-columns: 1fr; }
+    .info-card { padding: 12px; }
+
+    /* 디스코드 탭 */
+    .period-filter button { font-size: 10px; padding: 4px 8px; min-height: 32px; }
+    .insights-period button { font-size: 10px; padding: 4px 8px; }
   }
 
+  /* ==================== 소형 모바일 (480px 이하) ==================== */
   @media (max-width: 480px) {
-    .kpi-grid { grid-template-columns: 1fr; }
+    .header h1 { font-size: 13px; }
     .header-status .status-label { display: none; }
-    .header-status { gap: 4px; }
-    /* 테이블: Meta 매칭 숨기기 (6번째 열) */
+    .header-status { gap: 3px; }
+    .header-right .lsd-toggle { display: none; } /* 공간 절약 */
+
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); } /* 2열 유지 */
+    .kpi-card .value { font-size: 16px; }
+    .kpi-card .change, .kpi-card .sub { font-size: 9px; }
+
+    /* 테이블: Meta 매칭 숨기기 */
     table th:nth-child(6), table td:nth-child(6) { display: none; }
-    /* 필터바: 시간대 행 숨기기 */
-    .filter-group:last-child { display: none; }
-    /* 상세 패널 내부 여백 */
+
+    /* 필터바: 건강도/등급 행만 표시, 나머지 접기 */
+    .filter-group label { font-size: 9px; min-width: 34px; }
+    .filter-pill, .filter-pill-toggle { padding: 3px 6px; font-size: 9px; }
+
+    /* 상세 패널 내부 */
     .user-detail-panel .user-detail-sections { padding: 0 4px; }
     .user-detail-grid { grid-template-columns: 1fr !important; }
+    .detail-row .detail-label { font-size: 11px; }
+    .detail-row .detail-value { font-size: 11px; }
+
+    /* 네비 탭바 */
+    .nav button { font-size: 9px; padding: 8px 2px; }
+
+    /* 퍼널 라벨 */
+    .funnel-label { width: 60px; font-size: 9px; }
   }
 </style>
 </head>
