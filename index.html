@@ -208,6 +208,35 @@ startAutoRefresh();
   .status-dot.loading { background: var(--accent); animation: pulse 1s infinite; }
   .status-label { font-size: 13px; color: var(--muted); }
 
+  /* 건강도 방패 아이콘 + 등급 뱃지 아이콘 */
+  .hp-icon, .tier-icon {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 18px; height: 18px; vertical-align: middle; flex-shrink: 0;
+  }
+  .hp-icon svg, .tier-icon svg { width: 100%; height: 100%; }
+  .hp-badge, .tier-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 12px; font-weight: 600; line-height: 1;
+    padding: 3px 8px 3px 5px; border-radius: 6px;
+    white-space: nowrap;
+  }
+  .hp-badge { background: rgba(255,255,255,0.04); }
+  .tier-badge { background: rgba(255,255,255,0.04); }
+  [data-theme="light"] .hp-badge, [data-theme="light"] .tier-badge { background: rgba(0,0,0,0.04); }
+  .hp-badge.hp-active { color: var(--green); }
+  .hp-badge.hp-casual { color: var(--cyan); }
+  .hp-badge.hp-fading { color: var(--yellow); }
+  .hp-badge.hp-inactive { color: var(--red); }
+  .hp-badge.hp-left { color: #6b7280; }
+  .tier-badge.tier-core { color: #f59e0b; }
+  .tier-badge.tier-regular { color: var(--accent2); }
+  .tier-badge.tier-visitor { color: #64748b; }
+  .tier-badge.tier-silent { color: #475569; }
+  /* 방패 글로우 효과 (Active) */
+  .hp-badge.hp-active .hp-icon svg { filter: drop-shadow(0 0 3px rgba(34,197,94,0.5)); }
+  /* 다이아몬드 글로우 효과 (Core) */
+  .tier-badge.tier-core .tier-icon svg { filter: drop-shadow(0 0 3px rgba(245,158,11,0.5)); }
+
   /* Loading Overlay */
   .loading-overlay {
     position: fixed;
@@ -1668,9 +1697,18 @@ startAutoRefresh();
       <div class="filter-group">
         <label>건강도:</label>
         <button class="filter-pill active" data-filter="health" data-value="">전체</button>
-        <button class="filter-pill" data-filter="health" data-value="active" style="color:var(--green)">🟢 활발</button>
-        <button class="filter-pill" data-filter="health" data-value="watching" style="color:var(--yellow)">🟡 관심</button>
-        <button class="filter-pill" data-filter="health" data-value="inactive" style="color:var(--red)">🔴 비활성</button>
+        <button class="filter-pill" data-filter="health" data-value="active" style="color:var(--green)">Active</button>
+        <button class="filter-pill" data-filter="health" data-value="casual" style="color:var(--cyan)">Casual</button>
+        <button class="filter-pill" data-filter="health" data-value="fading" style="color:var(--yellow)">Fading</button>
+        <button class="filter-pill" data-filter="health" data-value="inactive" style="color:var(--red)">장기부재</button>
+      </div>
+      <div class="filter-group">
+        <label>등급:</label>
+        <button class="filter-pill active" data-filter="tier" data-value="">전체</button>
+        <button class="filter-pill" data-filter="tier" data-value="core" style="color:#f59e0b">Core</button>
+        <button class="filter-pill" data-filter="tier" data-value="regular" style="color:var(--accent2)">Regular</button>
+        <button class="filter-pill" data-filter="tier" data-value="visitor" style="color:#64748b">Visitor</button>
+        <button class="filter-pill" data-filter="tier" data-value="silent" style="color:#475569">Silent</button>
       </div>
       <div class="filter-group">
         <button class="filter-pill-toggle" id="leftUsersToggle" onclick="toggleLeftUsers()">탈퇴 유저 보기</button>
@@ -1695,8 +1733,8 @@ startAutoRefresh();
           <th class="sortable" onclick="sortUsersTable('discord_username')">유저명 <span class="sort-indicator" id="sort-discord_username"></span></th>
           <th class="sortable" onclick="sortUsersTable('join_date')">가입일 <small style="color:var(--muted);font-weight:400">(UTC)</small> <span class="sort-indicator" id="sort-join_date"></span></th>
           <th class="sortable" onclick="sortUsersTable('group')">그룹 <span class="sort-indicator" id="sort-group"></span></th>
-          <th>상태</th>
-          <th class="sortable" onclick="sortUsersTable('leave_date')">탈퇴일 <span class="sort-indicator" id="sort-leave_date"></span></th>
+          <th class="sortable" onclick="sortUsersTable('health')">건강도 <span class="sort-indicator" id="sort-health"></span></th>
+          <th class="sortable" onclick="sortUsersTable('tier')">등급 <span class="sort-indicator" id="sort-tier"></span></th>
           <th>유입 경로</th><th>테스터</th><th>Meta 매칭</th>
         </tr></thead>
         <tbody id="usersTableBody"></tbody>
@@ -1813,29 +1851,150 @@ let userFilters = {
   status: '',
   tester: '',
   matching: '',
-  health: ''
+  health: '',
+  tier: ''
 };
 
+// ========== 건강도 (방패 아이콘 — 체력 게이지 컨셉) ==========
+// 5단계: active / casual / fading / inactive / left
 function getUserHealth(u) {
-  if (u.status === 'left') return { level: 'left', label: '⚫ 이탈', color: '#888' };
-  if (!u.last_active_date) return { level: 'unknown', label: '⬜ 미확인', color: '#666' };
+  if (u.status === 'left' || u.status === 'left_no_data') return { level: 'left', name: '이탈', color: '#6b7280', css: 'hp-left' };
+  if (!u.last_active_date) return { level: 'inactive', name: '장기부재', color: 'var(--red)', css: 'hp-inactive', days: 999 };
   const days = Math.floor((new Date() - new Date(u.last_active_date)) / (1000*60*60*24));
-  if (days <= 7) return { level: 'active', label: '🟢 활발', color: 'var(--green)', days };
-  if (days <= 30) return { level: 'watching', label: '🟡 관심', color: 'var(--yellow)', days };
-  return { level: 'inactive', label: '🔴 비활성', color: 'var(--red)', days };
+  const msgs = parseInt(u.total_messages) || 0;
+  if (days <= 7 && msgs >= 6) return { level: 'active', name: 'Active', color: 'var(--green)', css: 'hp-active', days };
+  if (days <= 7) return { level: 'casual', name: 'Casual', color: 'var(--cyan)', css: 'hp-casual', days };
+  if (days <= 30) return { level: 'fading', name: 'Fading', color: 'var(--yellow)', css: 'hp-fading', days };
+  return { level: 'inactive', name: '장기부재', color: 'var(--red)', css: 'hp-inactive', days };
+}
+
+// 방패 SVG — fill% 로 체력 표현 (clipPath 대신 rect mask)
+let _shieldId = 0;
+function shieldSVG(color, fillPct) {
+  _shieldId++;
+  const h = 18 * (1 - fillPct);
+  const uid = 'shd' + _shieldId;
+  return `<svg viewBox="0 0 16 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs><clipPath id="${uid}"><rect x="0" y="${h.toFixed(1)}" width="16" height="${(18-h).toFixed(1)}"/></clipPath></defs>
+    <path d="M8 1L2 4v5c0 4 3 6.5 6 7.5 3-1 6-3.5 6-7.5V4L8 1z" stroke="${color}" stroke-width="1.2" fill="none"/>
+    <path d="M8 1L2 4v5c0 4 3 6.5 6 7.5 3-1 6-3.5 6-7.5V4L8 1z" fill="${color}" opacity="0.3" clip-path="url(#${uid})"/>
+  </svg>`;
+}
+
+// 해골 SVG (이탈 전용)
+function skullSVG(color) {
+  return `<svg viewBox="0 0 16 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="8" cy="8" r="6" stroke="${color}" stroke-width="1.2" fill="none"/>
+    <circle cx="5.5" cy="7" r="1.5" fill="${color}" opacity="0.5"/>
+    <circle cx="10.5" cy="7" r="1.5" fill="${color}" opacity="0.5"/>
+    <path d="M6 12h4" stroke="${color}" stroke-width="1" stroke-linecap="round"/>
+    <path d="M7 12v1.5M9 12v1.5" stroke="${color}" stroke-width="0.8" stroke-linecap="round"/>
+  </svg>`;
+}
+
+const healthMeta = {
+  active:   { fill: 1.0,  label: 'Active',  desc: '7일 내 활동 + 메시지 6개 이상' },
+  casual:   { fill: 0.6,  label: 'Casual',  desc: '7일 내 활동, 메시지 5개 이하' },
+  fading:   { fill: 0.3,  label: 'Fading',  desc: '8~30일 사이 마지막 활동' },
+  inactive: { fill: 0.05, label: '장기부재', desc: '31일 이상 활동 없음' },
+  left:     { fill: 0,    label: '이탈',    desc: '서버 탈퇴' },
+};
+
+function healthIcon(h) {
+  const m = healthMeta[h.level];
+  if (h.level === 'left') return `<span class="hp-icon">${skullSVG(h.color)}</span>`;
+  return `<span class="hp-icon">${shieldSVG(h.color, m.fill)}</span>`;
+}
+
+function healthBadge(u) {
+  const h = getUserHealth(u);
+  return `<span class="hp-badge ${h.css}">${healthIcon(h)} ${h.name}</span>`;
 }
 
 function getHealthTooltip(u) {
   const h = getUserHealth(u);
-  let parts = [h.label];
+  const m = healthMeta[h.level];
+  let parts = [m.label + ' — ' + m.desc];
   if (u.last_active_date) {
-    parts.push(`활동: ${u.last_active_date}`);
-    if (h.days !== undefined) parts.push(`${h.days}일 전`);
+    parts.push(`마지막 활동: ${u.last_active_date}` + (h.days !== undefined ? ` (${h.days}일 전)` : ''));
   } else {
     parts.push('활동 기록 없음');
   }
-  parts.push('기준: 🟢7일 🟡30일 🔴30일+ ⚫탈퇴');
+  if (u.total_messages) parts.push(`총 메시지: ${Number(u.total_messages).toLocaleString()}개`);
   return parts.join(' · ');
+}
+
+// ========== 유저 등급 (랭크 뱃지 컨셉) ==========
+// 4등급: core / regular / visitor / silent
+function getUserTier(u) {
+  const msgs = parseInt(u.total_messages) || 0;
+  if (msgs === 0) return { level: 'silent', name: 'Silent', color: '#475569', css: 'tier-silent' };
+  const joinDate = u.join_date ? new Date(u.join_date) : new Date();
+  const daysSinceJoin = Math.max(Math.floor((new Date() - joinDate) / (1000*60*60*24)), 1);
+  const mpd = msgs / daysSinceJoin;
+  // Core: 일평균 0.5+ AND 최소 50개 이상 (신규 유저가 1~2개로 Core 되는 것 방지)
+  if (mpd >= 0.5 && msgs >= 50) return { level: 'core', name: 'Core', color: '#f59e0b', css: 'tier-core' };
+  // Regular: 일평균 0.02+ AND 최소 10개 이상
+  if (mpd >= 0.02 && msgs >= 10) return { level: 'regular', name: 'Regular', color: 'var(--accent2)', css: 'tier-regular' };
+  return { level: 'visitor', name: 'Visitor', color: '#64748b', css: 'tier-visitor' };
+}
+
+// 다이아몬드 SVG (Core)
+function diamondSVG(color) {
+  return `<svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M8 1L14 6L8 15L2 6L8 1Z" stroke="${color}" stroke-width="1.2" fill="${color}" fill-opacity="0.2"/>
+    <path d="M2 6H14" stroke="${color}" stroke-width="0.8" opacity="0.5"/>
+    <path d="M8 1L6 6L8 15L10 6L8 1Z" fill="${color}" fill-opacity="0.15"/>
+  </svg>`;
+}
+// 삼각 뱃지 SVG (Regular)
+function triangleSVG(color) {
+  return `<svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M8 2L14 14H2L8 2Z" stroke="${color}" stroke-width="1.2" fill="${color}" fill-opacity="0.15"/>
+  </svg>`;
+}
+// 원형 SVG (Visitor)
+function circleSVG(color) {
+  return `<svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="8" cy="8" r="6" stroke="${color}" stroke-width="1.2" fill="${color}" fill-opacity="0.1"/>
+  </svg>`;
+}
+// 점선 원형 SVG (Silent)
+function dashedSVG(color) {
+  return `<svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="8" cy="8" r="6" stroke="${color}" stroke-width="1.2" stroke-dasharray="3 2" fill="none" opacity="0.4"/>
+  </svg>`;
+}
+
+const tierIcons = {
+  core: (c) => diamondSVG(c),
+  regular: (c) => triangleSVG(c),
+  visitor: (c) => circleSVG(c),
+  silent: (c) => dashedSVG(c),
+};
+
+function tierIcon(t) {
+  return `<span class="tier-icon">${tierIcons[t.level](t.color)}</span>`;
+}
+
+function tierBadge(u) {
+  const t = getUserTier(u);
+  return `<span class="tier-badge ${t.css}">${tierIcon(t)} ${t.name}</span>`;
+}
+
+function getTierTooltip(u) {
+  const t = getUserTier(u);
+  const msgs = parseInt(u.total_messages) || 0;
+  const joinDate = u.join_date ? new Date(u.join_date) : new Date();
+  const days = Math.max(Math.floor((new Date() - joinDate) / (1000*60*60*24)), 1);
+  const mpd = msgs / days;
+  const tierDescs = {
+    core: 'Core — 커뮤니티 핵심 (일평균 0.5개+)',
+    regular: 'Regular — 정기 참여자',
+    visitor: 'Visitor — 가끔 방문',
+    silent: 'Silent — 메시지 없음',
+  };
+  return `${tierDescs[t.level]} · 총 ${msgs.toLocaleString()}개 · 일평균 ${mpd.toFixed(2)}개`;
 }
 const DATA_CUTOFF = '2025-10-01';
 
@@ -1937,6 +2096,11 @@ function getFilteredUsers() {
   // Apply health filter
   if (userFilters.health) {
     filtered = filtered.filter(u => getUserHealth(u).level === userFilters.health);
+  }
+
+  // Apply tier filter
+  if (userFilters.tier) {
+    filtered = filtered.filter(u => getUserTier(u).level === userFilters.tier);
   }
 
   return filtered;
@@ -3107,14 +3271,16 @@ function filterUsersTable() {
     const rowStyle = dev ? ';opacity:0.45;font-style:italic' : (grp === 'LSD' ? ';opacity:0.65' : '');
     const health = getUserHealth(u);
     const healthTip = getHealthTooltip(u);
+    const tier = getUserTier(u);
+    const tierTip = getTierTooltip(u);
     return `
     <tr onclick="openUserPanel('${u.discord_id}')" style="cursor:pointer${rowStyle}">
       <td>${u.discord_id}</td>
       <td>${u.discord_display_name || u.discord_username}${u.discord_display_name && u.discord_display_name !== u.discord_username ? '<br><small style=\"color:var(--muted);\">@' + u.discord_username + '</small>' : ''}${dev ? ' <span class=\"badge dev\">DEV</span>' : ''}</td>
       <td>${toKST(u.join_date)}</td>
       <td><span class="badge ${grpClass}">${grp}</span></td>
-      <td><span class="badge ${u.status}">${statusKo[u.status] || u.status}</span></td>
-      <td>${u.leave_date ? toKST(u.leave_date) : '-'}</td>
+      <td><span data-tooltip="${healthTip}">${healthBadge(u)}</span></td>
+      <td><span data-tooltip="${tierTip}">${tierBadge(u)}</span></td>
       <td>${u.estimated_source || 'unknown'}</td>
       <td>${(u.tester_applied==='O'||u.tester_applied==='TRUE') ? ((u.tester_approved==='O'||u.tester_approved==='TRUE') ? '<span class="badge approved">승인</span>' : '<span class="badge applied">신청</span>') : '-'}</td>
       <td>${u.playfab_matched==='O' ? '<span class="badge linked">매칭</span>' : '-'}</td>
@@ -3204,12 +3370,13 @@ function openUserPanel(discordId) {
   const grp = getUserGroup(u);
   const devBadge = isDev(u) ? ' <span class="badge dev" style="font-size:12px;vertical-align:middle">DEV</span>' : '';
 
-  // 유저 건강도 판정
+  // 유저 건강도 + 등급 판정
   const health = getUserHealth(u);
-  const healthTip = getHealthTooltip(u);
-  const healthBadge = `<span data-tooltip="${healthTip}" style="font-size:12px;vertical-align:middle;margin-left:4px;color:${health.color}">${health.label}</span>`;
+  const tier = getUserTier(u);
+  const hBadge = `<span data-tooltip="${getHealthTooltip(u)}" style="vertical-align:middle;margin-left:4px">${healthBadge(u)}</span>`;
+  const tBadge = `<span data-tooltip="${getTierTooltip(u)}" style="vertical-align:middle;margin-left:2px">${tierBadge(u)}</span>`;
 
-  document.getElementById('userDetailName').innerHTML = `${u.discord_display_name || u.discord_username} <span class="badge ${grp==='LSD'?'lsd':'runuts_grp'}" style="font-size:12px;vertical-align:middle">${grp}</span>${devBadge}${healthBadge}`;
+  document.getElementById('userDetailName').innerHTML = `${u.discord_display_name || u.discord_username} <span class="badge ${grp==='LSD'?'lsd':'runuts_grp'}" style="font-size:12px;vertical-align:middle">${grp}</span>${devBadge}${hBadge}${tBadge}`;
   document.getElementById('userDetailContent').innerHTML = `
     <div class="user-detail-sections">
       <div class="user-detail-section">
@@ -3244,29 +3411,46 @@ function openUserPanel(discordId) {
         </div>
       </div>
       <div class="user-detail-section">
-        <div class="section-header">커뮤니티 건강도</div>
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
-          <span style="font-size:24px">${health.label.split(' ')[0]}</span>
-          <div>
-            <div style="font-size:16px;font-weight:700;color:${health.color}">${health.label.split(' ')[1] || health.label}</div>
-            <div style="font-size:12px;color:var(--muted)">${u.last_active_date ? '마지막 활동: ' + u.last_active_date + (health.days !== undefined ? ' (' + health.days + '일 전)' : '') : '활동 기록 없음'}</div>
-            ${u.total_messages ? '<div style="font-size:12px;color:var(--muted)">총 메시지: ' + Number(u.total_messages).toLocaleString() + '개</div>' : ''}
+        <div class="section-header">유저 상태</div>
+        <div style="display:flex;gap:20px;margin-bottom:12px;flex-wrap:wrap">
+          <div style="flex:1;min-width:140px">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">건강도</div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="width:28px;height:28px;display:flex;align-items:center;justify-content:center">${healthIcon(health)}</span>
+              <div>
+                <div style="font-size:15px;font-weight:700;color:${health.color}">${health.name}</div>
+                <div style="font-size:11px;color:var(--muted)">${u.last_active_date ? u.last_active_date + (health.days !== undefined ? ' (' + health.days + '일 전)' : '') : '활동 기록 없음'}</div>
+              </div>
+            </div>
+          </div>
+          <div style="flex:1;min-width:140px">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px">등급</div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="width:28px;height:28px;display:flex;align-items:center;justify-content:center">${tierIcon(tier)}</span>
+              <div>
+                <div style="font-size:15px;font-weight:700;color:${tier.color}">${tier.name}</div>
+                <div style="font-size:11px;color:var(--muted)">총 ${(parseInt(u.total_messages)||0).toLocaleString()}개 메시지</div>
+              </div>
+            </div>
           </div>
         </div>
         <div style="font-size:12px;color:var(--muted);line-height:1.8;border-top:1px solid var(--border);padding-top:8px">
-          <div style="margin-bottom:4px;font-weight:600;color:var(--text)">판정 근거</div>
-          <div>• 디스코드 메시지 활동 기준 (봇이 매일 자동 집계)</div>
-          <div>• 마지막 메시지 작성일로부터 경과 일수로 판정</div>
-          ${u.status === 'left' ? '<div>• 이 유저는 서버를 탈퇴한 상태입니다</div>' : ''}
-          <div style="margin-top:8px;font-weight:600;color:var(--text)">건강도 기준</div>
-          <div style="display:grid;grid-template-columns:auto 1fr;gap:2px 8px;margin-top:4px">
-            <span style="color:var(--green)">🟢 활발</span><span>최근 7일 내 메시지 활동</span>
-            <span style="color:var(--yellow)">🟡 관심</span><span>최근 30일 내 메시지 활동</span>
-            <span style="color:var(--red)">🔴 비활성</span><span>30일 이상 활동 없음</span>
-            <span>⚫ 이탈</span><span>서버 탈퇴</span>
-            <span>⬜ 미확인</span><span>활동 기록 없음</span>
+          <div style="margin-bottom:6px;font-weight:600;color:var(--text)">건강도 기준</div>
+          <div style="display:grid;grid-template-columns:auto 1fr;gap:2px 8px">
+            <span style="color:var(--green)">Active</span><span>7일 내 활동 + 메시지 6개 이상</span>
+            <span style="color:var(--cyan)">Casual</span><span>7일 내 활동, 메시지 5개 이하</span>
+            <span style="color:var(--yellow)">Fading</span><span>8~30일 사이 마지막 활동</span>
+            <span style="color:var(--red)">장기부재</span><span>31일+ 활동 없음</span>
+            <span style="color:#6b7280">이탈</span><span>서버 탈퇴</span>
           </div>
-          <div style="margin-top:8px;color:var(--muted);font-size:11px">※ 향후 게임 플레이 데이터(PlayFab) 연결 시 복합 지표로 업그레이드 예정</div>
+          <div style="margin-top:8px;margin-bottom:6px;font-weight:600;color:var(--text)">등급 기준</div>
+          <div style="display:grid;grid-template-columns:auto 1fr;gap:2px 8px">
+            <span style="color:#f59e0b">Core</span><span>일평균 메시지 0.5개 이상</span>
+            <span style="color:var(--accent2)">Regular</span><span>일평균 0.02~0.5개</span>
+            <span style="color:#64748b">Visitor</span><span>메시지 있지만 매우 드문</span>
+            <span style="color:#475569">Silent</span><span>메시지 없음</span>
+          </div>
+          <div style="margin-top:8px;color:var(--muted);font-size:11px">※ 게임 플레이 데이터(PlayFab) 연결 시 복합 지표로 업그레이드 예정</div>
         </div>
       </div>
       ${isDev(u) ? '<div class="user-detail-section" style="background:rgba(234,88,12,0.1);border:1px solid rgba(234,88,12,0.2)"><div class="section-header">개발자 계정</div><div style="font-size:13px;color:var(--orange)">KPI·퍼널 집계에서 제외됨</div></div>' : ''}
@@ -4168,11 +4352,23 @@ function getSortedUsers(users) {
   const col = userSortState.col;
   const dir = userSortState.dir;
 
+  // 건강도/등급 정렬 우선순위 맵
+  const healthOrder = { active: 5, casual: 4, fading: 3, inactive: 2, left: 1 };
+  const tierOrder = { core: 4, regular: 3, visitor: 2, silent: 1 };
+
   sorted.sort((a, b) => {
     let aVal, bVal;
     if (col === 'group') {
       aVal = getUserGroup(a);
       bVal = getUserGroup(b);
+    } else if (col === 'health') {
+      aVal = healthOrder[getUserHealth(a).level] || 0;
+      bVal = healthOrder[getUserHealth(b).level] || 0;
+      return dir === 'desc' ? bVal - aVal : aVal - bVal;
+    } else if (col === 'tier') {
+      aVal = tierOrder[getUserTier(a).level] || 0;
+      bVal = tierOrder[getUserTier(b).level] || 0;
+      return dir === 'desc' ? bVal - aVal : aVal - bVal;
     } else {
       aVal = a[col] || '';
       bVal = b[col] || '';
@@ -4182,7 +4378,7 @@ function getSortedUsers(users) {
       aVal = aVal ? new Date(aVal).getTime() || 0 : 0;
       bVal = bVal ? new Date(bVal).getTime() || 0 : 0;
       return dir === 'desc' ? bVal - aVal : aVal - bVal;
-    } else {
+    } else if (col !== 'health' && col !== 'tier') {
       aVal = String(aVal).toLowerCase();
       bVal = String(bVal).toLowerCase();
       return dir === 'desc' ? bVal.localeCompare(aVal) : aVal.localeCompare(bVal);
