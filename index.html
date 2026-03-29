@@ -1559,6 +1559,7 @@ startAutoRefresh();
   <!-- ===== 개요 페이지 ===== -->
   <div id="page-overview" class="page active">
     <div class="kpi-grid" id="kpiGrid"></div>
+    <div id="weeklySummaryCard" class="chart-container" style="margin-bottom:16px;display:none;"></div>
     <div class="funnel-container">
       <div class="section-title">테스터 전환 파이프라인</div>
       <div class="funnel-bar-group" id="funnelBars"></div>
@@ -1591,6 +1592,10 @@ startAutoRefresh();
     <div class="funnel-container">
       <div class="section-title">테스터 전환 파이프라인 (상세)</div>
       <div class="funnel-bar-group" id="funnelBarsFull"></div>
+    </div>
+    <div class="chart-container" style="margin-bottom:16px;">
+      <div class="section-title">월간 전환율 추이</div>
+      <div style="height:250px;position:relative"><canvas id="cvrTrendChart"></canvas></div>
     </div>
     <div class="table-container">
       <div class="section-title">월간 지표 추이</div>
@@ -2602,9 +2607,25 @@ function renderKPI() {
   const totalMetaAccounts = linked + playfabUnmatched;
   const scopeLabel = showLSDData ? '전체' : 'RUNuts';
 
+  // ========== 전주 대비 변화 계산 ==========
+  const thisWeekJoins = ddForWeekly.slice(-7).reduce((s,r) => s + (r.new_joins||0), 0);
+  const lastWeekJoins = ddForWeekly.slice(-14, -7).reduce((s,r) => s + (r.new_joins||0), 0);
+  const memberPrev = ddAll.length >= 8 ? parseInt(ddAll[ddAll.length - 8]?.total_members || 0) : 0;
+  const memberDiff = (showLSDData ? discordTotal : runutsActive) - memberPrev;
+
+  // 변화 방향 헬퍼
+  function weekDelta(cur, prev) {
+    const diff = cur - prev;
+    if (diff > 0) return { text: `▲ +${fmt(diff)}`, dir: 'up' };
+    if (diff < 0) return { text: `▼ ${fmt(diff)}`, dir: 'down' };
+    return { text: '— 변화 없음', dir: 'flat' };
+  }
+  const memberWk = memberPrev > 0 ? weekDelta(showLSDData ? discordTotal : runutsActive, memberPrev) : { text: '', dir: 'flat' };
+  const joinsWk = lastWeekJoins > 0 ? weekDelta(thisWeekJoins, lastWeekJoins) : { text: '', dir: 'flat' };
+
   const kpis = [
-    { label: showLSDData ? '현재 멤버' : 'RUNuts 멤버', value: memberValue, change: memberSub, dir: 'flat', tooltip: showLSDData ? '디스코드 서버의 실제 총 멤버 수 (Discord Server Insights 기준)' : 'RUNuts 유저 중 현재 디스코드에 남아있는 활동 멤버 수', link: 'users', spark: sparklineMembers },
-    { label: '주간 가입', value: fmt(ddForWeekly.slice(-7).reduce((s,r) => s + (r.new_joins||0), 0)), change: '최근 7일', dir: 'flat', tooltip: '최근 7일간 새로 가입한 유저 수', link: 'discord', spark: sparklineWeekly },
+    { label: showLSDData ? '현재 멤버' : 'RUNuts 멤버', value: memberValue, change: memberSub, change2: memberWk.text ? memberWk.text + ' 전주 대비' : '', dir: memberWk.dir, tooltip: showLSDData ? '디스코드 서버의 실제 총 멤버 수 (Discord Server Insights 기준)' : 'RUNuts 유저 중 현재 디스코드에 남아있는 활동 멤버 수', link: 'users', spark: sparklineMembers },
+    { label: '주간 가입', value: fmt(thisWeekJoins), change: joinsWk.text ? joinsWk.text + ' 전주 대비' : '최근 7일', dir: joinsWk.dir, tooltip: '최근 7일간 새로 가입한 유저 수', link: 'discord', spark: sparklineWeekly },
     { label: '테스터 신청', value: fmt(applied), change: `현재 멤버 대비 ${activeCount > 0 ? Math.round(applied/activeCount*100) : 0}%`, dir: 'flat', tooltip: `${scopeLabel} 유저 중 테스터 신청서를 작성한 유저 수`, link: 'funnel' },
     { label: '테스터 승인', value: fmt(testers), change: `신청 대비 ${applied > 0 ? Math.round(testers/applied*100) : 0}%`, dir: 'flat', tooltip: `${scopeLabel} 유저 중 디스코드에서 테스터 역할을 부여받은 수`, link: 'funnel' },
     { label: 'Playfab 등록', value: fmt(testersLinked), change: `승인 대비 ${testers > 0 ? Math.round(testersLinked/testers*100) : 0}%`, change2: `Meta 계정 ${fmt(totalMetaAccounts)}개 중 ${fmt(playfabUnmatched)}개 미매칭`, dir: 'flat', tooltip: `테스터 승인 유저 중 PlayFab 계정이 매칭된 수. 미매칭은 PlayFab에 존재하지만 디스코드 유저와 연결되지 않은 Meta 계정 수 (Matching Fail Users 시트 기준).`, link: 'funnel' },
@@ -2622,6 +2643,77 @@ function renderKPI() {
       ${k.change2 ? '<div class="change flat" style="font-size:11px;margin-top:2px;opacity:0.7">' + k.change2 + '</div>' : ''}
     </div>
   `).join('');
+
+  // 주간 요약 카드 렌더링
+  renderWeeklySummary();
+}
+
+function renderWeeklySummary() {
+  const card = document.getElementById('weeklySummaryCard');
+  if (!card) return;
+
+  const dd = data.discordDaily.filter(r => r.date >= DATA_CUTOFF);
+  const um = showLSDData ? data.userMaster.filter(isRealUser) : data.userMaster.filter(isRUNuts);
+  if (dd.length < 7) { card.style.display = 'none'; return; }
+
+  const today = new Date();
+  const weekAgo = new Date(today); weekAgo.setDate(weekAgo.getDate() - 7);
+  const twoWeeksAgo = new Date(today); twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+  const weekStr = weekAgo.toISOString().split('T')[0];
+  const twoWeekStr = twoWeeksAgo.toISOString().split('T')[0];
+  const todayStr = today.toISOString().split('T')[0];
+
+  // 이번 주 / 지난 주 Discord Daily
+  const thisWeek = dd.filter(r => r.date >= weekStr && r.date <= todayStr);
+  const lastWeek = dd.filter(r => r.date >= twoWeekStr && r.date < weekStr);
+
+  const twJoins = thisWeek.reduce((s,r) => s + (r.new_joins||0), 0);
+  const twLeaves = thisWeek.reduce((s,r) => s + (r.leaves||0), 0);
+  const twNet = twJoins - twLeaves;
+  const lwJoins = lastWeek.reduce((s,r) => s + (r.new_joins||0), 0);
+  const lwLeaves = lastWeek.reduce((s,r) => s + (r.leaves||0), 0);
+
+  // 멤버 변화
+  const memEnd = dd[dd.length-1]?.total_members || 0;
+  const memStart = (() => {
+    const target = dd.filter(r => r.date <= weekStr);
+    return target.length > 0 ? (target[target.length-1].total_members || 0) : memEnd;
+  })();
+
+  // 테스터 변화 (이번 주 승인된 유저)
+  const twApproved = um.filter(u => {
+    const d = u.tester_approved_date || '';
+    return d >= weekStr && d <= todayStr;
+  }).length;
+
+  // 전체 수
+  const totalApplied = um.filter(u => u.tester_applied === 'O' || u.tester_applied === 'TRUE').length;
+  const totalApproved = um.filter(u => u.tester_approved === 'O' || u.tester_approved === 'TRUE').length;
+
+  // 날짜 표시
+  const fmtDate = (d) => d.substring(5).replace('-', '/');
+  const delta = (v) => v > 0 ? `<span style="color:var(--green)">+${v}</span>` : v < 0 ? `<span style="color:var(--red)">${v}</span>` : '<span style="color:var(--muted)">±0</span>';
+
+  card.style.display = 'block';
+  card.innerHTML = `
+    <div class="section-title" style="margin-bottom:12px">이번 주 변화 <span style="font-size:11px;color:var(--muted);font-weight:400">${fmtDate(weekStr)} ~ ${fmtDate(todayStr)}</span></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;">
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <span style="font-size:11px;color:var(--muted)">멤버</span>
+        <span style="font-size:18px;font-weight:700">${fmt(memStart)} → ${fmt(memEnd)} <span style="font-size:13px">${delta(memEnd-memStart)}</span></span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <span style="font-size:11px;color:var(--muted)">가입 / 이탈</span>
+        <span style="font-size:18px;font-weight:700"><span style="color:var(--green)">${twJoins}</span> / <span style="color:var(--red)">${twLeaves}</span> <span style="font-size:13px">(순증 ${delta(twNet)})</span></span>
+        ${lwJoins > 0 ? '<span style="font-size:11px;color:var(--muted)">지난 주: ' + lwJoins + ' / ' + lwLeaves + '</span>' : ''}
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <span style="font-size:11px;color:var(--muted)">테스터 승인</span>
+        <span style="font-size:18px;font-weight:700">${delta(twApproved)} <span style="font-size:13px;color:var(--muted)">이번 주</span></span>
+        <span style="font-size:11px;color:var(--muted)">총 ${fmt(totalApproved)}명 (신청 ${fmt(totalApplied)})</span>
+      </div>
+    </div>
+  `;
 }
 
 function renderFunnel(containerId) {
@@ -3190,6 +3282,75 @@ function renderFunnelTable() {
       <td>${fmt(r.cumRUNuts)}</td>
     </tr>`;
   }).join('');
+
+  // 전환율 추이 차트 (2025-11 이후, RUNuts 가입 기준)
+  const cvrMonths = months.filter(m => m >= '2025-11');
+  if (cvrMonths.length < 2) return;
+
+  // 누적 기준으로 전환율 계산
+  const totalByMonth = {};
+  let cumJoins = 0, cumApplied = 0, cumApproved = 0, cumLinked = 0;
+  const umRN = um.filter(u => !isLSD(u) && !isDev(u));
+  // 월별 누적
+  cvrMonths.forEach(m => {
+    const joinedThisMonth = umRN.filter(u => u.join_date && u.join_date.substring(0,7) <= m);
+    const appliedByMonth = umRN.filter(u => (u.tester_applied === 'O' || u.tester_applied === 'TRUE') && u.join_date && u.join_date.substring(0,7) <= m).length;
+    const approvedByMonth = umRN.filter(u => (u.tester_approved === 'O' || u.tester_approved === 'TRUE') && u.join_date && u.join_date.substring(0,7) <= m).length;
+    const linkedByMonth = umRN.filter(u => u.playfab_matched === 'O' && u.join_date && u.join_date.substring(0,7) <= m).length;
+    const totalJoined = joinedThisMonth.length || 1;
+    totalByMonth[m] = {
+      joinToApply: Math.round(appliedByMonth / totalJoined * 100),
+      applyToApprove: appliedByMonth > 0 ? Math.round(approvedByMonth / appliedByMonth * 100) : 0,
+      approveToLink: approvedByMonth > 0 ? Math.round(linkedByMonth / approvedByMonth * 100) : 0,
+    };
+  });
+
+  const ctx = document.getElementById('cvrTrendChart');
+  if (!ctx) return;
+  if (ctx._chart) ctx._chart.destroy();
+  const chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: cvrMonths,
+      datasets: [
+        {
+          label: '가입→신청',
+          data: cvrMonths.map(m => totalByMonth[m].joinToApply),
+          borderColor: 'var(--accent)',
+          backgroundColor: 'rgba(99,102,241,0.1)',
+          tension: 0.3, fill: false, pointRadius: 4,
+        },
+        {
+          label: '신청→승인',
+          data: cvrMonths.map(m => totalByMonth[m].applyToApprove),
+          borderColor: 'var(--cyan)',
+          backgroundColor: 'rgba(6,182,212,0.1)',
+          tension: 0.3, fill: false, pointRadius: 4,
+        },
+        {
+          label: '승인→Playfab',
+          data: cvrMonths.map(m => totalByMonth[m].approveToLink),
+          borderColor: 'var(--green)',
+          backgroundColor: 'rgba(34,197,94,0.1)',
+          tension: 0.3, fill: false, pointRadius: 4,
+        },
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'top', labels: { color: '#8b92a5', font: { size: 11 }, usePointStyle: true, padding: 16 } },
+        tooltip: {
+          callbacks: { label: (ctx) => `${ctx.dataset.label}: ${ctx.parsed.y}%` }
+        }
+      },
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8b92a5', font: { size: 11 } } },
+        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#8b92a5', font: { size: 11 }, callback: v => v + '%' }, min: 0, max: 100 }
+      }
+    }
+  });
+  ctx._chart = chart;
 }
 
 function sortYtTable(key) {
