@@ -1666,6 +1666,13 @@ startAutoRefresh();
         <button class="filter-pill" data-filter="matching" data-value="unmatched">미매칭</button>
       </div>
       <div class="filter-group">
+        <label>건강도:</label>
+        <button class="filter-pill active" data-filter="health" data-value="">전체</button>
+        <button class="filter-pill" data-filter="health" data-value="active" style="color:var(--green)">🟢 활발</button>
+        <button class="filter-pill" data-filter="health" data-value="watching" style="color:var(--yellow)">🟡 관심</button>
+        <button class="filter-pill" data-filter="health" data-value="inactive" style="color:var(--red)">🔴 비활성</button>
+      </div>
+      <div class="filter-group">
         <button class="filter-pill-toggle" id="leftUsersToggle" onclick="toggleLeftUsers()">탈퇴 유저 보기</button>
       </div>
       <div class="filter-group">
@@ -1690,7 +1697,7 @@ startAutoRefresh();
           <th class="sortable" onclick="sortUsersTable('group')">그룹 <span class="sort-indicator" id="sort-group"></span></th>
           <th>상태</th>
           <th class="sortable" onclick="sortUsersTable('leave_date')">탈퇴일 <span class="sort-indicator" id="sort-leave_date"></span></th>
-          <th>유입 경로</th><th>테스터</th><th>Meta 매칭</th>
+          <th>건강도</th><th>유입 경로</th><th>테스터</th><th>Meta 매칭</th>
         </tr></thead>
         <tbody id="usersTableBody"></tbody>
       </table>
@@ -1805,8 +1812,31 @@ let userFilters = {
   group: '',
   status: '',
   tester: '',
-  matching: ''
+  matching: '',
+  health: ''
 };
+
+function getUserHealth(u) {
+  if (u.status === 'left') return { level: 'left', label: '⚫ 이탈', color: '#888' };
+  if (!u.last_active_date) return { level: 'unknown', label: '⬜ 미확인', color: '#666' };
+  const days = Math.floor((new Date() - new Date(u.last_active_date)) / (1000*60*60*24));
+  if (days <= 7) return { level: 'active', label: '🟢 활발', color: 'var(--green)', days };
+  if (days <= 30) return { level: 'watching', label: '🟡 관심', color: 'var(--yellow)', days };
+  return { level: 'inactive', label: '🔴 비활성', color: 'var(--red)', days };
+}
+
+function getHealthTooltip(u) {
+  const h = getUserHealth(u);
+  let tip = `건강도: ${h.label}\n`;
+  tip += `기준: 🟢 7일 내 / 🟡 30일 내 / 🔴 30일+ / ⚫ 탈퇴\n`;
+  if (u.last_active_date) {
+    tip += `마지막 활동: ${u.last_active_date}`;
+    if (h.days !== undefined) tip += ` (${h.days}일 전)`;
+  } else {
+    tip += `마지막 활동: 기록 없음`;
+  }
+  return tip;
+}
 const DATA_CUTOFF = '2025-10-01';
 
 // ========== HELPER: Global LSD Toggle ==========
@@ -1902,6 +1932,11 @@ function getFilteredUsers() {
     filtered = filtered.filter(u => u.playfab_matched === 'O');
   } else if (userFilters.matching === 'unmatched') {
     filtered = filtered.filter(u => u.playfab_matched !== 'O');
+  }
+
+  // Apply health filter
+  if (userFilters.health) {
+    filtered = filtered.filter(u => getUserHealth(u).level === userFilters.health);
   }
 
   return filtered;
@@ -3070,6 +3105,8 @@ function filterUsersTable() {
     const grpClass = grp === 'LSD' ? 'lsd' : 'runuts_grp';
     const dev = isDev(u);
     const rowStyle = dev ? ';opacity:0.45;font-style:italic' : (grp === 'LSD' ? ';opacity:0.65' : '');
+    const health = getUserHealth(u);
+    const healthTip = getHealthTooltip(u).replace(/\n/g, '&#10;');
     return `
     <tr onclick="openUserPanel('${u.discord_id}')" style="cursor:pointer${rowStyle}">
       <td>${u.discord_id}</td>
@@ -3078,6 +3115,7 @@ function filterUsersTable() {
       <td><span class="badge ${grpClass}">${grp}</span></td>
       <td><span class="badge ${u.status}">${statusKo[u.status] || u.status}</span></td>
       <td>${u.leave_date ? toKST(u.leave_date) : '-'}</td>
+      <td title="${healthTip}" style="cursor:help;color:${health.color}">${health.label}</td>
       <td>${u.estimated_source || 'unknown'}</td>
       <td>${(u.tester_applied==='O'||u.tester_applied==='TRUE') ? ((u.tester_approved==='O'||u.tester_approved==='TRUE') ? '<span class="badge approved">승인</span>' : '<span class="badge applied">신청</span>') : '-'}</td>
       <td>${u.playfab_matched==='O' ? '<span class="badge linked">매칭</span>' : '-'}</td>
@@ -3168,17 +3206,9 @@ function openUserPanel(discordId) {
   const devBadge = isDev(u) ? ' <span class="badge dev" style="font-size:12px;vertical-align:middle">DEV</span>' : '';
 
   // 유저 건강도 판정
-  let healthBadge = '';
-  if (u.status === 'left') {
-    healthBadge = '<span style="font-size:12px;vertical-align:middle;margin-left:4px">⚫ 이탈</span>';
-  } else if (u.last_active_date) {
-    const lastActive = new Date(u.last_active_date);
-    const now = new Date();
-    const daysSince = Math.floor((now - lastActive) / (1000*60*60*24));
-    if (daysSince <= 7) healthBadge = '<span style="font-size:12px;vertical-align:middle;margin-left:4px;color:var(--green)">🟢 활발</span>';
-    else if (daysSince <= 30) healthBadge = '<span style="font-size:12px;vertical-align:middle;margin-left:4px;color:var(--yellow)">🟡 관심</span>';
-    else healthBadge = '<span style="font-size:12px;vertical-align:middle;margin-left:4px;color:var(--red)">🔴 비활성</span>';
-  }
+  const health = getUserHealth(u);
+  const healthTip = getHealthTooltip(u).replace(/\n/g, '&#10;');
+  const healthBadge = `<span title="${healthTip}" style="font-size:12px;vertical-align:middle;margin-left:4px;color:${health.color};cursor:help">${health.label}</span>`;
 
   document.getElementById('userDetailName').innerHTML = `${u.discord_display_name || u.discord_username} <span class="badge ${grp==='LSD'?'lsd':'runuts_grp'}" style="font-size:12px;vertical-align:middle">${grp}</span>${devBadge}${healthBadge}`;
   document.getElementById('userDetailContent').innerHTML = `
