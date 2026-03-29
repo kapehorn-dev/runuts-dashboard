@@ -406,27 +406,31 @@ startAutoRefresh();
   [data-tooltip]::after {
     content: attr(data-tooltip);
     position: absolute;
-    bottom: calc(100% + 8px);
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--card);
+    top: calc(100% + 6px);
+    left: 0;
+    background: #1a1d2e;
     color: var(--text);
     border: 1px solid var(--border);
-    padding: 8px 12px;
+    padding: 10px 14px;
     border-radius: 8px;
     font-size: 12px;
     font-weight: 400;
-    white-space: normal;
-    max-width: 300px;
-    z-index: 200;
+    white-space: pre-line;
+    width: max-content;
+    max-width: 420px;
+    z-index: 9000;
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.15s ease;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    line-height: 1.4;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    line-height: 1.6;
   }
   [data-tooltip]:hover::after {
     opacity: 1;
+  }
+  /* 테이블 오른쪽 열은 왼쪽으로 뜨게 */
+  td:nth-child(n+7) [data-tooltip]::after {
+    left: auto; right: 0;
   }
 
   /* Funnel */
@@ -1923,14 +1927,14 @@ function healthBadge(u) {
 function getHealthTooltip(u) {
   const h = getUserHealth(u);
   const m = healthMeta[h.level];
-  let parts = [m.label + ' — ' + m.desc];
+  let lines = [m.label + ' — ' + m.desc];
   if (u.last_active_date) {
-    parts.push(`마지막 활동: ${u.last_active_date}` + (h.days !== undefined ? ` (${h.days}일 전)` : ''));
+    lines.push('마지막 활동: ' + u.last_active_date + (h.days !== undefined ? ' (' + h.days + '일 전)' : ''));
   } else {
-    parts.push('활동 기록 없음');
+    lines.push('활동 기록 없음');
   }
-  if (u.total_messages) parts.push(`총 메시지: ${Number(u.total_messages).toLocaleString()}개`);
-  return parts.join(' · ');
+  if (u.total_messages) lines.push('총 메시지: ' + Number(u.total_messages).toLocaleString() + '개');
+  return lines.join('\n');
 }
 
 // ========== 유저 등급 (랭크 뱃지 컨셉) ==========
@@ -2003,7 +2007,7 @@ function getTierTooltip(u) {
     visitor: 'Visitor — 가끔 방문',
     silent: 'Silent — 메시지 없음',
   };
-  return `${tierDescs[t.level]} · 총 ${msgs.toLocaleString()}개 · 일평균 ${mpd.toFixed(2)}개`;
+  return `${tierDescs[t.level]}\n총 ${msgs.toLocaleString()}개 메시지\n일평균 ${mpd.toFixed(2)}개`;
 }
 const DATA_CUTOFF = '2025-10-01';
 
