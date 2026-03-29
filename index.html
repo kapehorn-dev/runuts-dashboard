@@ -988,9 +988,9 @@ startAutoRefresh();
   .user-filter-bar {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    margin-bottom: 16px;
-    padding: 16px;
+    gap: 6px;
+    margin-bottom: 12px;
+    padding: 12px;
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: 8px;
@@ -998,24 +998,24 @@ startAutoRefresh();
   .filter-group {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 5px;
     align-items: center;
   }
   .filter-group label {
-    font-size: 12px;
+    font-size: 11px;
     color: var(--muted);
     font-weight: 600;
-    min-width: 50px;
+    min-width: 48px;
   }
   .filter-pill {
-    padding: 6px 12px;
-    border-radius: 16px;
+    padding: 4px 10px;
+    border-radius: 14px;
     background: var(--bg);
     border: 1px solid var(--border);
     color: var(--muted);
-    font-size: 12px;
+    font-size: 11px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.15s;
   }
   .filter-pill:hover {
     color: var(--text);
@@ -1027,14 +1027,14 @@ startAutoRefresh();
     border-color: var(--accent);
   }
   .filter-pill-toggle {
-    padding: 6px 12px;
-    border-radius: 16px;
+    padding: 4px 10px;
+    border-radius: 14px;
     background: transparent;
     border: 1px solid var(--border);
     color: var(--muted);
-    font-size: 12px;
+    font-size: 11px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.15s;
     margin-left: auto;
   }
   .filter-pill-toggle:hover {
@@ -1344,74 +1344,68 @@ startAutoRefresh();
   @media (max-width: 768px) {
     .header {
       flex-wrap: wrap;
-      padding: 12px 16px;
-      gap: 12px;
+      padding: 10px 12px;
+      gap: 8px;
     }
-    .header h1 {
-      font-size: 16px;
-    }
+    .header h1 { font-size: 15px; }
     .header-right {
       flex-wrap: wrap;
       width: 100%;
       justify-content: space-between;
+      gap: 6px;
     }
+    .header-status { font-size: 11px; gap: 8px; }
     .nav {
       overflow-x: auto;
       flex-wrap: nowrap;
       -webkit-overflow-scrolling: touch;
-      padding: 0 16px;
+      padding: 0 12px;
+      gap: 0;
     }
     .nav button {
-      padding: 8px 12px;
-      font-size: 12px;
+      padding: 8px 10px;
+      font-size: 11px;
       white-space: nowrap;
     }
-    .nav-divider {
-      display: none;
-    }
-    .main {
-      padding: 16px;
-    }
+    .nav-divider { display: none; }
+    .main { padding: 12px; }
     .kpi-grid {
       grid-template-columns: repeat(2, 1fr);
       gap: 8px;
     }
-    .kpi-card {
-      padding: 12px;
-    }
-    .kpi-card .value {
-      font-size: 20px;
-    }
-    .info-grid {
-      grid-template-columns: 1fr;
-    }
-    .table-container {
-      padding: 12px;
-    }
-    .funnel-label {
-      width: 80px;
-      font-size: 11px;
-    }
-    .user-detail-panel { width: 420px !important; }
-    .user-filter-bar {
-      padding: 8px;
-    }
-    .search-bar input {
-      font-size: 13px;
-    }
-    .lsd-toggle button {
-      padding: 6px 10px;
-      font-size: 11px;
-    }
+    .kpi-card { padding: 12px; }
+    .kpi-card .value { font-size: 20px; }
+    .info-grid { grid-template-columns: 1fr; }
+    .table-container { padding: 8px; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .funnel-label { width: 80px; font-size: 11px; }
+    /* 유저 상세 패널: 모바일 전체화면 */
+    .user-detail-panel { width: 100% !important; max-width: 100% !important; }
+    /* 필터바 컴팩트 */
+    .user-filter-bar { padding: 8px; gap: 4px; }
+    .filter-group { gap: 4px; }
+    .filter-group label { min-width: 42px; font-size: 10px; }
+    .filter-pill, .filter-pill-toggle { padding: 3px 8px; font-size: 10px; }
+    .search-bar input { font-size: 13px; }
+    .lsd-toggle button { padding: 5px 8px; font-size: 10px; }
+    /* 테이블: Discord ID + 유입경로 숨기기 */
+    table th:first-child, table td:first-child { display: none; }
+    table th:nth-child(7), table td:nth-child(7) { display: none; }
+    table th, table td { padding: 8px 6px; font-size: 12px; }
+    /* 툴팁 모바일 대응 */
+    [data-tooltip]::after { max-width: 280px; font-size: 11px; left: 0; right: auto; }
   }
 
   @media (max-width: 480px) {
-    .kpi-grid {
-      grid-template-columns: 1fr;
-    }
-    .header-status .status-label {
-      display: none;
-    }
+    .kpi-grid { grid-template-columns: 1fr; }
+    .header-status .status-label { display: none; }
+    .header-status { gap: 4px; }
+    /* 테이블: Meta 매칭도 숨기기 */
+    table th:nth-child(9), table td:nth-child(9) { display: none; }
+    /* 필터바: 시간대 행 숨기기 */
+    .filter-group:last-child { display: none; }
+    /* 상세 패널 내부 여백 */
+    .user-detail-panel .user-detail-sections { padding: 0 4px; }
+    .user-detail-grid { grid-template-columns: 1fr !important; }
   }
 </style>
 </head>
