@@ -1906,9 +1906,9 @@ function skullSVG(color) {
 }
 
 const healthMeta = {
-  active:   { fill: 1.0,  label: 'Active',  desc: '7일 내 활동 + 메시지 6개 이상' },
-  casual:   { fill: 0.6,  label: 'Casual',  desc: '7일 내 활동, 메시지 5개 이하' },
-  fading:   { fill: 0.3,  label: 'Fading',  desc: '8~30일 사이 마지막 활동' },
+  active:   { fill: 1.0,  label: 'Active',  desc: '최근 7일 내 활발히 활동' },
+  casual:   { fill: 0.6,  label: 'Casual',  desc: '최근 7일 내 접속' },
+  fading:   { fill: 0.3,  label: 'Fading',  desc: '8~30일 전 마지막 활동' },
   inactive: { fill: 0.05, label: '장기부재', desc: '31일 이상 활동 없음' },
   left:     { fill: 0,    label: '이탈',    desc: '서버 탈퇴' },
 };
@@ -1926,15 +1926,9 @@ function healthBadge(u) {
 
 function getHealthTooltip(u) {
   const h = getUserHealth(u);
-  const m = healthMeta[h.level];
-  let lines = [m.label + ' — ' + m.desc];
-  if (u.last_active_date) {
-    lines.push('마지막 활동: ' + u.last_active_date + (h.days !== undefined ? ' (' + h.days + '일 전)' : ''));
-  } else {
-    lines.push('활동 기록 없음');
-  }
-  if (u.total_messages) lines.push('총 메시지: ' + Number(u.total_messages).toLocaleString() + '개');
-  return lines.join('\n');
+  if (h.level === 'left') return '서버 탈퇴';
+  if (!u.last_active_date) return '활동 기록 없음';
+  return '마지막 활동: ' + u.last_active_date + (h.days !== undefined ? ' (' + h.days + '일 전)' : '');
 }
 
 // ========== 유저 등급 (랭크 뱃지 컨셉) ==========
@@ -3448,22 +3442,21 @@ function openUserPanel(discordId) {
           </div>
         </div>
         <div style="font-size:12px;color:var(--muted);line-height:1.8;border-top:1px solid var(--border);padding-top:8px">
-          <div style="margin-bottom:6px;font-weight:600;color:var(--text)">건강도 기준</div>
+          <div style="margin-bottom:6px;font-weight:600;color:var(--text)">건강도 — 최근 접속 기준</div>
           <div style="display:grid;grid-template-columns:auto 1fr;gap:2px 8px">
-            <span style="color:var(--green)">Active</span><span>7일 내 활동 + 메시지 6개 이상</span>
-            <span style="color:var(--cyan)">Casual</span><span>7일 내 활동, 메시지 5개 이하</span>
-            <span style="color:var(--yellow)">Fading</span><span>8~30일 사이 마지막 활동</span>
+            <span style="color:var(--green)">Active</span><span>최근 7일 내 활발히 활동</span>
+            <span style="color:var(--cyan)">Casual</span><span>최근 7일 내 접속</span>
+            <span style="color:var(--yellow)">Fading</span><span>8~30일 전 마지막 활동</span>
             <span style="color:var(--red)">장기부재</span><span>31일+ 활동 없음</span>
             <span style="color:#6b7280">이탈</span><span>서버 탈퇴</span>
           </div>
-          <div style="margin-top:8px;margin-bottom:6px;font-weight:600;color:var(--text)">등급 기준</div>
+          <div style="margin-top:8px;margin-bottom:6px;font-weight:600;color:var(--text)">등급 — 누적 참여도 기준</div>
           <div style="display:grid;grid-template-columns:auto 1fr;gap:2px 8px">
-            <span style="color:#f59e0b">Core</span><span>일평균 메시지 0.5개 이상</span>
-            <span style="color:var(--accent2)">Regular</span><span>일평균 0.02~0.5개</span>
-            <span style="color:#64748b">Visitor</span><span>메시지 있지만 매우 드문</span>
+            <span style="color:#f59e0b">Core</span><span>커뮤니티 핵심 멤버</span>
+            <span style="color:var(--accent2)">Regular</span><span>정기 참여자</span>
+            <span style="color:#64748b">Visitor</span><span>가끔 방문</span>
             <span style="color:#475569">Silent</span><span>메시지 없음</span>
           </div>
-          <div style="margin-top:8px;color:var(--muted);font-size:11px">※ 게임 플레이 데이터(PlayFab) 연결 시 복합 지표로 업그레이드 예정</div>
         </div>
       </div>
       ${isDev(u) ? '<div class="user-detail-section" style="background:rgba(234,88,12,0.1);border:1px solid rgba(234,88,12,0.2)"><div class="section-header">개발자 계정</div><div style="font-size:13px;color:var(--orange)">KPI·퍼널 집계에서 제외됨</div></div>' : ''}
