@@ -1664,6 +1664,13 @@ startAutoRefresh();
         <canvas id="chartMessageActivity"></canvas>
       </div>
     </div>
+    <!-- 건강도 추이 (Health Snapshot) -->
+    <div class="chart-container" id="healthTrendContainer" style="display:none">
+      <div class="section-title">건강도 추이 <span style="font-size:11px;color:var(--muted);font-weight:400">일일 스냅샷 · 메시지 활동 기준</span></div>
+      <div class="chart-canvas-wrap">
+        <canvas id="chartHealthTrend"></canvas>
+      </div>
+    </div>
     <!-- 일간 기록 테이블 -->
     <div class="table-container">
       <div class="section-title">일간 기록</div>
@@ -1797,7 +1804,7 @@ startAutoRefresh();
         lg.innerHTML = [
           '<span style="font-weight:600;color:var(--text)">건강도:</span>',
           it(sh('var(--green)',0),'Active','var(--green)','최근 7일 내 활발히 활동'),
-          it(sh('var(--cyan)',7.2),'Casual','var(--cyan)','최근 7일 내 접속'),
+          it(sh('var(--cyan)',7.2),'Casual','var(--cyan)','최근 7일 내 메시지, 5개 이하'),
           it(sh('var(--yellow)',12.6),'Fading','var(--yellow)','8~30일 전 마지막 활동'),
           it(sh('var(--red)',17.1),'장기부재','var(--red)','31일 이상 활동 없음'),
           it(st('var(--accent2)'),'신규','var(--accent2)','가입 14일 이내, 아직 활동 없음'),
@@ -1889,6 +1896,8 @@ startAutoRefresh();
       <input type="text" id="urlSubAccounts" placeholder="https://docs.google.com/spreadsheets/d/e/...">
       <label>Discord Insights CSV URL</label>
       <input type="text" id="urlDiscordInsights" placeholder="https://docs.google.com/spreadsheets/d/e/...">
+      <label>Health Snapshot CSV URL</label>
+      <input type="text" id="urlHealthSnapshot" placeholder="https://docs.google.com/spreadsheets/d/e/...">
       <button class="btn-save" onclick="saveSettings()">저장 후 데이터 갱신</button>
       <p class="help-text" style="margin-top:12px">설정은 브라우저 localStorage에 저장됩니다.</p>
     </div>
@@ -1905,7 +1914,7 @@ let chartMembersInstance, chartGrowthInstance;
 // ========== CONFIG ==========
 const SHEET_KEYS = [
   'urlUserMaster','urlDiscordDaily','urlYouTube','urlTikTok',
-  'urlTesterPipeline','urlFunnelTracker','urlKpiDashboard','urlUGCArchive','urlMatchingFail','urlSubAccounts','urlDiscordInsights'
+  'urlTesterPipeline','urlFunnelTracker','urlKpiDashboard','urlUGCArchive','urlMatchingFail','urlSubAccounts','urlDiscordInsights','urlHealthSnapshot'
 ];
 let config = {};
 let data = {
@@ -1913,7 +1922,8 @@ let data = {
   testerPipeline: [], funnelTracker: [], kpiDashboard: [], ugcArchive: [], acquisitionEvents: [],
   matchingFail: [],
   subAccounts: [],
-  discordInsights: []
+  discordInsights: [],
+  healthSnapshot: []
 };
 let charts = {};
 let isLive = false;
@@ -1979,7 +1989,7 @@ function skullSVG(color) {
 
 const healthMeta = {
   active:   { fill: 1.0,  label: 'Active',  desc: '최근 7일 내 활발히 활동' },
-  casual:   { fill: 0.6,  label: 'Casual',  desc: '최근 7일 내 접속' },
+  casual:   { fill: 0.6,  label: 'Casual',  desc: '최근 7일 내 메시지, 5개 이하' },
   fading:   { fill: 0.3,  label: 'Fading',  desc: '8~30일 전 마지막 활동' },
   inactive: { fill: 0.05, label: '장기부재', desc: '31일 이상 활동 없음' },
   new:      { fill: 0,    label: '신규',    desc: '가입 14일 이내, 아직 활동 없음' },
@@ -2315,7 +2325,8 @@ const SHEET_LABELS = {
   urlUGCArchive: 'UGC Archive',
   urlMatchingFail: 'Matching Fail Users',
   urlSubAccounts: 'Sub Accounts',
-  urlDiscordInsights: 'Discord Insights'
+  urlDiscordInsights: 'Discord Insights',
+  urlHealthSnapshot: 'Health Snapshot'
 };
 
 function showLoading(show) {
@@ -2371,12 +2382,12 @@ async function loadAllData() {
   showLoading(true);
   showFetchError([]);
 
-  const sheetKeys = ['urlUserMaster','urlDiscordDaily','urlYouTube','urlTikTok','urlTesterPipeline','urlFunnelTracker','urlKpiDashboard','urlUGCArchive','urlMatchingFail','urlSubAccounts','urlDiscordInsights'];
+  const sheetKeys = ['urlUserMaster','urlDiscordDaily','urlYouTube','urlTikTok','urlTesterPipeline','urlFunnelTracker','urlKpiDashboard','urlUGCArchive','urlMatchingFail','urlSubAccounts','urlDiscordInsights','urlHealthSnapshot'];
   const fetched = await Promise.all(
     sheetKeys.map(k => fetchSheetData(config[k]))
   );
 
-  const dataKeys = ['userMaster','discordDaily','youtube','tiktok','testerPipeline','funnelTracker','kpiDashboard','ugcArchive','matchingFail','subAccounts','discordInsights'];
+  const dataKeys = ['userMaster','discordDaily','youtube','tiktok','testerPipeline','funnelTracker','kpiDashboard','ugcArchive','matchingFail','subAccounts','discordInsights','healthSnapshot'];
   let anyLive = false;
   const failedSheets = [];
   const numericFields = new Set([
@@ -3203,6 +3214,67 @@ function renderDiscordPage() {
       <td>${r.tester_role_count||'-'}</td>
     </tr>`;
   }).join('');
+
+  // 건강도 추이 차트 렌더링
+  renderHealthTrend();
+}
+
+// ========== 건강도 추이 차트 ==========
+function renderHealthTrend() {
+  const hs = (data.healthSnapshot || []).filter(r => r.type === 'summary');
+  const container = document.getElementById('healthTrendContainer');
+  if (!hs.length) {
+    if (container) container.style.display = 'none';
+    return;
+  }
+  if (container) container.style.display = '';
+
+  // 날짜순 정렬
+  hs.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+  const labels = hs.map(r => r.date);
+  const active = hs.map(r => parseInt(r.col_c) || 0);
+  const casual = hs.map(r => parseInt(r.col_d) || 0);
+  const fading = hs.map(r => parseInt(r.col_e) || 0);
+  const inactive = hs.map(r => parseInt(r.col_f) || 0);
+  const newUsers = hs.map(r => parseInt(r.col_g) || 0);
+
+  if (charts.healthTrend) charts.healthTrend.destroy();
+  charts.healthTrend = new Chart(document.getElementById('chartHealthTrend'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Active', data: active, borderColor: '#22c55e', backgroundColor: 'rgba(34,197,94,0.1)', fill: true, tension: 0.3, pointRadius: 2 },
+        { label: 'Casual', data: casual, borderColor: '#06b6d4', backgroundColor: 'rgba(6,182,212,0.1)', fill: true, tension: 0.3, pointRadius: 2 },
+        { label: 'Fading', data: fading, borderColor: '#eab308', backgroundColor: 'rgba(234,179,8,0.1)', fill: true, tension: 0.3, pointRadius: 2 },
+        { label: '장기부재', data: inactive, borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.1)', fill: true, tension: 0.3, pointRadius: 2 },
+        { label: '신규', data: newUsers, borderColor: '#6366f1', backgroundColor: 'rgba(99,102,241,0.1)', fill: true, tension: 0.3, pointRadius: 2 },
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { labels: { color: '#8b92a5', usePointStyle: true, pointStyle: 'circle', padding: 12 } },
+        tooltip: {
+          backgroundColor: 'rgba(22,24,34,0.95)', titleColor: '#eaedf3', bodyColor: '#c0c5d4',
+          callbacks: {
+            afterBody: function(items) {
+              if (!items.length) return '';
+              const idx = items[0].dataIndex;
+              const total = active[idx] + casual[idx] + fading[idx] + inactive[idx] + newUsers[idx];
+              return '\n합계: ' + total + '명';
+            }
+          }
+        }
+      },
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color: '#8b92a5', font: { size: 11 } } },
+        y: { grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color: '#8b92a5', font: { size: 11 } }, beginAtZero: true }
+      }
+    }
+  });
 }
 
 function renderFunnelTable() {
@@ -3575,6 +3647,44 @@ function toggleLeftUsers() {
 }
 
 // 서브 계정 섹션 빌드
+function buildHealthHistorySection(discordId) {
+  const changes = (data.healthSnapshot || []).filter(r => r.type === 'change' && r.col_c === discordId);
+  if (!changes.length) return '';
+
+  const healthColors = { active: 'var(--green)', casual: 'var(--cyan)', fading: 'var(--yellow)', inactive: 'var(--red)', new: 'var(--accent2)', left: '#6b7280' };
+  const healthLabels = { active: 'Active', casual: 'Casual', fading: 'Fading', inactive: '장기부재', new: '신규', left: '이탈' };
+  const tierColors = { core: '#f59e0b', regular: 'var(--accent2)', visitor: '#64748b', silent: '#475569' };
+  const tierLabels = { core: 'Core', regular: 'Regular', visitor: 'Visitor', silent: 'Silent' };
+
+  // 최신순 정렬
+  changes.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+
+  const rows = changes.slice(0, 20).map(c => {
+    const ph = c.col_e || '';  // prev_health
+    const nh = c.col_f || '';  // new_health
+    const pt = c.col_g || '';  // prev_tier
+    const nt = c.col_h || '';  // new_tier
+
+    let parts = [];
+    if (ph !== nh && nh) {
+      parts.push(`<span style="color:${healthColors[ph]||'var(--muted)'}">${healthLabels[ph]||ph||'?'}</span> → <span style="color:${healthColors[nh]||'var(--muted)'}">${healthLabels[nh]||nh}</span>`);
+    }
+    if (pt !== nt && nt) {
+      parts.push(`<span style="color:${tierColors[pt]||'var(--muted)'}">${tierLabels[pt]||pt||'?'}</span> → <span style="color:${tierColors[nt]||'var(--muted)'}">${tierLabels[nt]||nt}</span>`);
+    }
+
+    return `<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)">
+      <span style="color:var(--muted);font-size:12px">${c.date}</span>
+      <span style="font-size:12px">${parts.join(' · ')}</span>
+    </div>`;
+  }).join('');
+
+  return `<div class="user-detail-section">
+    <div class="section-header">건강도/등급 변화 이력</div>
+    ${rows}
+  </div>`;
+}
+
 function buildPreviousAccountSection(u) {
   // Sub Accounts에서 이 유저의 이전 계정(sub_discord_id) 찾기
   const subs = (data.subAccounts || []).filter(s => s.discord_id === u.discord_id && s.account_type === 'discord' && s.sub_discord_id);
@@ -3732,10 +3842,10 @@ function openUserPanel(discordId) {
           </div>
         </div>
         <div style="font-size:12px;color:var(--muted);line-height:1.8;border-top:1px solid var(--border);padding-top:8px">
-          <div style="margin-bottom:6px;font-weight:600;color:var(--text)">건강도 — 최근 접속 기준</div>
+          <div style="margin-bottom:6px;font-weight:600;color:var(--text)">건강도 — 메시지 활동 기준</div>
           <div style="display:grid;grid-template-columns:auto 1fr;gap:2px 8px">
             <span style="color:var(--green)">Active</span><span>최근 7일 내 활발히 활동</span>
-            <span style="color:var(--cyan)">Casual</span><span>최근 7일 내 접속</span>
+            <span style="color:var(--cyan)">Casual</span><span>최근 7일 내 메시지, 5개 이하</span>
             <span style="color:var(--yellow)">Fading</span><span>8~30일 전 마지막 활동</span>
             <span style="color:var(--red)">장기부재</span><span>31일+ 활동 없음</span>
             <span style="color:var(--accent2)">신규</span><span>가입 14일 이내, 아직 활동 없음</span>
@@ -3751,6 +3861,7 @@ function openUserPanel(discordId) {
         </div>
       </div>
       ${isDev(u) ? '<div class="user-detail-section" style="background:rgba(234,88,12,0.1);border:1px solid rgba(234,88,12,0.2)"><div class="section-header">개발자 계정</div><div style="font-size:13px;color:var(--orange)">KPI·퍼널 집계에서 제외됨</div></div>' : ''}
+      ${buildHealthHistorySection(u.discord_id)}
       ${buildPreviousAccountSection(u)}
       ${buildSubAccountsSection(u.discord_id)}
     </div>
@@ -4717,7 +4828,8 @@ const SHEET_GID_MAP = {
   urlKpiDashboard: 853056757,
   urlMatchingFail: 1440181399,
   urlSubAccounts: 1351563527,
-  urlDiscordInsights: 1530041356
+  urlDiscordInsights: 1530041356,
+  urlHealthSnapshot: 1954960031
 };
 
 const DEFAULT_PUB_BASE = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vR3QcezImsy5jV2Wm_XL29Y0r-tujiIUiBG6xsDaNfES2-CNnQZLp_40YWPOtnLR7vf3M_iN4OP6YLy/pub';
