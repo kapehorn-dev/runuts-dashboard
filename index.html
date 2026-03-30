@@ -1572,7 +1572,10 @@ startAutoRefresh();
       </div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px;">
         <div style="font-size:11px;color:#888;">ℹ️ 점선 = 데이터 소스 전환 (Insights → 봇 API). 전환 시점에 opt-out 유저 ~37명 차이 발생.</div>
-        <button id="ytMarkerToggle" onclick="toggleYtMarker()" style="font-size:11px;padding:3px 10px;border-radius:4px;border:1px solid var(--border);background:var(--card);color:#ef4444;cursor:pointer;white-space:nowrap">▲ YT 업로드</button>
+        <div style="display:flex;gap:4px">
+          <button id="ytMarkerToggle" onclick="toggleYtMarker()" style="font-size:11px;padding:3px 10px;border-radius:4px;border:1px solid var(--border);background:var(--card);color:#ef4444;cursor:pointer;white-space:nowrap">▲ YT 업로드</button>
+          <button onclick="resetChartZoom()" style="font-size:11px;padding:3px 10px;border-radius:4px;border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;white-space:nowrap">↺ 리셋</button>
+        </div>
       </div>
     </div>
     <!-- 일일 순증감 -->
@@ -1912,6 +1915,8 @@ startAutoRefresh();
 
 <!-- Chart.js CDN -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
 
 <script>
 // Chart.js instances
@@ -2810,6 +2815,11 @@ function renderFunnel(containerId) {
 const sourceTransitionPlugin = { id: 'sourceTransition' };
 // (실제 점선 처리는 datasets segment로 구현, 플러그인은 빈 껍데기로 유지)
 
+function resetChartZoom() {
+  if (charts.overviewGrowth) charts.overviewGrowth.resetZoom();
+  if (charts.netGrowth) charts.netGrowth.resetZoom();
+}
+
 function toggleYtMarker() {
   showYtMarkers = !showYtMarkers;
   const btn = document.getElementById('ytMarkerToggle');
@@ -2913,6 +2923,16 @@ function renderOverviewGrowthChart() {
       scales: {
         x: { ticks: { color: tickColor, maxTicksLimit: 12, maxRotation: 0, font: { size: 11 } }, grid: { color: gridColor } },
         y: { ticks: { color: tickColor, font: { size: 11 } }, grid: { color: gridColor } }
+      },
+      zoom: {
+        pan: { enabled: true, mode: 'x' },
+        zoom: {
+          wheel: { enabled: true },
+          pinch: { enabled: true },
+          drag: { enabled: true, backgroundColor: 'rgba(99,102,241,0.15)', borderColor: '#6366f1', borderWidth: 1 },
+          mode: 'x'
+        },
+        limits: { x: { minRange: 7 } }
       }
     },
     plugins: [sourceTransitionPlugin]
@@ -2970,6 +2990,16 @@ function renderOverviewGrowthChart() {
           grid: { color: gridColor },
           suggestedMin: -5
         }
+      },
+      zoom: {
+        pan: { enabled: true, mode: 'x' },
+        zoom: {
+          wheel: { enabled: true },
+          pinch: { enabled: true },
+          drag: { enabled: true, backgroundColor: 'rgba(99,102,241,0.15)', borderColor: '#6366f1', borderWidth: 1 },
+          mode: 'x'
+        },
+        limits: { x: { minRange: 7 } }
       }
     },
     plugins: [sourceTransitionPlugin]
