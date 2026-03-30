@@ -2420,8 +2420,11 @@ async function loadAllData() {
       });
       anyLive = true;
     } else if (config[sheetKeys[i]]) {
-      // URL이 설정되어 있는데 fetch 실패
-      failedSheets.push(sheetKeys[i]);
+      // URL이 설정되어 있는데 fetch 실패 — 선택적 시트는 에러 표시 안 함
+      const optionalSheets = new Set(['urlHealthSnapshot', 'urlActivityLog']);
+      if (!optionalSheets.has(sheetKeys[i])) {
+        failedSheets.push(sheetKeys[i]);
+      }
     }
   });
 
