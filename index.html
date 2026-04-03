@@ -3954,6 +3954,8 @@ function openUserPanel(discordId) {
           ${u.leave_date ? `<div class="detail-row"><span class="detail-label">탈퇴일</span><span class="detail-value">${toKST(u.leave_date)}</span></div>` : ''}
           <div class="detail-row"><span class="detail-label">유입 경로</span><span class="detail-value">${u.estimated_source || 'unknown'}</span></div>
           <div class="detail-row"><span class="detail-label">초대자</span><span class="detail-value">${u.invited_by || '-'}</span></div>
+          ${u.username_history ? `<div class="detail-row"><span class="detail-label">이전 유저명</span><span class="detail-value" style="color:var(--muted)">${u.username_history}</span></div>` : ''}
+          ${u.display_name_history ? `<div class="detail-row"><span class="detail-label">이전 닉네임</span><span class="detail-value" style="color:var(--muted)">${u.display_name_history}</span></div>` : ''}
         </div>
       </div>
       <div class="user-detail-section">
