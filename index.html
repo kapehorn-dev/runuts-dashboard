@@ -4565,7 +4565,11 @@ function displayDate(dateStr) {
   if (currentTZ === 'UTC') return s;  // UTC 모드면 원본 그대로
   if (s.length <= 10) return s;  // 날짜만 있으면 그대로
   try {
-    const utc = new Date(s.replace(' ', 'T') + 'Z');  // UTC로 파싱
+    // '2026-04-05 1:51:56' → '2026-04-05T01:51:56Z' (1자리 시간 패딩)
+    const normalized = s.replace(/(\d{4}-\d{2}-\d{2})\s+(\d{1,2}):(\d{2}):(\d{2})/, (_, date, h, m, sec) =>
+      `${date}T${h.padStart(2,'0')}:${m}:${sec}Z`
+    );
+    const utc = new Date(normalized.includes('T') ? normalized : s.replace(' ', 'T') + 'Z');
     if (isNaN(utc.getTime())) return s;
     const kst = new Date(utc.getTime() + 9 * 60 * 60 * 1000);
     const y = kst.getUTCFullYear();
