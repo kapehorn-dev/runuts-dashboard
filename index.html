@@ -4228,11 +4228,7 @@ function openUserPanel(discordId) {
               const pts = (gameRow.played_playtests || '').split(',').map(s => s.trim()).filter(Boolean);
               if (!pts.length) return '-';
               return '<div style="display:flex;flex-wrap:wrap;gap:4px;justify-content:flex-end">' + pts.map(pt => {
-                const isRecent = RECENT_4_PLAYTESTS.includes(pt);
-                const bg = isRecent ? 'rgba(99,102,241,0.2)' : 'rgba(255,255,255,0.06)';
-                const color = isRecent ? '#a5b4fc' : 'var(--muted)';
-                const border = isRecent ? '1px solid rgba(99,102,241,0.35)' : '1px solid rgba(255,255,255,0.08)';
-                return '<span style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;background:' + bg + ';color:' + color + ';border:' + border + ';line-height:1.4">' + pt + '</span>';
+                return '<span style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;background:rgba(255,255,255,0.06);color:var(--muted);border:1px solid rgba(255,255,255,0.08);line-height:1.4">' + pt + '</span>';
               }).join('') + '</div>';
             })()}</span></div>
             <div class="detail-row"><span class="detail-label">총 세션</span><span class="detail-value">${gameRow.total_sessions || 0}회</span></div>
