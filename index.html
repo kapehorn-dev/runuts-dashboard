@@ -1658,6 +1658,27 @@ startAutoRefresh();
       <div class="section-title">플레이테스트별 일별 활성 유저 (DAU)</div>
       <div style="height:320px;position:relative"><canvas id="playtestDauChart"></canvas></div>
     </div>
+    <div class="chart-container">
+      <div class="section-title">플레이테스트별 모드 이용량</div>
+      <div style="height:320px;position:relative"><canvas id="modeUsageChart"></canvas></div>
+    </div>
+    <div class="table-container">
+      <div class="section-title">이벤트 분석</div>
+      <table>
+        <thead><tr>
+          <th>플레이테스트</th>
+          <th style="text-align:center">유저</th>
+          <th style="text-align:center">튜토리얼<br><small style="color:var(--muted)">완료율</small></th>
+          <th style="text-align:center">Obby<br><small style="color:var(--muted)">클리어율</small></th>
+          <th style="text-align:center">태그</th>
+          <th style="text-align:center">상점</th>
+          <th style="text-align:center">장비</th>
+          <th style="text-align:center">퀘스트</th>
+          <th style="text-align:center">궁극기</th>
+        </tr></thead>
+        <tbody id="eventTableBody"></tbody>
+      </table>
+    </div>
     <div class="table-container">
       <div class="section-title">플레이테스트 요약</div>
       <table>
@@ -2009,7 +2030,7 @@ let chartMembersInstance, chartGrowthInstance;
 const SHEET_KEYS = [
   'urlUserMaster','urlDiscordDaily','urlYouTube','urlTikTok',
   'urlTesterPipeline','urlFunnelTracker','urlKpiDashboard','urlUGCArchive','urlMatchingFail','urlSubAccounts','urlDiscordInsights','urlHealthSnapshot','urlActivityLog',
-  'urlGameUserSummary','urlPlaytestSummary','urlPlaytestDaily'
+  'urlGameUserSummary','urlPlaytestSummary','urlPlaytestDaily','urlEventBreakdown'
 ];
 let config = {};
 let data = {
@@ -2022,7 +2043,8 @@ let data = {
   activityLog: [],
   gameUserSummary: [],
   playtestSummary: [],
-  playtestDaily: []
+  playtestDaily: [],
+  eventBreakdown: []
 };
 let charts = {};
 let isLive = false;
@@ -2505,12 +2527,12 @@ async function loadAllData() {
   showLoading(true);
   showFetchError([]);
 
-  const sheetKeys = ['urlUserMaster','urlDiscordDaily','urlYouTube','urlTikTok','urlTesterPipeline','urlFunnelTracker','urlKpiDashboard','urlUGCArchive','urlMatchingFail','urlSubAccounts','urlDiscordInsights','urlHealthSnapshot','urlActivityLog','urlGameUserSummary','urlPlaytestSummary','urlPlaytestDaily'];
+  const sheetKeys = ['urlUserMaster','urlDiscordDaily','urlYouTube','urlTikTok','urlTesterPipeline','urlFunnelTracker','urlKpiDashboard','urlUGCArchive','urlMatchingFail','urlSubAccounts','urlDiscordInsights','urlHealthSnapshot','urlActivityLog','urlGameUserSummary','urlPlaytestSummary','urlPlaytestDaily','urlEventBreakdown'];
   const fetched = await Promise.all(
     sheetKeys.map(k => fetchSheetData(config[k]))
   );
 
-  const dataKeys = ['userMaster','discordDaily','youtube','tiktok','testerPipeline','funnelTracker','kpiDashboard','ugcArchive','matchingFail','subAccounts','discordInsights','healthSnapshot','activityLog','gameUserSummary','playtestSummary','playtestDaily'];
+  const dataKeys = ['userMaster','discordDaily','youtube','tiktok','testerPipeline','funnelTracker','kpiDashboard','ugcArchive','matchingFail','subAccounts','discordInsights','healthSnapshot','activityLog','gameUserSummary','playtestSummary','playtestDaily','eventBreakdown'];
   let anyLive = false;
   const failedSheets = [];
   const numericFields = new Set([
@@ -2525,7 +2547,10 @@ async function loadAllData() {
     'visitors','pct_communicated','messages','messages_per_communicator','speaking_minutes',
     'leavers_new','leavers_old','total_leavers','muters_new','muters_existing',
     'total_playtests','total_sessions','total_events',
-    'unique_users','active_days','daily_users','daily_sessions','daily_events'
+    'unique_users','active_days','daily_users','daily_sessions','daily_events',
+    'new_players','tutorial_users','tutorial_complete_users','tutorial_skips','tutorial_rate',
+    'obby_starts','obby_clears','obby_deaths','obby_clear_rate',
+    'tag_ends','game_running','shop_enters','equip_items','quests_claimed','ultimate_uses'
   ]);
   dataKeys.forEach((k, i) => {
     if (fetched[i] && fetched[i].length > 0) {
@@ -2542,7 +2567,7 @@ async function loadAllData() {
       anyLive = true;
     } else if (config[sheetKeys[i]]) {
       // URL이 설정되어 있는데 fetch 실패 — 선택적 시트는 에러 표시 안 함
-      const optionalSheets = new Set(['urlHealthSnapshot', 'urlActivityLog', 'urlGameUserSummary', 'urlPlaytestSummary', 'urlPlaytestDaily']);
+      const optionalSheets = new Set(['urlHealthSnapshot', 'urlActivityLog', 'urlGameUserSummary', 'urlPlaytestSummary', 'urlPlaytestDaily', 'urlEventBreakdown']);
       if (!optionalSheets.has(sheetKeys[i])) {
         failedSheets.push(sheetKeys[i]);
       }
@@ -3958,6 +3983,66 @@ function renderPlaytestAnalysis() {
       <td style="text-align:center;color:var(--yellow)">${s.dormant}</td>
       <td style="text-align:center;color:var(--red)">${s.churn}</td>
       <td style="text-align:center;color:${retColor};font-weight:600">${retRate}%</td>
+    </tr>`;
+  }).join('');
+
+  // 이벤트 분석 (Event Breakdown 데이터)
+  renderEventAnalysis();
+}
+
+let _modeUsageChart = null;
+function renderEventAnalysis() {
+  const evRows = data.eventBreakdown || [];
+  const tbody = document.getElementById('eventTableBody');
+  if (!evRows.length || !tbody) return;
+
+  const evMap = {};
+  evRows.forEach(r => { evMap[r.playtest_name] = r; });
+
+  // 모드 이용량 차트
+  const modeCtx = document.getElementById('modeUsageChart');
+  if (modeCtx) {
+    if (_modeUsageChart) _modeUsageChart.destroy();
+    const shortLabels = PLAYTEST_NAMES.map(n => n.replace('Playtest', 'PT').replace('UT ', 'UT'));
+    _modeUsageChart = new Chart(modeCtx, {
+      type: 'bar',
+      data: {
+        labels: shortLabels,
+        datasets: [
+          { label: 'Obby', data: PLAYTEST_NAMES.map(pt => (evMap[pt]?.obby_starts || 0)), backgroundColor: '#22c55e90', borderRadius: 2 },
+          { label: '태그', data: PLAYTEST_NAMES.map(pt => (evMap[pt]?.tag_ends || 0)), backgroundColor: '#ef444490', borderRadius: 2 },
+          { label: '상점', data: PLAYTEST_NAMES.map(pt => (evMap[pt]?.shop_enters || 0)), backgroundColor: '#eab30890', borderRadius: 2 },
+          { label: '퀘스트', data: PLAYTEST_NAMES.map(pt => (evMap[pt]?.quests_claimed || 0)), backgroundColor: '#06b6d490', borderRadius: 2 },
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: true, position: 'top', labels: { color: '#8b92a5', font: { size: 11 }, boxWidth: 12, padding: 12 } } },
+        scales: {
+          x: { grid: { display: false }, ticks: { color: '#8b92a5', font: { size: 10 }, maxRotation: 45, minRotation: 25 } },
+          y: { grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color: '#8b92a5', font: { size: 11 } }, beginAtZero: true }
+        }
+      }
+    });
+  }
+
+  // 이벤트 테이블
+  tbody.innerHTML = PLAYTEST_NAMES.map(pt => {
+    const e = evMap[pt] || {};
+    const tutRate = e.tutorial_rate || 0;
+    const tutColor = tutRate >= 80 ? 'var(--green)' : tutRate >= 50 ? 'var(--yellow)' : 'var(--red)';
+    const obbyRate = e.obby_clear_rate || 0;
+    const obbyColor = obbyRate >= 15 ? 'var(--green)' : obbyRate >= 5 ? 'var(--yellow)' : 'var(--red)';
+    return `<tr>
+      <td>${pt}</td>
+      <td style="text-align:center">${e.unique_users || '-'}</td>
+      <td style="text-align:center">${e.tutorial_users ? `${e.tutorial_complete_users}/${e.tutorial_users} <span style="color:${tutColor};font-weight:600">${tutRate}%</span>` : '-'}</td>
+      <td style="text-align:center">${e.obby_starts ? `${fmt(e.obby_clears)}/${fmt(e.obby_starts)} <span style="color:${obbyColor};font-weight:600">${obbyRate}%</span>` : '-'}</td>
+      <td style="text-align:center">${e.tag_ends ? fmt(e.tag_ends) : '-'}</td>
+      <td style="text-align:center">${e.shop_enters ? fmt(e.shop_enters) : '-'}</td>
+      <td style="text-align:center">${e.equip_items ? fmt(e.equip_items) : '-'}</td>
+      <td style="text-align:center">${e.quests_claimed ? fmt(e.quests_claimed) : '-'}</td>
+      <td style="text-align:center">${e.ultimate_uses ? fmt(e.ultimate_uses) : '-'}</td>
     </tr>`;
   }).join('');
 }
@@ -5537,6 +5622,7 @@ const GAME_SUMMARY_GID_MAP = {
   urlGameUserSummary: 151122489,       // Game Users 탭 (전체 405명)
   urlPlaytestSummary: 729239948,       // Playtest Summary 탭 (13개 플테)
   urlPlaytestDaily: 1110379708,        // Playtest Daily 탭 (일별 DAU)
+  urlEventBreakdown: 1571863902,       // Event Breakdown 탭 (이벤트 분석)
 };
 
 function autoFillGameSummaryUrl() {
