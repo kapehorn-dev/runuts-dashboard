@@ -1868,6 +1868,7 @@ startAutoRefresh();
           <th class="sortable" onclick="sortUsersTable('join_date')">가입일 <small style="color:var(--muted);font-weight:400">(UTC)</small> <span class="sort-indicator" id="sort-join_date"></span></th>
           <th class="sortable" onclick="sortUsersTable('group')">그룹 <span class="sort-indicator" id="sort-group"></span></th>
           <th>테스터</th><th>Meta 매칭</th>
+          <th class="sortable" onclick="sortUsersTable('playtests')" style="text-align:center">플테 <span class="sort-indicator" id="sort-playtests"></span></th>
         </tr></thead>
         <tbody id="usersTableBody"></tbody>
       </table>
@@ -3908,7 +3909,9 @@ function debounceSearch() {
   clearTimeout(searchDebounceTimer);
   searchDebounceTimer = setTimeout(() => filterUsersTable(), 300);
 }
+var _gameUserMapCache = {};
 function filterUsersTable() {
+  _gameUserMapCache = buildGameUserMap();
   const statusKo = { active: '활동 중', left: '탈퇴', pre_registered: '사전등록' };
   const searchQuery = document.getElementById('userSearch')?.value.trim().toLowerCase() || '';
   let filtered = getFilteredUsers();
@@ -3958,6 +3961,7 @@ function filterUsersTable() {
       <td><span class="badge ${grpClass}">${grp}</span></td>
       <td>${(u.tester_applied==='O'||u.tester_applied==='TRUE') ? ((u.tester_approved==='O'||u.tester_approved==='TRUE') ? '<span class="badge approved">승인</span>' : '<span class="badge applied">신청</span>') : '-'}</td>
       <td>${u.playfab_matched==='O' ? '<span class="badge linked">매칭</span>' : '-'}</td>
+      <td style="text-align:center">${(() => { const mid = String(u.meta_id || '').trim(); const gm = typeof _gameUserMapCache !== 'undefined' ? _gameUserMapCache : {}; const gr = mid ? gm[mid] : null; const cnt = gr ? (gr.total_playtests || 0) : 0; return cnt > 0 ? cnt : '-'; })()}</td>
     </tr>`;
   }).join('');
   // 더 보기 버튼
@@ -5283,6 +5287,13 @@ function getSortedUsers(users) {
     } else if (col === 'tier') {
       aVal = tierOrder[getUserTier(a).level] || 0;
       bVal = tierOrder[getUserTier(b).level] || 0;
+      return dir === 'desc' ? bVal - aVal : aVal - bVal;
+    } else if (col === 'playtests') {
+      const gm = typeof _gameUserMapCache !== 'undefined' ? _gameUserMapCache : {};
+      const aM = String(a.meta_id || '').trim();
+      const bM = String(b.meta_id || '').trim();
+      aVal = (aM && gm[aM]) ? Number(gm[aM].total_playtests || 0) : 0;
+      bVal = (bM && gm[bM]) ? Number(gm[bM].total_playtests || 0) : 0;
       return dir === 'desc' ? bVal - aVal : aVal - bVal;
     } else {
       aVal = a[col] || '';
