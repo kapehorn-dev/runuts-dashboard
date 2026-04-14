@@ -1644,6 +1644,32 @@ startAutoRefresh();
         <tbody id="funnelTableBody"></tbody>
       </table>
     </div>
+
+    <!-- 플레이테스트 분석 -->
+    <div class="funnel-page-header" style="margin-top:32px;">
+      <h2>플레이테스트 분석</h2>
+      <p>플레이테스트별 참여자 수, 신규/재참여 비율, 잔존 현황을 비교합니다. Game User Summary 데이터 기반.</p>
+    </div>
+    <div class="chart-container">
+      <div class="section-title">플레이테스트별 참여자 수</div>
+      <div style="height:320px;position:relative"><canvas id="playtestChart"></canvas></div>
+    </div>
+    <div class="table-container">
+      <div class="section-title">플레이테스트 요약</div>
+      <table>
+        <thead><tr>
+          <th>플레이테스트</th>
+          <th style="text-align:center">참여자</th>
+          <th style="text-align:center">신규</th>
+          <th style="text-align:center">재참여</th>
+          <th style="text-align:center">잔존</th>
+          <th style="text-align:center">휴면</th>
+          <th style="text-align:center">이탈</th>
+          <th style="text-align:center">잔존율</th>
+        </tr></thead>
+        <tbody id="playtestTableBody"></tbody>
+      </table>
+    </div>
   </div>
 
   <!-- ===== 디스코드 페이지 ===== -->
@@ -2602,6 +2628,7 @@ function renderAll() {
   renderMultiDatasetChart();
   renderDiscordPage();
   renderFunnelTable();
+  renderPlaytestAnalysis();
   renderSNS();
   renderUsersTable();
   renderInfo();
@@ -3781,6 +3808,114 @@ function renderFunnelTable() {
     }
   });
   ctx._chart = chart;
+}
+
+// ========== 플레이테스트 분석 ==========
+let _playtestChart = null;
+function renderPlaytestAnalysis() {
+  const gameMap = buildGameUserMap();
+  const gameRows = data.gameUserSummary || [];
+  if (!gameRows.length) {
+    document.getElementById('playtestTableBody').innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--muted)">Game User Summary 데이터가 없습니다. 설정에서 URL을 연결해주세요.</td></tr>';
+    return;
+  }
+
+  // 플테별 집계
+  const stats = {};
+  PLAYTEST_NAMES.forEach(pt => {
+    stats[pt] = { participants: 0, newUsers: 0, returning: 0, retain: 0, dormant: 0, churn: 0 };
+  });
+
+  // 유저별 첫 플테 판별을 위해 PLAYTEST_NAMES 순서 사용
+  gameRows.forEach(row => {
+    const played = (row.played_playtests || '').split(',').map(s => s.trim()).filter(Boolean);
+    if (!played.length) return;
+    const retStatus = (row._retention_status || '').trim();
+
+    // 이 유저의 첫 플테 (PLAYTEST_NAMES 순서 기준 가장 빠른 것)
+    let firstPtIdx = 999;
+    played.forEach(pt => {
+      const idx = PLAYTEST_NAMES.indexOf(pt);
+      if (idx >= 0 && idx < firstPtIdx) firstPtIdx = idx;
+    });
+
+    played.forEach(pt => {
+      if (!stats[pt]) return;
+      stats[pt].participants++;
+      const ptIdx = PLAYTEST_NAMES.indexOf(pt);
+      if (ptIdx === firstPtIdx) stats[pt].newUsers++;
+      else stats[pt].returning++;
+      if (retStatus === '잔존') stats[pt].retain++;
+      else if (retStatus === '이탈') stats[pt].churn++;
+      else stats[pt].dormant++;
+    });
+  });
+
+  // 차트 렌더링
+  const ctx = document.getElementById('playtestChart');
+  if (_playtestChart) _playtestChart.destroy();
+
+  // 라벨 축약
+  const shortLabels = PLAYTEST_NAMES.map(n => n.replace('Playtest', 'PT').replace('UT ', 'UT'));
+
+  _playtestChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: shortLabels,
+      datasets: [
+        {
+          label: '신규',
+          data: PLAYTEST_NAMES.map(pt => stats[pt].newUsers),
+          backgroundColor: 'rgba(99,102,241,0.7)',
+          borderRadius: 2,
+        },
+        {
+          label: '재참여',
+          data: PLAYTEST_NAMES.map(pt => stats[pt].returning),
+          backgroundColor: 'rgba(99,102,241,0.3)',
+          borderRadius: 2,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: true, position: 'top', labels: { color: '#8b92a5', font: { size: 11 }, boxWidth: 12, padding: 12 } },
+        tooltip: {
+          callbacks: {
+            afterBody: function(ctx) {
+              const idx = ctx[0].dataIndex;
+              const pt = PLAYTEST_NAMES[idx];
+              const s = stats[pt];
+              return `총 참여자: ${s.participants}\n잔존: ${s.retain} / 휴면: ${s.dormant} / 이탈: ${s.churn}`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: { stacked: true, grid: { display: false }, ticks: { color: '#8b92a5', font: { size: 10 }, maxRotation: 45, minRotation: 25 } },
+        y: { stacked: true, grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { color: '#8b92a5', font: { size: 11 } }, beginAtZero: true }
+      }
+    }
+  });
+
+  // 테이블 렌더링
+  document.getElementById('playtestTableBody').innerHTML = PLAYTEST_NAMES.map(pt => {
+    const s = stats[pt];
+    const retRate = s.participants > 0 ? Math.round(s.retain / s.participants * 100) : 0;
+    const retColor = retRate >= 60 ? 'var(--green)' : retRate >= 30 ? 'var(--yellow)' : 'var(--red)';
+    return `<tr>
+      <td>${pt}</td>
+      <td style="text-align:center;font-weight:600">${s.participants}</td>
+      <td style="text-align:center;color:rgba(99,102,241,0.9)">${s.newUsers}</td>
+      <td style="text-align:center;color:var(--muted)">${s.returning}</td>
+      <td style="text-align:center;color:var(--green)">${s.retain}</td>
+      <td style="text-align:center;color:var(--yellow)">${s.dormant}</td>
+      <td style="text-align:center;color:var(--red)">${s.churn}</td>
+      <td style="text-align:center;color:${retColor};font-weight:600">${retRate}%</td>
+    </tr>`;
+  }).join('');
 }
 
 function sortYtTable(key) {
