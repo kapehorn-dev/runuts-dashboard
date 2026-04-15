@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>9차 Playtest 보고서 — RUNuts</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&family=Black+Han+Sans&display=swap');
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'IBM Plex Sans KR', -apple-system, sans-serif;
+    background: #fff; color: #1a1a2e;
+    line-height: 1.7; font-size: 14px;
+    max-width: 960px; margin: 0 auto; padding: 40px 32px;
+  }
+
+  /* 헤더 */
+  .report-header {
+    border-bottom: 3px solid #FF9900;
+    padding-bottom: 24px; margin-bottom: 32px;
+  }
+  .report-header h1 {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 28px; color: #1a1a2e; margin-bottom: 4px;
+  }
+  .report-header .subtitle {
+    font-size: 14px; color: #666; margin-bottom: 12px;
+  }
+  .report-meta {
+    display: flex; gap: 24px; font-size: 12px; color: #888;
+  }
+  .report-meta span { display: flex; align-items: center; gap: 4px; }
+
+  /* 섹션 */
+  .section { margin-bottom: 32px; }
+  .section-heading {
+    font-family: 'Black Han Sans', sans-serif;
+    font-size: 18px; color: #1a1a2e;
+    border-left: 4px solid #FF9900;
+    padding-left: 12px; margin-bottom: 16px;
+  }
+  /* Action Title (McKinsey 스타일) */
+  .action-title {
+    font-size: 15px; font-weight: 600; color: #333;
+    margin-bottom: 12px; line-height: 1.5;
+  }
+
+  /* KPI 카드 */
+  .kpi-row {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px; margin-bottom: 20px;
+  }
+  .kpi-box {
+    background: #f8f9fa; border-radius: 8px; padding: 16px;
+    text-align: center; border: 1px solid #e9ecef;
+  }
+  .kpi-box .label { font-size: 11px; color: #888; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .kpi-box .value { font-size: 24px; font-weight: 700; color: #1a1a2e; }
+  .kpi-box .delta { font-size: 11px; margin-top: 2px; }
+  .delta-up { color: #16a34a; }
+  .delta-down { color: #dc2626; }
+  .delta-neutral { color: #888; }
+
+  /* 인사이트 박스 */
+  .insight-box {
+    border-left: 4px solid #06b6d4; background: #f0fdfa;
+    padding: 12px 16px; border-radius: 0 8px 8px 0;
+    margin: 16px 0; font-size: 13px; line-height: 1.6;
+  }
+  .insight-box.warning {
+    border-left-color: #eab308; background: #fefce8;
+  }
+  .insight-box.action {
+    border-left-color: #22c55e; background: #f0fdf4;
+  }
+  .insight-box .insight-label {
+    font-weight: 700; font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.5px; margin-bottom: 4px;
+  }
+  .insight-box.warning .insight-label { color: #a16207; }
+  .insight-box.action .insight-label { color: #15803d; }
+  .insight-box .insight-label { color: #0e7490; }
+
+  /* 차트 */
+  .chart-wrap {
+    background: #f8f9fa; border-radius: 8px; padding: 16px;
+    margin: 16px 0; border: 1px solid #e9ecef;
+  }
+  .chart-wrap canvas { max-height: 300px; }
+
+  /* 테이블 */
+  table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 12px 0; }
+  th { background: #f1f3f5; padding: 8px 12px; text-align: left; font-weight: 600; font-size: 12px; color: #555; border-bottom: 2px solid #dee2e6; }
+  td { padding: 8px 12px; border-bottom: 1px solid #e9ecef; }
+  tr:hover td { background: #f8f9fa; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+
+  /* 신호등 */
+  .signal { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+  .signal-green { background: #22c55e; }
+  .signal-yellow { background: #eab308; }
+  .signal-red { background: #ef4444; }
+
+  /* 접기/펼치기 */
+  details { margin: 12px 0; }
+  summary { cursor: pointer; font-weight: 600; font-size: 13px; color: #555; padding: 8px 0; }
+  summary:hover { color: #FF9900; }
+
+  /* 푸터 */
+  .report-footer {
+    margin-top: 48px; padding-top: 16px; border-top: 1px solid #e9ecef;
+    font-size: 11px; color: #aaa; text-align: center;
+  }
+
+  /* 반응형 */
+  @media (max-width: 640px) {
+    body { padding: 20px 16px; }
+    .report-header h1 { font-size: 22px; }
+    .kpi-row { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  /* 인쇄 */
+  @media print {
+    body { padding: 20px; font-size: 12px; }
+    .chart-wrap { break-inside: avoid; }
+    .section { break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== 헤더 ===== -->
+<div class="report-header">
+  <h1>9차 Playtest 보고서</h1>
+  <div class="subtitle">RUNuts — 비행 기반 소셜 VR 멀티플레이 게임</div>
+  <div class="report-meta">
+    <span>📅 플테 기간: 2026-04-04 ~ 2026-04-06 (3일)</span>
+    <span>🏷️ 빌드: v0.13.0</span>
+    <span>📝 작성일: 2026-04-15</span>
+  </div>
+</div>
+
+<!-- ===== 1. Executive Summary ===== -->
+<div class="section">
+  <div class="section-heading">1. Executive Summary</div>
+  <div class="action-title">참여자 68명 중 잔존율 99% 달성 — Obby 클리어율 전회 대비 +5.7%p 개선으로 콘텐츠 난이도 조정 효과 확인</div>
+
+  <div class="kpi-row">
+    <div class="kpi-box">
+      <div class="label">참여자</div>
+      <div class="value">68</div>
+      <div class="delta delta-down">▼13 vs 8차</div>
+    </div>
+    <div class="kpi-box">
+      <div class="label">신규 유저</div>
+      <div class="value">10</div>
+      <div class="delta delta-down">▼6 vs 8차</div>
+    </div>
+    <div class="kpi-box">
+      <div class="label">잔존율</div>
+      <div class="value" style="color:#16a34a">99%</div>
+      <div class="delta delta-up">▲3%p vs 8차</div>
+    </div>
+    <div class="kpi-box">
+      <div class="label">총 세션</div>
+      <div class="value">965</div>
+      <div class="delta delta-down">▼222 vs 8차</div>
+    </div>
+    <div class="kpi-box">
+      <div class="label">피크 DAU</div>
+      <div class="value">57</div>
+      <div class="delta delta-down">▼12 vs 8차</div>
+    </div>
+    <div class="kpi-box">
+      <div class="label">Obby 클리어율</div>
+      <div class="value" style="color:#16a34a">14.2%</div>
+      <div class="delta delta-up">▲5.7%p vs 8차</div>
+    </div>
+  </div>
+
+  <div class="insight-box">
+    <div class="insight-label">💡 핵심 요약</div>
+    참여 규모는 8차 대비 감소했으나, 잔존율(99%)과 Obby 클리어율(14.2%)이 크게 개선되어 <strong>참여 품질이 향상</strong>되었다. 튜토리얼 완수율도 56.5% → 63.6%로 개선. 다만 신규 유저 유입(10명)이 줄어 <strong>모집 채널 다변화</strong>가 필요하다.
+  </div>
+</div>
+
+<!-- ===== 2. 참여자 분석 ===== -->
+<div class="section">
+  <div class="section-heading">2. 참여자 분석</div>
+  <div class="action-title">재참여 비율 85% — 코어 유저 기반 안정화, 신규 유입은 감소세</div>
+
+  <table>
+    <thead><tr><th>구분</th><th class="num">인원</th><th class="num">비율</th><th>비고</th></tr></thead>
+    <tbody>
+      <tr><td>총 참여자</td><td class="num"><strong>68</strong></td><td class="num">100%</td><td></td></tr>
+      <tr><td>　신규</td><td class="num">10</td><td class="num">15%</td><td>첫 플레이테스트 참여</td></tr>
+      <tr><td>　재참여</td><td class="num">58</td><td class="num">85%</td><td>이전 플테 경험자</td></tr>
+      <tr><td colspan="4" style="height:8px;border:none;"></td></tr>
+      <tr><td><span class="signal signal-green"></span>잔존</td><td class="num" style="color:#16a34a"><strong>67</strong></td><td class="num">99%</td><td>최근 4회 플테 + Discord 활동</td></tr>
+      <tr><td><span class="signal signal-yellow"></span>휴면</td><td class="num" style="color:#eab308">0</td><td class="num">0%</td><td></td></tr>
+      <tr><td><span class="signal signal-red"></span>이탈</td><td class="num" style="color:#dc2626">1</td><td class="num">1%</td><td>Discord 탈퇴</td></tr>
+    </tbody>
+  </table>
+
+  <div class="action-title" style="margin-top:20px">국가별 분포 — 미국(60%) 중심, 영국·캐나다 안정적</div>
+  <table>
+    <thead><tr><th>국가</th><th class="num">인원</th><th class="num">비율</th></tr></thead>
+    <tbody>
+      <tr><td>🇺🇸 미국</td><td class="num">41</td><td class="num">60%</td></tr>
+      <tr><td>🇬🇧 영국</td><td class="num">7</td><td class="num">10%</td></tr>
+      <tr><td>🇨🇦 캐나다</td><td class="num">5</td><td class="num">7%</td></tr>
+      <tr><td>🇦🇺 호주</td><td class="num">3</td><td class="num">4%</td></tr>
+      <tr><td>🇳🇱 네덜란드</td><td class="num">2</td><td class="num">3%</td></tr>
+      <tr><td>기타</td><td class="num">10</td><td class="num">15%</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ===== 3. 게임플레이 분석 ===== -->
+<div class="section">
+  <div class="section-heading">3. 게임플레이 분석</div>
+  <div class="action-title">피크 DAU 57명(Day 2), 인당 평균 14.2세션 — 세션 밀도 8차 대비 유사</div>
+
+  <div class="kpi-row">
+    <div class="kpi-box">
+      <div class="label">총 이벤트</div>
+      <div class="value">18,505</div>
+    </div>
+    <div class="kpi-box">
+      <div class="label">인당 세션</div>
+      <div class="value">14.2</div>
+    </div>
+    <div class="kpi-box">
+      <div class="label">인당 이벤트</div>
+      <div class="value">272</div>
+    </div>
+    <div class="kpi-box">
+      <div class="label">활성 일수</div>
+      <div class="value">3일</div>
+    </div>
+  </div>
+
+  <!-- DAU 차트 -->
+  <div class="chart-wrap">
+    <div style="font-size:13px;font-weight:600;margin-bottom:8px;color:#555">일별 활성 유저 (DAU)</div>
+    <canvas id="chartDau" height="200"></canvas>
+  </div>
+
+  <div class="insight-box">
+    <div class="insight-label">💡 인사이트</div>
+    Day 2(토요일)에 피크 57명을 기록한 후 Day 3에 급감(16명). 주말 집중 패턴은 8차와 동일하며, <strong>평일까지 참여를 유도하는 이벤트</strong>가 필요하다.
+  </div>
+
+  <!-- 모드별 이용 -->
+  <div class="action-title" style="margin-top:20px">게임 모드별 이용 — 태그 모드 102회, Obby 366회 시작</div>
+  <div class="chart-wrap">
+    <canvas id="chartModes" height="200"></canvas>
+  </div>
+</div>
+
+<!-- ===== 4. FTUE / 온보딩 분석 ===== -->
+<div class="section">
+  <div class="section-heading">4. FTUE / 온보딩 분석</div>
+  <div class="action-title">튜토리얼 완수율 63.6% (+7.1%p) — 개선 추세이나 스킵 3건 주의</div>
+
+  <table>
+    <thead><tr><th>단계</th><th class="num">유저 수</th><th class="num">비율</th><th>vs 8차</th></tr></thead>
+    <tbody>
+      <tr><td>튜토리얼 시작</td><td class="num">11</td><td class="num">100%</td><td></td></tr>
+      <tr><td>튜토리얼 완료</td><td class="num">7</td><td class="num">63.6%</td><td class="delta-up">▲7.1%p</td></tr>
+      <tr><td>튜토리얼 스킵</td><td class="num">3</td><td class="num">27.3%</td><td class="delta-down">▲18.6%p</td></tr>
+    </tbody>
+  </table>
+
+  <div class="insight-box warning">
+    <div class="insight-label">⚠️ 주의</div>
+    튜토리얼 스킵률(27.3%)이 8차(8.7%)에서 크게 증가. 재참여 유저가 스킵하는 것은 자연스러우나, <strong>신규 유저의 스킵 여부를 구분</strong>하여 모니터링할 필요가 있다.
+  </div>
+</div>
+
+<!-- ===== 5. 리텐션 분석 ===== -->
+<div class="section">
+  <div class="section-heading">5. 리텐션 분석</div>
+  <div class="action-title">잔존율 99%로 전회(96%) 대비 개선 — 이탈 1명(Discord 탈퇴)</div>
+
+  <div class="chart-wrap">
+    <canvas id="chartRetention" height="200"></canvas>
+  </div>
+
+  <div class="insight-box action">
+    <div class="insight-label">✅ 긍정 신호</div>
+    68명 중 67명이 잔존 상태를 유지하고 있어 <strong>코어 유저 기반이 매우 견고</strong>하다. 이탈 1명은 Discord 서버 자체 탈퇴에 의한 것으로, 게임 경험과는 무관한 이탈이다.
+  </div>
+</div>
+
+<!-- ===== 6. 이벤트 분석 ===== -->
+<div class="section">
+  <div class="section-heading">6. 이벤트 분석</div>
+  <div class="action-title">Obby 클리어율 14.2% — 난이도 조정 효과 확인, 상점 방문은 감소</div>
+
+  <table>
+    <thead><tr><th>이벤트</th><th class="num">9차</th><th class="num">8차</th><th class="num">변화</th></tr></thead>
+    <tbody>
+      <tr><td>Obby 시작</td><td class="num">366</td><td class="num">294</td><td class="num delta-up">+72</td></tr>
+      <tr><td>Obby 클리어</td><td class="num">52</td><td class="num">25</td><td class="num delta-up">+27</td></tr>
+      <tr><td>Obby 사망</td><td class="num">1,020</td><td class="num">583</td><td class="num delta-down">+437</td></tr>
+      <tr><td>Obby 클리어율</td><td class="num" style="font-weight:700;color:#16a34a">14.2%</td><td class="num">8.5%</td><td class="num delta-up">+5.7%p</td></tr>
+      <tr><td>태그 종료</td><td class="num">102</td><td class="num">213</td><td class="num delta-down">-111</td></tr>
+      <tr><td>상점 입장</td><td class="num">614</td><td class="num">1,132</td><td class="num delta-down">-518</td></tr>
+      <tr><td>아이템 장착</td><td class="num">648</td><td class="num">892</td><td class="num delta-down">-244</td></tr>
+      <tr><td>퀘스트 완료</td><td class="num">531</td><td class="num">391</td><td class="num delta-up">+140</td></tr>
+      <tr><td>궁극기 사용</td><td class="num">2,573</td><td class="num">3,473</td><td class="num delta-down">-900</td></tr>
+    </tbody>
+  </table>
+
+  <div class="insight-box">
+    <div class="insight-label">💡 인사이트</div>
+    Obby 모드의 시작 횟수와 클리어율이 모두 상승하여 <strong>난이도 조정이 효과적</strong>이었다. 반면 상점 방문(-46%)과 태그 모드(-52%)는 감소했는데, 이는 참여자 수 감소와 더불어 <strong>Obby 모드 집중 플레이</strong> 경향을 반영한다.
+  </div>
+
+  <div class="insight-box action">
+    <div class="insight-label">✅ 권장사항</div>
+    <ul style="margin:4px 0 0 16px;padding:0;">
+      <li><strong>P0</strong>: Obby 모드 난이도 개선 방향 유지 — 클리어율 20%+ 목표</li>
+      <li><strong>P1</strong>: 태그 모드 참여 유도 이벤트 검토 — 모드 간 균형 필요</li>
+      <li><strong>P1</strong>: 상점/아이템 시스템 개선 — 방문 동기 강화</li>
+      <li><strong>P2</strong>: 퀘스트 시스템 효과 긍정적 — 확장 검토</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ===== 7. 인사이트 & 권장사항 ===== -->
+<div class="section">
+  <div class="section-heading">7. 인사이트 & 권장사항</div>
+
+  <div class="insight-box action">
+    <div class="insight-label">✅ 핵심 발견 & 액션 아이템</div>
+    <table style="margin-top:8px;">
+      <thead><tr><th>우선순위</th><th>발견</th><th>권장 액션</th></tr></thead>
+      <tbody>
+        <tr><td><strong>P0</strong></td><td>신규 유입 감소 (16→10명)</td><td>모집 채널 다변화: Reddit, VR 커뮤니티, 크로스 프로모션</td></tr>
+        <tr><td><strong>P0</strong></td><td>Obby 클리어율 14.2%로 개선</td><td>현재 난이도 방향 유지, 20%+ 목표로 미세 조정</td></tr>
+        <tr><td><strong>P1</strong></td><td>태그 모드 이용 52% 감소</td><td>태그 모드 보상/이벤트 추가로 참여 유도</td></tr>
+        <tr><td><strong>P1</strong></td><td>상점 방문 46% 감소</td><td>신규 아이템 또는 기간 한정 프로모션 검토</td></tr>
+        <tr><td><strong>P2</strong></td><td>튜토리얼 스킵률 증가</td><td>재참여 유저와 신규 유저 분리 추적</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="insight-box">
+    <div class="insight-label">📊 긍정적 트렌드</div>
+    <ul style="margin:4px 0 0 16px;padding:0;">
+      <li>잔존율 99% — 코어 유저 기반 매우 안정</li>
+      <li>튜토리얼 완수율 63.6% — 2회 연속 상승</li>
+      <li>퀘스트 완료 +36% — 퀘스트 시스템 정착</li>
+      <li>Obby 참여·클리어 모두 증가 — 콘텐츠 개선 효과</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ===== 부록 ===== -->
+<div class="section">
+  <div class="section-heading">8. 부록</div>
+  <details>
+    <summary>📊 일별 상세 데이터</summary>
+    <table style="margin-top:8px;">
+      <thead><tr><th>날짜</th><th class="num">DAU</th><th class="num">세션</th><th class="num">이벤트</th></tr></thead>
+      <tbody>
+        <tr><td>2026-04-04 (금)</td><td class="num">30</td><td class="num">272</td><td class="num">5,041</td></tr>
+        <tr><td>2026-04-05 (토)</td><td class="num"><strong>57</strong></td><td class="num">609</td><td class="num">11,702</td></tr>
+        <tr><td>2026-04-06 (일)</td><td class="num">16</td><td class="num">84</td><td class="num">1,762</td></tr>
+        <tr style="font-weight:600;background:#f1f3f5"><td>합계</td><td class="num">-</td><td class="num">965</td><td class="num">18,505</td></tr>
+      </tbody>
+    </table>
+  </details>
+
+  <details style="margin-top:8px;">
+    <summary>📋 데이터 수집 방법론</summary>
+    <div style="padding:12px 0;font-size:13px;color:#666;line-height:1.7">
+      <ul style="margin-left:16px;">
+        <li><strong>게임 이벤트</strong>: BigQuery (runuts-analytics.runuts.events) — Unity SDK 기반 자동 수집</li>
+        <li><strong>유저 매칭</strong>: BigQuery USER_ID = User Master meta_id</li>
+        <li><strong>잔존 분류</strong>: 최근 4개 플테 참여 + Discord 활동 상태 기반</li>
+        <li><strong>빌드 매핑</strong>: CLIENT_VERSION 0.13.0 = 9차 Playtest</li>
+        <li><strong>집계 시점</strong>: 2026-04-15 기준</li>
+      </ul>
+    </div>
+  </details>
+</div>
+
+<!-- 푸터 -->
+<div class="report-footer">
+  RUNuts Analytics Dashboard · 9차 Playtest 보고서 · 생성일 2026-04-15<br>
+  이 보고서는 BigQuery + Google Sheets 데이터 기반으로 작성되었습니다.
+</div>
+
+<script>
+// DAU 차트
+new Chart(document.getElementById('chartDau'), {
+  type: 'bar',
+  data: {
+    labels: ['04-04 (금)', '04-05 (토)', '04-06 (일)'],
+    datasets: [
+      { label: 'DAU', data: [30, 57, 16], backgroundColor: ['#60a5fa','#FF9900','#60a5fa'], borderRadius: 4 },
+      { label: '세션', data: [272, 609, 84], backgroundColor: 'rgba(99,102,241,0.2)', borderColor: '#6366f1', type: 'line', yAxisID: 'y1', borderWidth: 2, pointRadius: 4, tension: 0.2 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { position: 'top', labels: { font: { size: 11 }, boxWidth: 12 } } },
+    scales: {
+      y: { beginAtZero: true, title: { display: true, text: 'DAU', font: { size: 11 } }, grid: { color: '#e9ecef' } },
+      y1: { position: 'right', beginAtZero: true, title: { display: true, text: '세션', font: { size: 11 } }, grid: { display: false } },
+      x: { grid: { display: false } }
+    }
+  }
+});
+
+// 모드별 이용 차트
+new Chart(document.getElementById('chartModes'), {
+  type: 'bar',
+  data: {
+    labels: ['Obby 시작', 'Obby 클리어', '태그 종료', '상점 입장', '아이템 장착', '퀘스트 완료', '궁극기 사용'],
+    datasets: [
+      { label: '9차', data: [366, 52, 102, 614, 648, 531, 2573], backgroundColor: '#FF9900', borderRadius: 3 },
+      { label: '8차', data: [294, 25, 213, 1132, 892, 391, 3473], backgroundColor: '#d1d5db', borderRadius: 3 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+    plugins: { legend: { position: 'top', labels: { font: { size: 11 }, boxWidth: 12 } } },
+    scales: {
+      x: { beginAtZero: true, grid: { color: '#e9ecef' } },
+      y: { grid: { display: false }, ticks: { font: { size: 11 } } }
+    }
+  }
+});
+
+// 잔존 차트
+new Chart(document.getElementById('chartRetention'), {
+  type: 'doughnut',
+  data: {
+    labels: ['잔존', '이탈'],
+    datasets: [{ data: [67, 1], backgroundColor: ['#22c55e', '#ef4444'], borderWidth: 0 }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false, cutout: '60%',
+    plugins: {
+      legend: { position: 'right', labels: { font: { size: 12 }, padding: 16 } },
+      tooltip: { callbacks: { label: ctx => `${ctx.label}: ${ctx.raw}명 (${(ctx.raw/68*100).toFixed(0)}%)` } }
+    }
+  }
+});
+</script>
+</body>
+</html>

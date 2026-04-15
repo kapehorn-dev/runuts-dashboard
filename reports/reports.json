@@ -1,0 +1,22 @@
+[
+  {
+    "id": "PT09",
+    "title": "9차 Playtest 보고서",
+    "playtest": "9차 Playtest",
+    "period": "2026-04-04 ~ 2026-04-06",
+    "date": "2026-04-15",
+    "summary": "참여자 68명, 잔존율 99%, Obby 클리어율 14.2%로 전회 대비 개선",
+    "file": "PT09_2026-04.html",
+    "status": "published"
+  },
+  {
+    "id": "PT08",
+    "title": "8차 Playtest 보고서",
+    "playtest": "8차 Playtest",
+    "period": "2026-03-21 ~ 2026-03-23",
+    "date": "2026-04-15",
+    "summary": "참여자 81명(역대 최다), 튜토리얼 완수율 56.5%, 피크 DAU 69명",
+    "file": "PT08_2026-03.html",
+    "status": "published"
+  }
+]

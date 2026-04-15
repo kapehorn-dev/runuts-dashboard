@@ -3,7 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RUNuts 마케팅 대시보드</title>
+<title>RUNuts Analytics Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Bowlby+One&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Quantico:wght@400;700&display=swap" rel="stylesheet">
 <script>
 // 대시보드 자동 새로고침 (10분마다)
 const AUTO_REFRESH_INTERVAL = 10 * 60 * 1000; // 10분
@@ -25,53 +28,124 @@ startAutoRefresh();
 </script>
 <style>
     :root {
-    --bg: #0c0e14;
-    --card: #161822;
-    --card-hover: #1c1f2e;
-    --border: #252838;
-    --text: #eaedf3;
-    --muted: #8b92a5;
-    --accent: #6366f1;
-    --accent2: #818cf8;
-    --accent-soft: rgba(99, 102, 241, 0.12);
-    --green: #22c55e;
-    --yellow: #eab308;
-    --red: #ef4444;
-    --orange: #f97316;
-    --cyan: #06b6d4;
-    --funnel1: #6366f1;
+    /* 브랜드 */
+    --brand-primary: #FF9900;
+    --brand-highlight: #47E333;
+    /* 배경 */
+    --bg: #111113;
+    --bg-surface: #1a1a1e;
+    --card: #1a1a1e;
+    --card-hover: #222226;
+    --border: rgba(255,255,255,0.07);
+    /* 텍스트 */
+    --text: #e8e6e3;
+    --muted: #7a7a85;
+    /* 액센트 — UI 인터랙션용 (브랜드 오렌지는 사이드바/CTA에만) */
+    --accent: #FF9900;
+    --accent2: #FFB340;
+    --accent-soft: rgba(255,153,0,0.08);
+    /* 상태 — 채도 조절, 다크 배경 가독성 최적화 */
+    --green: #34d399;
+    --yellow: #fbbf24;
+    --red: #f87171;
+    --orange: #fb923c;
+    --cyan: #22d3ee;
+    --blue: #60a5fa;
+    /* 차트 카테고리 색상 (Amplitude/Mixpanel 참조) */
+    --chart-1: #60a5fa;   /* 블루 */
+    --chart-2: #34d399;   /* 에메랄드 */
+    --chart-3: #a78bfa;   /* 바이올렛 */
+    --chart-4: #fb923c;   /* 오렌지 */
+    --chart-5: #f472b6;   /* 핑크 */
+    --chart-6: #22d3ee;   /* 시안 */
+    --chart-7: #fbbf24;   /* 앰버 */
+    --chart-8: #4ade80;   /* 라임 */
+    /* 퍼널 — 단계별 구분 (쿨→웜 그라디언트) */
+    --funnel1: #60a5fa;
     --funnel2: #818cf8;
-    --funnel3: #06b6d4;
-    --funnel4: #22c55e;
-    --funnel5: #eab308;
-    --funnel-retain: #22c55e;
-    --funnel-dormant: #eab308;
-    --funnel-churn: #ef4444;
+    --funnel3: #22d3ee;
+    --funnel4: #34d399;
+    --funnel5: #fbbf24;
+    --funnel-retain: #34d399;
+    --funnel-dormant: #fbbf24;
+    --funnel-churn: #f87171;
+    /* 사이드바 */
+    --sidebar-width: 240px;
+    --sidebar-collapsed: 60px;
+    --global-bar-height: 48px;
   }
   * { margin:0; padding:0; box-sizing:border-box; }
-    body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  body {
+    font-family: 'Quantico', 'IBM Plex Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
     background: var(--bg);
     color: var(--text);
     line-height: 1.6;
     min-height: 100vh;
     transition: background-color 0.2s ease, color 0.2s ease;
   }
-  .header {
-    background: var(--card);
+  /* 브랜드 제목 폰트 */
+  .heading-brand {
+    font-family: 'Bowlby One', 'Black Han Sans', sans-serif;
+    letter-spacing: 0.03em;
+    line-height: 1.2;
+  }
+  /* ===== 글로벌 바 (상단 고정) ===== */
+  .global-bar {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: var(--global-bar-height);
+    background: var(--bg);
     border-bottom: 1px solid var(--border);
-    padding: 16px 32px;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    padding: 0 16px;
+    z-index: 1000;
   }
-  .header h1 {
-    font-size: 20px;
-    font-weight: 700;
+  .global-bar-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .sidebar-toggle {
+    background: none;
+    border: none;
     color: var(--text);
+    font-size: 20px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: background 0.2s;
   }
-  .header h1 span { color: var(--accent); }
-  .header-right {
+  .sidebar-toggle:hover { background: rgba(255,255,255,0.06); }
+  .global-bar-logo {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    cursor: pointer;
+    text-decoration: none;
+    user-select: none;
+  }
+  .global-bar-logo:hover { opacity: 0.85; }
+  .global-bar-logo img {
+    height: 24px;
+    width: auto;
+    margin-right: 8px;
+  }
+  .global-bar-logo .logo-text {
+    font-family: 'Bowlby One', 'Black Han Sans', sans-serif;
+    font-size: 17px;
+    letter-spacing: 0.02em;
+    line-height: 1;
+  }
+  .global-bar-logo .logo-text .ru { color: var(--brand-primary); }
+  .global-bar-logo .logo-text .nuts { color: var(--text); }
+  .global-bar-center {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .global-bar-right {
     display: flex;
     align-items: center;
     gap: 12px;
@@ -79,12 +153,12 @@ startAutoRefresh();
   .header-status {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 10px;
     font-size: 13px;
   }
   .lsd-toggle {
     display: flex;
-    background: var(--card);
+    background: rgba(255,255,255,0.04);
     border: 1px solid var(--border);
     border-radius: 8px;
     overflow: hidden;
@@ -94,7 +168,7 @@ startAutoRefresh();
     background: none;
     border: none;
     color: var(--muted);
-    padding: 8px 14px;
+    padding: 6px 12px;
     font-size: 12px;
     cursor: pointer;
     transition: all 0.2s;
@@ -108,10 +182,10 @@ startAutoRefresh();
   }
   .theme-toggle {
     display: flex;
-    background: var(--card);
+    background: rgba(255,255,255,0.04);
     border: 1px solid var(--border);
     border-radius: 8px;
-    padding: 6px 10px;
+    padding: 4px 8px;
     cursor: pointer;
     font-size: 16px;
     transition: all 0.2s;
@@ -119,21 +193,128 @@ startAutoRefresh();
   .theme-toggle:hover {
     border-color: var(--accent);
   }
+
+  /* ===== 사이드바 ===== */
+  .sidebar {
+    position: fixed;
+    top: var(--global-bar-height);
+    left: 0;
+    bottom: 0;
+    width: var(--sidebar-width);
+    background: var(--card);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 8px 0;
+    z-index: 900;
+    transition: width 0.2s ease-in-out;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+  .sidebar.collapsed {
+    width: var(--sidebar-collapsed);
+  }
+  .sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 0 8px;
+    flex: 1;
+  }
+  .sidebar-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 8px 12px;
+  }
+  .sidebar-bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 0 8px;
+  }
+  .sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    transition: all 0.15s;
+    white-space: nowrap;
+    position: relative;
+  }
+  .sidebar-item:hover {
+    background: rgba(255,255,255,0.04);
+    color: var(--text);
+  }
+  .sidebar-item.active {
+    background: rgba(255,153,0,0.08);
+    color: var(--accent);
+    border-left: 3px solid var(--brand-primary);
+    padding-left: 9px; /* 12px - 3px border */
+  }
+  .sidebar-item .sidebar-icon {
+    font-size: 16px;
+    width: 20px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .sidebar-item .sidebar-label {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .sidebar.collapsed .sidebar-label {
+    display: none;
+  }
+  .sidebar.collapsed .sidebar-item {
+    justify-content: center;
+    padding: 10px 0;
+  }
+  .sidebar.collapsed .sidebar-item.active {
+    padding-left: 0;
+  }
+
+  /* 사이드바 오버레이 (모바일) */
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 899;
+  }
+  .sidebar-overlay.show { display: block; }
     html[data-theme="light"] {
-    --bg: #f4f6f9;
+    --bg: #f5f5f7;
+    --bg-surface: #ffffff;
     --card: #ffffff;
-    --card-hover: #f7f8fb;
-    --border: #e0e3ea;
-    --text: #1e2130;
-    --muted: #6c7389;
-    --accent: #4338ca;
-    --accent2: #5b52e0;
-    --accent-soft: rgba(67, 56, 202, 0.06);
+    --card-hover: #f8f8fa;
+    --border: #e2e2e8;
+    --text: #1a1a2e;
+    --muted: #6b6b7b;
+    --accent: #e08600;
+    --accent2: #c27400;
+    --accent-soft: rgba(224, 134, 0, 0.06);
     --green: #059669;
-    --yellow: #b45309;
+    --yellow: #d97706;
     --red: #dc2626;
-    --orange: #c2410c;
-    --cyan: #0e7490;
+    --orange: #ea580c;
+    --cyan: #0891b2;
+    --blue: #2563eb;
+    --chart-1: #2563eb;
+    --chart-2: #059669;
+    --chart-3: #7c3aed;
+    --chart-4: #ea580c;
+    --chart-5: #db2777;
+    --chart-6: #0891b2;
+    --chart-7: #d97706;
+    --chart-8: #16a34a;
   }
   [data-theme="light"] .kpi-card {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0, 0, 0, 0.03);
@@ -151,18 +332,21 @@ startAutoRefresh();
   [data-theme="light"] .funnel-container {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0, 0, 0, 0.02);
   }
-  [data-theme="light"] .header {
+  [data-theme="light"] .global-bar {
+    background: var(--bg);
     border-bottom: 1px solid var(--border);
   }
-  [data-theme="light"] .nav button.active {
+  [data-theme="light"] .sidebar {
+    background: var(--card);
+    border-right: 1px solid var(--border);
+  }
+  [data-theme="light"] .sidebar-item.active {
+    background: rgba(217,119,6,0.08);
     color: var(--accent);
-    border-color: var(--accent);
+    border-left-color: var(--accent);
   }
-  [data-theme="light"] .nav button {
-    color: var(--muted);
-  }
-  [data-theme="light"] .nav button:hover {
-    color: var(--text);
+  [data-theme="light"] .sidebar-item:hover {
+    background: rgba(0,0,0,0.03);
   }
   [data-theme="light"] table thead th {
     background: #f0f2f6;
@@ -172,7 +356,7 @@ startAutoRefresh();
     background: #f5f7fa;
   }
   [data-theme="light"] .funnel-bar {
-    background: linear-gradient(90deg, #6366f1, #818cf8) !important;
+    background: linear-gradient(90deg, var(--chart-1), var(--chart-6)) !important;
   }
   [data-theme="light"] .badge.runuts_grp {
     background: #e0e7ff;
@@ -301,80 +485,85 @@ startAutoRefresh();
   }
   .fetch-error-banner button:hover { opacity: 0.9; }
 
-  .nav {
-    background: var(--card);
-    border-bottom: 1px solid var(--border);
-    padding: 0 32px;
+  /* ===== 메인 콘텐츠 ===== */
+  .dashboard-layout {
     display: flex;
-    gap: 4px;
-    align-items: center;
+    margin-top: var(--global-bar-height);
   }
-  .nav button {
-    background: none;
-    border: none;
-    color: var(--muted);
-    padding: 12px 16px;
-    font-size: 14px;
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    transition: all 0.2s;
+  .main {
+    margin-left: var(--sidebar-width);
+    margin-top: var(--global-bar-height);
+    padding: 24px;
+    max-width: 1400px;
+    width: 100%;
+    transition: margin-left 0.2s ease-in-out;
   }
-  .nav button:hover { color: var(--text); }
-  .nav button.active {
-    color: var(--accent2);
-    border-bottom-color: var(--accent);
-  }
-  .nav-divider {
-    width: 1px;
-    background: var(--border);
-    height: 16px;
-    margin: 0 8px;
-  }
-  .nav-right {
-    margin-left: auto;
-    display: flex;
-    gap: 4px;
-    align-items: center;
+  .sidebar.collapsed ~ .main,
+  body.sidebar-collapsed .main {
+    margin-left: var(--sidebar-collapsed);
   }
 
-  .main { padding: 24px 32px; max-width: 1400px; margin: 0 auto; }
+  /* 반응형 */
+  @media (max-width: 1199px) {
+    .sidebar { width: var(--sidebar-collapsed); }
+    .sidebar .sidebar-label { display: none; }
+    .sidebar .sidebar-item { justify-content: center; padding: 10px 0; }
+    .sidebar .sidebar-item.active { padding-left: 0; }
+    .main { margin-left: var(--sidebar-collapsed); }
+  }
+  @media (max-width: 767px) {
+    .sidebar {
+      width: var(--sidebar-width);
+      transform: translateX(-100%);
+    }
+    .sidebar.mobile-open {
+      transform: translateX(0);
+    }
+    .sidebar .sidebar-label { display: inline; }
+    .sidebar .sidebar-item { justify-content: flex-start; padding: 10px 12px; }
+    .main { margin-left: 0; padding: 16px; }
+    .global-bar-center { display: none; }
+  }
 
   .section-title {
+    font-family: 'Black Han Sans', 'Bowlby One', 'IBM Plex Sans KR', sans-serif;
     font-size: 16px;
-    font-weight: 600;
-    margin-bottom: 16px;
+    font-weight: 500;
+    margin-bottom: 12px;
     color: var(--text);
+    line-height: 1.3;
+    letter-spacing: 0.01em;
   }
 
   /* KPI Cards */
   .kpi-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 16px;
-    margin-bottom: 32px;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+    margin-bottom: 24px;
   }
   .kpi-card {
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px;
+    border-radius: 8px;
+    padding: 16px;
     cursor: pointer;
     transition: all 0.2s;
   }
   .kpi-card:hover {
-    border-color: var(--accent);
-    background: rgba(99,102,241,0.05);
+    border-color: rgba(255,153,0,0.3);
+    background: var(--card-hover);
   }
   .kpi-card.kpi-alert {
-    border-color: rgba(234,179,8,0.4);
-    background: rgba(234,179,8,0.05);
+    border-color: rgba(251,191,36,0.25);
+    background: rgba(251,191,36,0.04);
   }
   .kpi-card.kpi-alert:hover {
-    border-color: rgba(234,179,8,0.7);
-    background: rgba(234,179,8,0.1);
+    border-color: rgba(251,191,36,0.4);
+    background: rgba(251,191,36,0.07);
   }
   .kpi-card.kpi-alert .label {
-    color: #b8860b;
+    color: var(--yellow);
   }
   .kpi-card .label {
     font-size: 12px;
@@ -438,9 +627,9 @@ startAutoRefresh();
   .funnel-container {
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 24px;
-    margin-bottom: 32px;
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
   }
   .funnel-bar-group {
     display: flex;
@@ -500,34 +689,96 @@ startAutoRefresh();
     font-weight: 600;
     color: #fff;
     transition: width 0.6s ease;
-    background: linear-gradient(90deg, var(--accent) 0%, var(--accent2) 100%) !important;
+    background: linear-gradient(90deg, var(--chart-1) 0%, var(--chart-6) 100%) !important;
   }
 
   /* Task 3: Funnel page differentiation */
-  #page-funnel .funnel-page-header {
-    background: linear-gradient(135deg, rgba(99,102,241,0.1) 0%, rgba(129,140,248,0.1) 100%);
-    border: 1px solid rgba(99,102,241,0.2);
-    border-radius: 12px;
-    padding: 24px;
+  /* 페이지 헤더 — 모든 탭 공통 */
+  .funnel-page-header {
     margin-bottom: 24px;
   }
-  #page-funnel .funnel-page-header h2 {
+  .funnel-page-header h2 {
+    font-family: 'Black Han Sans', 'Bowlby One', 'IBM Plex Sans KR', sans-serif;
     font-size: 24px;
-    font-weight: 700;
+    font-weight: 500;
     color: var(--text);
-    margin: 0 0 8px 0;
+    margin: 0 0 6px 0;
+    line-height: 1.3;
+    letter-spacing: 0.01em;
   }
-  #page-funnel .funnel-page-header p {
+  .funnel-page-header p {
     color: var(--muted);
     margin: 0;
     font-size: 14px;
     line-height: 1.6;
   }
-  #page-funnel .funnel-container {
-    background: rgba(99,102,241,0.04);
-    border: 1px solid rgba(99,102,241,0.15);
-    border-radius: 12px;
+  /* 보고서 카드 그리드 */
+  .report-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+  }
+  .report-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
     padding: 20px;
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.15s;
+  }
+  .report-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+  }
+  .report-card .rc-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: rgba(255,153,0,0.15);
+    color: var(--accent);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .report-card .rc-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .report-card .rc-period {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .report-card .rc-summary {
+    font-size: 13px;
+    color: var(--text);
+    opacity: 0.85;
+    line-height: 1.5;
+  }
+  .report-card .rc-date {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* 퍼널 페이지만 배경 강조 */
+  #page-funnel .funnel-page-header {
+    background: linear-gradient(135deg, rgba(96,165,250,0.06) 0%, rgba(34,211,238,0.06) 100%);
+    border: 1px solid rgba(96,165,250,0.12);
+    border-radius: 8px;
+    padding: 20px 24px;
+  }
+  #page-funnel .funnel-container {
+    background: rgba(96,165,250,0.04);
+    border: 1px solid rgba(96,165,250,0.12);
+    border-radius: 8px;
+    padding: 20px 24px;
   }
   #page-funnel .section-title {
     color: var(--accent);
@@ -550,9 +801,9 @@ startAutoRefresh();
   .chart-container {
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 24px;
-    margin-bottom: 32px;
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
   }
   .chart-canvas-wrap {
     width: 100%;
@@ -642,9 +893,9 @@ startAutoRefresh();
   .table-container {
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 24px;
-    margin-bottom: 32px;
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 16px;
     overflow-x: auto;
   }
   table {
@@ -1483,17 +1734,17 @@ startAutoRefresh();
   </div>
 </noscript>
 <style>#dashboardRoot { display: none; }</style>
-<div id="authGate" style="position:fixed;inset:0;z-index:99999;background:#0c0e14;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;">
+<div id="authGate" style="position:fixed;inset:0;z-index:99999;background:#171312;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;">
   <div style="text-align:center;">
-    <div style="font-size:28px;font-weight:700;color:#eaedf3;margin-bottom:4px;">🐿️ RUNuts Dashboard</div>
-    <div style="font-size:13px;color:#8b92a5;">POP Team 전용 — 비밀번호를 입력하세요</div>
+    <div style="font-family:'Bowlby One','Black Han Sans',sans-serif;font-size:28px;font-weight:700;color:#F2F0ED;margin-bottom:4px;">🐿️ <span style="color:#FF9900">RU</span>Nuts Analytics</div>
+    <div style="font-size:13px;color:rgba(242,240,237,0.5);">POP Team 전용 — 비밀번호를 입력하세요</div>
   </div>
   <div style="display:flex;gap:8px;">
     <input type="password" id="authInput" placeholder="비밀번호" autocomplete="off"
-      style="padding:10px 16px;border-radius:8px;border:1px solid #252838;background:#161822;color:#eaedf3;font-size:15px;outline:none;width:220px;"
+      style="padding:10px 16px;border-radius:8px;border:1px solid rgba(255,255,255,0.08);background:#1E1B1A;color:#F2F0ED;font-size:15px;outline:none;width:220px;"
       onkeydown="if(event.key==='Enter')authCheck()">
     <button onclick="authCheck()"
-      style="padding:10px 20px;border-radius:8px;border:none;background:#6366f1;color:#fff;font-size:14px;font-weight:600;cursor:pointer;">확인</button>
+      style="padding:10px 20px;border-radius:8px;border:none;background:#FF9900;color:#fff;font-size:14px;font-weight:600;cursor:pointer;">확인</button>
   </div>
   <div id="authError" style="color:#ef4444;font-size:13px;display:none;">비밀번호가 올바르지 않습니다</div>
 </div>
@@ -1542,36 +1793,70 @@ startAutoRefresh();
   <div class="loading-text" id="loadingText">Google Sheets에서 데이터를 불러오는 중...</div>
 </div>
 
-<div class="header">
-  <h1><span>RUNuts</span> 마케팅 대시보드</h1>
-  <div class="header-right">
+<!-- 글로벌 바 -->
+<div class="global-bar">
+  <div class="global-bar-left">
+    <button class="sidebar-toggle" onclick="toggleSidebar()" title="사이드바 접기/펼치기">☰</button>
+    <div class="global-bar-logo" onclick="showPage('overview')" title="개요로 이동">
+      <span class="logo-text"><span class="ru">RU</span><span class="nuts">Nuts</span></span>
+    </div>
+  </div>
+  <div class="global-bar-center">
+    <div class="lsd-toggle">
+      <button onclick="setLSDToggle(false)">RUNuts만</button>
+      <button class="active" onclick="setLSDToggle(true)">전체 (LSD 포함)</button>
+    </div>
+  </div>
+  <div class="global-bar-right">
+    <div class="lsd-toggle" id="tzToggle" title="시간대 전환 (원본 데이터는 UTC)" style="display:inline-flex;">
+      <button class="active" onclick="setTimezone('KST')">KST</button>
+      <button onclick="setTimezone('UTC')">UTC</button>
+    </div>
     <div class="header-status">
       <span class="status-dot loading" id="statusDot"></span>
       <span class="status-label" id="statusLabel">로딩 중...</span>
       <span id="lastDataDate" style="color: var(--muted); font-size: 13px;"></span>
     </div>
-    <div class="lsd-toggle">
-      <button onclick="setLSDToggle(false)">RUNuts만</button>
-      <button class="active" onclick="setLSDToggle(true)">전체 (LSD 포함)</button>
-    </div>
     <div class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙</div>
   </div>
 </div>
 
-<div class="nav">
-  <button class="active" onclick="showPage('overview')">개요</button>
-  <button onclick="showPage('funnel')">퍼널</button>
-  <span class="nav-divider"></span>
-  <button onclick="showPage('discord')">디스코드</button>
-  <button onclick="showPage('sns')">유튜브 / 틱톡</button>
-  <span class="nav-divider"></span>
-  <button onclick="showPage('users')">유저</button>
-  <div class="nav-right">
-    <span class="nav-divider"></span>
-    <button onclick="showPage('info')">정보</button>
-    <button onclick="showPage('settings')">설정</button>
+<!-- 사이드바 -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebarMobile()"></div>
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-nav">
+    <button class="sidebar-item active" data-page="overview" onclick="showPage('overview',this)">
+      <span class="sidebar-icon">📊</span><span class="sidebar-label">개요</span>
+    </button>
+    <button class="sidebar-item" data-page="discord" onclick="showPage('discord',this)">
+      <span class="sidebar-icon">💬</span><span class="sidebar-label">디스코드</span>
+    </button>
+    <button class="sidebar-item" data-page="playtest" onclick="showPage('playtest',this)">
+      <span class="sidebar-icon">🎮</span><span class="sidebar-label">플레이테스트</span>
+    </button>
+    <button class="sidebar-item" data-page="retention" onclick="showPage('retention',this)">
+      <span class="sidebar-icon">🔄</span><span class="sidebar-label">리텐션</span>
+    </button>
+    <button class="sidebar-item" data-page="users" onclick="showPage('users',this)">
+      <span class="sidebar-icon">👤</span><span class="sidebar-label">유저</span>
+    </button>
+    <button class="sidebar-item" data-page="sns" onclick="showPage('sns',this)">
+      <span class="sidebar-icon">📺</span><span class="sidebar-label">SNS</span>
+    </button>
+    <button class="sidebar-item" data-page="reports" onclick="showPage('reports',this)">
+      <span class="sidebar-icon">📋</span><span class="sidebar-label">보고서</span>
+    </button>
   </div>
-</div>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-bottom">
+    <button class="sidebar-item" data-page="info" onclick="showPage('info',this)">
+      <span class="sidebar-icon">ℹ️</span><span class="sidebar-label">정보</span>
+    </button>
+    <button class="sidebar-item" data-page="settings" onclick="showPage('settings',this)">
+      <span class="sidebar-icon">⚙️</span><span class="sidebar-label">설정</span>
+    </button>
+  </div>
+</nav>
 
 <div class="main">
 
@@ -1584,6 +1869,11 @@ startAutoRefresh();
   <!-- ===== 개요 페이지 ===== -->
   <div id="page-overview" class="page active">
     <div class="kpi-grid" id="kpiGrid"></div>
+    <!-- 최근 플레이테스트 요약 카드 (R-2-6) -->
+    <div id="recentPtSummary" class="chart-container" style="margin-bottom:16px;display:none;">
+      <div class="section-title">최근 플레이테스트 요약</div>
+      <div id="recentPtContent"></div>
+    </div>
     <div id="weeklySummaryCard" class="chart-container" style="margin-bottom:16px;display:none;"></div>
     <div class="funnel-container">
       <div class="section-title">테스터 전환 파이프라인</div>
@@ -1606,26 +1896,28 @@ startAutoRefresh();
         <div style="display:flex;gap:4px">
           <button id="ytMarkerToggle" onclick="toggleYtMarker()" style="font-size:11px;padding:3px 10px;border-radius:4px;border:1px solid var(--border);background:var(--card);color:#ef4444;cursor:pointer;white-space:nowrap">▲ YT 업로드</button>
           <button onclick="resetChartZoom()" style="font-size:11px;padding:3px 10px;border-radius:4px;border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;white-space:nowrap">↺ 리셋</button>
+          <button onclick="downloadChart('chartOverviewGrowth','멤버_성장_추이')" style="font-size:11px;padding:3px 10px;border-radius:4px;border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;white-space:nowrap" title="PNG로 저장">⬇ PNG</button>
         </div>
       </div>
     </div>
     <!-- 일일 순증감 -->
     <div class="chart-container">
-      <div class="section-title">일일 순증감 (가입 - 이탈)</div>
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div class="section-title" style="margin-bottom:0">일일 순증감 (가입 - 이탈)</div>
+        <button onclick="downloadChart('chartNetGrowth','일일_순증감')" style="font-size:11px;padding:3px 10px;border-radius:4px;border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;white-space:nowrap" title="PNG로 저장">⬇ PNG</button>
+      </div>
       <div class="chart-canvas-wrap">
         <canvas id="chartNetGrowth"></canvas>
       </div>
     </div>
   </div>
 
-  <!-- ===== 퍼널 페이지 ===== -->
+  <!-- ===== 퍼널 (개요 하단으로 통합된 상세 퍼널 — 숨김, 기존 JS 호환용) ===== -->
   <div id="page-funnel" class="page">
-    <!-- Task 3: Funnel page header -->
     <div class="funnel-page-header">
       <h2>테스터 전환 퍼널 분석</h2>
       <p>현재 디스코드 멤버부터 Playfab 등록 및 잔존까지 사용자 여정 추적. 각 단계를 클릭하면 해당 유저 목록을 확인할 수 있습니다.</p>
     </div>
-
     <div class="funnel-container">
       <div class="section-title">테스터 전환 파이프라인 (상세)</div>
       <div class="funnel-bar-group" id="funnelBarsFull"></div>
@@ -1644,18 +1936,26 @@ startAutoRefresh();
         <tbody id="funnelTableBody"></tbody>
       </table>
     </div>
+  </div>
 
-    <!-- 플레이테스트 분석 -->
-    <div class="funnel-page-header" style="margin-top:32px;">
-      <h2>플레이테스트 분석</h2>
+  <!-- ===== 플레이테스트 페이지 (신규 분리) ===== -->
+  <div id="page-playtest" class="page">
+    <div class="funnel-page-header">
+      <h2>🎮 플레이테스트 분석</h2>
       <p>플레이테스트별 참여자 수, 신규/재참여 비율, 잔존 현황을 비교합니다. Game User Summary 데이터 기반.</p>
     </div>
     <div class="chart-container">
-      <div class="section-title">플레이테스트별 참여자 수</div>
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div class="section-title" style="margin-bottom:0">플레이테스트별 참여자 수</div>
+        <button onclick="downloadChart('playtestChart','플테별_참여자')" style="font-size:11px;padding:3px 10px;border-radius:4px;border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;white-space:nowrap" title="PNG로 저장">⬇ PNG</button>
+      </div>
       <div style="height:320px;position:relative"><canvas id="playtestChart"></canvas></div>
     </div>
     <div class="chart-container">
-      <div class="section-title">플레이테스트별 일별 활성 유저 (DAU)</div>
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div class="section-title" style="margin-bottom:0">플레이테스트별 일별 활성 유저 (DAU)</div>
+        <button onclick="downloadChart('playtestDauChart','플테별_DAU')" style="font-size:11px;padding:3px 10px;border-radius:4px;border:1px solid var(--border);background:var(--card);color:var(--muted);cursor:pointer;white-space:nowrap" title="PNG로 저장">⬇ PNG</button>
+      </div>
       <div style="height:320px;position:relative"><canvas id="playtestDauChart"></canvas></div>
     </div>
     <div class="chart-container">
@@ -1699,10 +1999,55 @@ startAutoRefresh();
     </div>
   </div>
 
+  <!-- ===== 리텐션 페이지 ===== -->
+  <div id="page-retention" class="page">
+    <div class="funnel-page-header">
+      <h2>🔄 리텐션</h2>
+      <p>유저 잔존, 휴면, 이탈 심층 분석. 코호트별 리텐션 히트맵과 이탈 패턴을 추적합니다.</p>
+    </div>
+    <!-- KPI 요약 -->
+    <div class="kpi-grid" id="retentionKpi"></div>
+    <!-- 코호트 리텐션 히트맵 -->
+    <div class="chart-container">
+      <div class="section-title">코호트 리텐션 히트맵 <span style="font-size:11px;color:var(--muted);font-weight:400">— 첫 참여 플테 기준, 후속 플테 참여율</span></div>
+      <div style="overflow-x:auto"><canvas id="cohortHeatmap"></canvas></div>
+    </div>
+    <!-- 리텐션 커브 -->
+    <div class="chart-container">
+      <div class="section-title">리텐션 커브 <span style="font-size:11px;color:var(--muted);font-weight:400">— 코호트별 N번째 플테 잔존율</span></div>
+      <div style="height:320px;position:relative"><canvas id="retentionCurve"></canvas></div>
+    </div>
+    <!-- 이탈 분석 + FTUE 퍼널 -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div class="chart-container" style="margin-bottom:0">
+        <div class="section-title">이탈 분석 <span style="font-size:11px;color:var(--muted);font-weight:400">— 마지막 참여 플테 기준</span></div>
+        <div style="height:280px;position:relative"><canvas id="churnChart"></canvas></div>
+      </div>
+      <div class="chart-container" style="margin-bottom:0">
+        <div class="section-title">FTUE 퍼널 <span style="font-size:11px;color:var(--muted);font-weight:400">— 최근 4개 플테 튜토리얼</span></div>
+        <div style="height:280px;position:relative"><canvas id="ftueFunnel"></canvas></div>
+      </div>
+    </div>
+    <div style="height:16px"></div>
+    <!-- 플테 비교 레이더 -->
+    <div class="chart-container">
+      <div class="section-title">플레이테스트 비교 <span style="font-size:11px;color:var(--muted);font-weight:400">— 최근 3개 플테 지표 비교</span></div>
+      <div style="height:360px;position:relative;max-width:500px;margin:0 auto"><canvas id="playtestRadar"></canvas></div>
+    </div>
+  </div>
+
   <!-- ===== 디스코드 페이지 ===== -->
   <div id="page-discord" class="page">
     <div class="kpi-grid" id="discordKpi"></div>
     <div style="font-size:11px;color:var(--muted);text-align:right;margin-top:-8px;margin-bottom:8px">모든 데이터는 UTC 기준으로 집계됩니다. Server Insights 데이터는 Discord 자체 집계이며, opt-out 유저 ~37명이 제외됩니다.</div>
+    <!-- 유입 경로 분석 (R-2-7) -->
+    <div class="chart-container" id="sourceAnalysisContainer" style="display:none;">
+      <div class="section-title">유입 경로 분석 <span style="font-size:11px;color:var(--muted);font-weight:400">User Master estimated_source 기반</span></div>
+      <div style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;">
+        <div style="width:280px;height:280px;flex-shrink:0"><canvas id="chartSourceDonut"></canvas></div>
+        <div id="sourceBreakdownTable" style="flex:1;min-width:200px;"></div>
+      </div>
+    </div>
     <!-- 멤버 증감 분석 — 토글 카드 + 멀티 데이터셋 차트 -->
     <div class="chart-container">
       <div class="section-title">멤버 증감 분석</div>
@@ -1870,13 +2215,6 @@ startAutoRefresh();
       <div class="filter-group">
         <button class="filter-pill-toggle" id="leftUsersToggle" onclick="toggleLeftUsers()">탈퇴 유저 보기</button>
       </div>
-      <div class="filter-group">
-        <label>시간대:</label>
-        <div class="lsd-toggle" id="tzToggle" style="display:inline-flex;margin-left:4px;">
-          <button class="active" onclick="setTimezone('UTC')">UTC</button>
-          <button onclick="setTimezone('KST')">KST</button>
-        </div>
-      </div>
     </div>
     <div class="filter-result-count" id="filterResultCount"></div>
     <div class="table-container">
@@ -1952,6 +2290,28 @@ startAutoRefresh();
     </div>
   </div>
 
+  <!-- ===== 보고서 페이지 ===== -->
+  <div id="page-reports" class="page">
+    <!-- 보고서 목록 뷰 -->
+    <div id="reportListView">
+      <div class="funnel-page-header">
+        <h2>플레이테스트 보고서</h2>
+        <p>플레이테스트 단위 종합 데이터 분석 보고서. 각 카드를 클릭하면 상세 보고서를 열람할 수 있습니다.</p>
+      </div>
+      <div id="reportCards" class="report-cards-grid"></div>
+    </div>
+    <!-- 보고서 뷰어 -->
+    <div id="reportViewer" style="display:none;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+        <button onclick="closeReportViewer()" style="background:var(--bg-surface);border:1px solid var(--border);border-radius:8px;padding:8px 16px;color:var(--text);cursor:pointer;font-size:13px;display:flex;align-items:center;gap:6px;">
+          <span style="font-size:16px">←</span> 목록으로
+        </button>
+        <span id="reportViewerTitle" style="font-size:15px;font-weight:600;color:var(--text)"></span>
+      </div>
+      <iframe id="reportFrame" style="width:100%;border:none;border-radius:8px;background:#fff;min-height:80vh;"></iframe>
+    </div>
+  </div>
+
   <!-- ===== 정보 페이지 ===== -->
   <div id="page-info" class="page">
     <div class="info-grid" id="infoGrid"></div>
@@ -2022,6 +2382,7 @@ startAutoRefresh();
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-chart-matrix@2.0.1/dist/chartjs-chart-matrix.min.js"></script>
 
 <script>
 // Chart.js instances
@@ -2651,21 +3012,210 @@ function isRUNuts(u) { return !isDev(u) && getUserGroup(u) !== 'LSD'; }
 function isLSD(u) { return !isDev(u) && getUserGroup(u) === 'LSD'; }
 function isRealUser(u) { return !isDev(u); }
 
+// ========== R-2-6: 최근 플레이테스트 요약 카드 ==========
+let _recentPtRadarChart = null;
+function renderRecentPtSummary() {
+  const container = document.getElementById('recentPtSummary');
+  const content = document.getElementById('recentPtContent');
+  if (!container || !content) return;
+
+  const gameRows = data.gameUserSummary || [];
+  if (!gameRows.length) { container.style.display = 'none'; return; }
+
+  // retention_status가 계산되어 있어야 함
+  buildGameUserMap();
+
+  // 가장 최근 플테와 직전 플테 식별
+  const latestPt = PLAYTEST_NAMES[PLAYTEST_NAMES.length - 1];
+  const prevPt = PLAYTEST_NAMES.length >= 2 ? PLAYTEST_NAMES[PLAYTEST_NAMES.length - 2] : null;
+
+  // 플테별 유저 집계
+  function aggregatePt(ptName) {
+    let participants = 0, newUsers = 0, returning = 0, retain = 0, dormant = 0, churn = 0;
+    gameRows.forEach(row => {
+      const played = (row.played_playtests || '').split(',').map(s => s.trim());
+      if (!played.includes(ptName)) return;
+      participants++;
+      // 첫 플테 판별
+      let firstIdx = 999;
+      played.forEach(p => { const idx = PLAYTEST_NAMES.indexOf(p); if (idx >= 0 && idx < firstIdx) firstIdx = idx; });
+      const thisIdx = PLAYTEST_NAMES.indexOf(ptName);
+      if (thisIdx === firstIdx) newUsers++; else returning++;
+      const ret = (row._retention_status || '').trim();
+      if (ret === '잔존') retain++; else if (ret === '이탈') churn++; else dormant++;
+    });
+    const retRate = participants > 0 ? Math.round(retain / participants * 100) : 0;
+    return { participants, newUsers, returning, retain, dormant, churn, retRate };
+  }
+
+  const latest = aggregatePt(latestPt);
+  const prev = prevPt ? aggregatePt(prevPt) : null;
+
+  // BigQuery Playtest Summary (있으면 보충)
+  const ptSummaryMap = {};
+  (data.playtestSummary || []).forEach(row => { ptSummaryMap[row.playtest_name] = row; });
+  const bqLatest = ptSummaryMap[latestPt];
+  const bqPrev = prevPt ? ptSummaryMap[prevPt] : null;
+
+  // 변화 표시 헬퍼
+  function delta(curr, prevVal) {
+    if (prevVal == null) return '';
+    const diff = curr - prevVal;
+    if (diff === 0) return '<span style="color:var(--muted);font-size:11px;margin-left:4px">→ 0</span>';
+    const color = diff > 0 ? 'var(--green)' : 'var(--red)';
+    const arrow = diff > 0 ? '▲' : '▼';
+    return `<span style="color:${color};font-size:11px;margin-left:4px">${arrow}${Math.abs(diff)}</span>`;
+  }
+  function deltaPct(curr, prevVal) {
+    if (prevVal == null) return '';
+    const diff = curr - prevVal;
+    if (diff === 0) return '<span style="color:var(--muted);font-size:11px;margin-left:4px">→ 0%p</span>';
+    const color = diff > 0 ? 'var(--green)' : 'var(--red)';
+    const arrow = diff > 0 ? '▲' : '▼';
+    return `<span style="color:${color};font-size:11px;margin-left:4px">${arrow}${Math.abs(diff)}%p</span>`;
+  }
+
+  const sessions = bqLatest ? fmt(bqLatest.total_sessions) : '-';
+  const events = bqLatest ? fmt(bqLatest.total_events) : '-';
+  const retColor = latest.retRate >= 60 ? 'var(--green)' : latest.retRate >= 30 ? 'var(--yellow)' : 'var(--red)';
+
+  content.innerHTML = `
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+      <span style="font-size:15px;font-weight:700;color:var(--text)">${latestPt}</span>
+      ${prev ? `<span style="font-size:11px;color:var(--muted)">vs ${prevPt}</span>` : ''}
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:16px;">
+      <div style="background:var(--bg);border-radius:8px;padding:12px;">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:4px">참여자</div>
+        <div style="font-size:22px;font-weight:700;color:var(--text)">${latest.participants}${delta(latest.participants, prev?.participants)}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">신규 ${latest.newUsers} · 재참여 ${latest.returning}</div>
+      </div>
+      <div style="background:var(--bg);border-radius:8px;padding:12px;">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:4px">잔존율</div>
+        <div style="font-size:22px;font-weight:700;color:${retColor}">${latest.retRate}%${deltaPct(latest.retRate, prev?.retRate)}</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">잔존 ${latest.retain} · 휴면 ${latest.dormant} · 이탈 ${latest.churn}</div>
+      </div>
+      <div style="background:var(--bg);border-radius:8px;padding:12px;">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:4px">세션</div>
+        <div style="font-size:22px;font-weight:700;color:var(--text)">${sessions}</div>
+        ${bqLatest ? `<div style="font-size:11px;color:var(--muted);margin-top:2px">이벤트 ${events}</div>` : '<div style="font-size:11px;color:var(--muted);margin-top:2px">Playtest Summary 미연결</div>'}
+      </div>
+      <div style="background:var(--bg);border-radius:8px;padding:12px;">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:4px">신규 비율</div>
+        <div style="font-size:22px;font-weight:700;color:var(--chart-1)">${latest.participants ? Math.round(latest.newUsers / latest.participants * 100) : 0}%</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">${latest.newUsers}명 첫 참여</div>
+      </div>
+    </div>
+  `;
+  container.style.display = '';
+}
+
+// ========== R-2-7: 유입 경로 분석 (디스코드 탭) ==========
+let _sourceDonutChart = null;
+function renderSourceAnalysis() {
+  const container = document.getElementById('sourceAnalysisContainer');
+  if (!container) return;
+
+  const um = showLSDData ? data.userMaster.filter(isRealUser) : data.userMaster.filter(isRUNuts);
+  if (!um.length) { container.style.display = 'none'; return; }
+
+  // estimated_source 집계
+  const srcCounts = {};
+  um.forEach(u => {
+    const src = (u.estimated_source || 'unknown').trim().toLowerCase();
+    srcCounts[src] = (srcCounts[src] || 0) + 1;
+  });
+
+  // 정렬 (내림차순)
+  const sorted = Object.entries(srcCounts).sort((a,b) => b[1] - a[1]);
+  const total = um.length;
+
+  // 도넛 차트
+  const chartColors = [
+    'var(--chart-1)','var(--chart-2)','var(--chart-3)','var(--chart-4)',
+    'var(--chart-5)','var(--chart-6)','var(--chart-7)','var(--chart-8)'
+  ];
+  // CSS 변수를 실제 색상으로 변환
+  const computedStyle = getComputedStyle(document.documentElement);
+  const resolvedColors = chartColors.map(c => {
+    const varName = c.replace('var(','').replace(')','');
+    return computedStyle.getPropertyValue(varName).trim() || '#888';
+  });
+
+  const canvasEl = document.getElementById('chartSourceDonut');
+  if (_sourceDonutChart) _sourceDonutChart.destroy();
+  _sourceDonutChart = new Chart(canvasEl, {
+    type: 'doughnut',
+    data: {
+      labels: sorted.map(([src]) => src),
+      datasets: [{
+        data: sorted.map(([,cnt]) => cnt),
+        backgroundColor: sorted.map((_,i) => resolvedColors[i % resolvedColors.length]),
+        borderColor: 'transparent',
+        borderWidth: 0
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: true,
+      cutout: '55%',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => {
+              const pct = total > 0 ? (ctx.raw / total * 100).toFixed(1) : 0;
+              return `${ctx.label}: ${ctx.raw}명 (${pct}%)`;
+            }
+          }
+        }
+      }
+    }
+  });
+
+  // 테이블
+  const tableEl = document.getElementById('sourceBreakdownTable');
+  if (tableEl) {
+    tableEl.innerHTML = `
+      <table style="width:100%;font-size:12px;">
+        <thead><tr>
+          <th style="text-align:left;padding:6px 8px;border-bottom:1px solid var(--border)">경로</th>
+          <th style="text-align:right;padding:6px 8px;border-bottom:1px solid var(--border)">인원</th>
+          <th style="text-align:right;padding:6px 8px;border-bottom:1px solid var(--border)">비율</th>
+        </tr></thead>
+        <tbody>${sorted.map(([src, cnt], i) => {
+          const pct = (cnt / total * 100).toFixed(1);
+          const color = resolvedColors[i % resolvedColors.length];
+          return `<tr>
+            <td style="padding:5px 8px;"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};margin-right:6px;vertical-align:middle;"></span>${src}</td>
+            <td style="text-align:right;padding:5px 8px;font-weight:600">${cnt}</td>
+            <td style="text-align:right;padding:5px 8px;color:var(--muted)">${pct}%</td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table>
+    `;
+  }
+  container.style.display = '';
+}
+
 // ========== RENDER ==========
 function renderAll() {
   initializeFilterButtons();
   renderKPI();
+  renderRecentPtSummary();
   renderFunnel('funnelBars');
   renderFunnel('funnelBarsFull');
   renderOverviewGrowthChart();
   renderGrowthStageCards();
   renderMultiDatasetChart();
   renderDiscordPage();
+  renderSourceAnalysis();
   renderFunnelTable();
   renderPlaytestAnalysis();
+  renderRetentionPage();
   renderSNS();
   renderUsersTable();
   renderInfo();
+  loadReports();
 }
 
 function initializeFilterButtons() {
@@ -4067,6 +4617,333 @@ function sortTtTable(key) {
   renderSNS();
 }
 
+// ========== RETENTION PAGE ==========
+let cohortHeatmapInstance, retentionCurveInstance, churnChartInstance, ftueFunnelInstance, playtestRadarInstance;
+
+function renderRetentionPage() {
+  const gus = data.gameUserSummary || [];
+  const ps = data.playtestSummary || [];
+  const eb = data.eventBreakdown || [];
+  if (!gus.length || !ps.length) return;
+
+  // 플테 순서 목록
+  const ptOrder = ps.map(r => r.playtest_name);
+
+  // --- KPI 요약 ---
+  const retain = gus.filter(r => (r._retention_status||'').trim() === '잔존').length;
+  const dormant = gus.filter(r => (r._retention_status||'').trim() === '휴면').length;
+  const churn = gus.filter(r => (r._retention_status||'').trim() === '이탈').length;
+  const total = gus.length;
+  const retainPct = total ? (retain/total*100).toFixed(1) : 0;
+  const dormantPct = total ? (dormant/total*100).toFixed(1) : 0;
+  const churnPct = total ? (churn/total*100).toFixed(1) : 0;
+
+  // 최근 2개 플테 리텐션율 계산
+  const lastPt = ptOrder[ptOrder.length-1];
+  const prevPt = ptOrder.length >= 3 ? ptOrder[ptOrder.length-3] : ptOrder[ptOrder.length-2]; // April Fools 건너뛰기
+  const lastPtUsers = gus.filter(r => (r.played_playtests||'').includes(lastPt));
+  const prevToLast = prevPt ? gus.filter(r => (r.played_playtests||'').includes(prevPt) && (r.played_playtests||'').includes(lastPt)).length : 0;
+  const prevTotal = prevPt ? gus.filter(r => (r.played_playtests||'').includes(prevPt)).length : 0;
+  const ptRetention = prevTotal ? (prevToLast/prevTotal*100).toFixed(0) : '-';
+
+  document.getElementById('retentionKpi').innerHTML = [
+    `<div class="kpi-card"><div class="label">잔존</div><div class="value" style="color:var(--green)">${retain}</div><div class="change" style="color:var(--muted)">${retainPct}% · 최근 4개 플테 중 1개+ 참여</div></div>`,
+    `<div class="kpi-card"><div class="label">휴면</div><div class="value" style="color:var(--yellow)">${dormant}</div><div class="change" style="color:var(--muted)">${dormantPct}% · 최근 4개 플테 미참여</div></div>`,
+    `<div class="kpi-card"><div class="label">이탈</div><div class="value" style="color:var(--red)">${churn}</div><div class="change" style="color:var(--muted)">${churnPct}% · 디스코드 탈퇴</div></div>`,
+    `<div class="kpi-card"><div class="label">플테 리텐션</div><div class="value">${ptRetention}%</div><div class="change" style="color:var(--muted)">${prevPt||''} → ${lastPt}</div></div>`
+  ].join('');
+
+  // --- 코호트 히트맵 데이터 ---
+  // 코호트 = 첫 참여 플테 기준, 후속 참여율
+  const cohorts = {};
+  gus.forEach(row => {
+    const played = (row.played_playtests || '').split(',').map(s => s.trim()).filter(s => s);
+    if (!played.length) return;
+    // 첫 참여 플테 = ptOrder에서 가장 빠른 것
+    let firstIdx = Infinity;
+    played.forEach(p => { const idx = ptOrder.indexOf(p); if (idx >= 0 && idx < firstIdx) firstIdx = idx; });
+    if (firstIdx === Infinity) return;
+    const cohortName = ptOrder[firstIdx];
+    if (!cohorts[cohortName]) cohorts[cohortName] = { total: 0, byPt: {} };
+    cohorts[cohortName].total++;
+    played.forEach(p => {
+      if (ptOrder.indexOf(p) >= firstIdx) {
+        cohorts[cohortName].byPt[p] = (cohorts[cohortName].byPt[p] || 0) + 1;
+      }
+    });
+  });
+
+  // 히트맵 matrix 데이터
+  const matrixData = [];
+  const cohortNames = ptOrder.filter(p => cohorts[p]);
+  cohortNames.forEach((cName, yIdx) => {
+    const c = cohorts[cName];
+    ptOrder.forEach((pName, xIdx) => {
+      if (xIdx >= ptOrder.indexOf(cName)) {
+        const count = c.byPt[pName] || 0;
+        const pct = c.total ? Math.round(count / c.total * 100) : 0;
+        matrixData.push({ x: xIdx, y: yIdx, v: pct, count, total: c.total });
+      }
+    });
+  });
+
+  // 히트맵 렌더링
+  if (cohortHeatmapInstance) cohortHeatmapInstance.destroy();
+  const hmCtx = document.getElementById('cohortHeatmap');
+  // 캔버스 크기 동적 조정
+  const hmHeight = Math.max(200, cohortNames.length * 32 + 60);
+  hmCtx.style.height = hmHeight + 'px';
+  hmCtx.height = hmHeight;
+
+  cohortHeatmapInstance = new Chart(hmCtx, {
+    type: 'matrix',
+    data: {
+      datasets: [{
+        data: matrixData,
+        backgroundColor(ctx) {
+          const v = ctx.dataset.data[ctx.dataIndex]?.v || 0;
+          if (v === 0) return 'rgba(255,255,255,0.02)';
+          const alpha = 0.15 + (v / 100) * 0.85;
+          return `rgba(96, 165, 250, ${alpha})`;
+        },
+        width: ({chart}) => (chart.chartArea?.width || 600) / ptOrder.length - 2,
+        height: ({chart}) => (chart.chartArea?.height || 300) / cohortNames.length - 2,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: {
+          type: 'linear',
+          position: 'top',
+          min: -0.5,
+          max: ptOrder.length - 0.5,
+          ticks: {
+            stepSize: 1,
+            callback: (v) => ptOrder[v] ? ptOrder[v].replace(' Playtest','').replace(' UT','') : '',
+            color: 'var(--muted)',
+            font: { size: 10 },
+            maxRotation: 45
+          },
+          grid: { display: false }
+        },
+        y: {
+          type: 'linear',
+          min: -0.5,
+          max: cohortNames.length - 0.5,
+          ticks: {
+            stepSize: 1,
+            callback: (v) => cohortNames[v] ? cohortNames[v].replace(' Playtest','').replace(' UT','') : '',
+            color: 'var(--muted)',
+            font: { size: 10 }
+          },
+          grid: { display: false }
+        }
+      },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            title: (items) => {
+              const d = items[0].raw;
+              return `코호트: ${cohortNames[d.y]} → ${ptOrder[d.x]}`;
+            },
+            label: (item) => {
+              const d = item.raw;
+              return `잔존율: ${d.v}% (${d.count}/${d.total}명)`;
+            }
+          }
+        }
+      }
+    }
+  });
+
+  // --- 리텐션 커브 ---
+  // 각 코호트의 N번째 플테 참여율
+  const curveDatasets = [];
+  const colors = ['#60a5fa','#34d399','#a78bfa','#fb923c','#f472b6','#22d3ee','#fbbf24'];
+  // 최근 5개 주요 코호트만 표시 (유저 10명 이상)
+  const majorCohorts = cohortNames.filter(c => cohorts[c].total >= 10).slice(-5);
+
+  majorCohorts.forEach((cName, idx) => {
+    const c = cohorts[cName];
+    const startIdx = ptOrder.indexOf(cName);
+    const points = [];
+    for (let i = startIdx; i < ptOrder.length; i++) {
+      const pct = c.total ? Math.round((c.byPt[ptOrder[i]] || 0) / c.total * 100) : 0;
+      points.push(pct);
+    }
+    curveDatasets.push({
+      label: cName.replace(' Playtest','PT').replace(' UT',''),
+      data: points,
+      borderColor: colors[idx % colors.length],
+      backgroundColor: 'transparent',
+      borderWidth: 2,
+      tension: 0.3,
+      pointRadius: 3,
+      pointHoverRadius: 5
+    });
+  });
+
+  if (retentionCurveInstance) retentionCurveInstance.destroy();
+  retentionCurveInstance = new Chart(document.getElementById('retentionCurve'), {
+    type: 'line',
+    data: {
+      labels: Array.from({length: Math.max(...curveDatasets.map(d => d.data.length))}, (_, i) => `PT+${i}`),
+      datasets: curveDatasets
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: { title: { display: true, text: '참여 후 N번째 플테', color: 'var(--muted)', font: { size: 11 } }, ticks: { color: 'var(--muted)' }, grid: { color: 'rgba(255,255,255,0.04)' } },
+        y: { min: 0, max: 100, title: { display: true, text: '잔존율 (%)', color: 'var(--muted)', font: { size: 11 } }, ticks: { color: 'var(--muted)', callback: v => v+'%' }, grid: { color: 'rgba(255,255,255,0.04)' } }
+      },
+      plugins: {
+        legend: { labels: { color: 'var(--muted)', font: { size: 11 }, usePointStyle: true, pointStyle: 'circle' } },
+        tooltip: { callbacks: { label: (item) => `${item.dataset.label}: ${item.raw}%` } }
+      }
+    }
+  });
+
+  // --- 이탈 분석 (마지막 참여 플테) ---
+  const churnByPt = {};
+  const dormantByPt = {};
+  gus.forEach(row => {
+    const status = (row._retention_status||'').trim();
+    if (status !== '휴면' && status !== '이탈') return;
+    const played = (row.played_playtests || '').split(',').map(s => s.trim()).filter(s => s);
+    let lastIdx = -1;
+    played.forEach(p => { const idx = ptOrder.indexOf(p); if (idx > lastIdx) lastIdx = idx; });
+    if (lastIdx < 0) return;
+    const lastPtName = ptOrder[lastIdx];
+    if (status === '이탈') churnByPt[lastPtName] = (churnByPt[lastPtName]||0)+1;
+    else dormantByPt[lastPtName] = (dormantByPt[lastPtName]||0)+1;
+  });
+
+  if (churnChartInstance) churnChartInstance.destroy();
+  churnChartInstance = new Chart(document.getElementById('churnChart'), {
+    type: 'bar',
+    data: {
+      labels: ptOrder.map(p => p.replace(' Playtest','').replace(' UT','')),
+      datasets: [
+        { label: '휴면', data: ptOrder.map(p => dormantByPt[p]||0), backgroundColor: 'rgba(251,191,36,0.6)', borderRadius: 3 },
+        { label: '이탈', data: ptOrder.map(p => churnByPt[p]||0), backgroundColor: 'rgba(248,113,113,0.6)', borderRadius: 3 }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: { stacked: true, ticks: { color: 'var(--muted)', font: { size: 9 }, maxRotation: 45 }, grid: { display: false } },
+        y: { stacked: true, ticks: { color: 'var(--muted)' }, grid: { color: 'rgba(255,255,255,0.04)' } }
+      },
+      plugins: {
+        legend: { labels: { color: 'var(--muted)', font: { size: 11 }, usePointStyle: true, pointStyle: 'circle' } }
+      }
+    }
+  });
+
+  // --- FTUE 퍼널 (최근 4개 플테 튜토리얼) ---
+  const recentEB = eb.filter(r => parseInt(r.tutorial_users) > 0).slice(-4);
+  if (ftueFunnelInstance) ftueFunnelInstance.destroy();
+  if (recentEB.length > 0) {
+    ftueFunnelInstance = new Chart(document.getElementById('ftueFunnel'), {
+      type: 'bar',
+      data: {
+        labels: recentEB.map(r => r.playtest_name.replace(' Playtest','').replace(' UT','')),
+        datasets: [
+          { label: '튜토리얼 시작', data: recentEB.map(r => parseInt(r.tutorial_users)||0), backgroundColor: 'rgba(96,165,250,0.6)', borderRadius: 3 },
+          { label: '튜토리얼 완료', data: recentEB.map(r => parseInt(r.tutorial_complete_users)||0), backgroundColor: 'rgba(52,211,153,0.6)', borderRadius: 3 }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        indexAxis: 'y',
+        scales: {
+          x: { ticks: { color: 'var(--muted)' }, grid: { color: 'rgba(255,255,255,0.04)' } },
+          y: { ticks: { color: 'var(--muted)', font: { size: 10 } }, grid: { display: false } }
+        },
+        plugins: {
+          legend: { labels: { color: 'var(--muted)', font: { size: 11 }, usePointStyle: true, pointStyle: 'circle' } },
+          tooltip: {
+            callbacks: {
+              afterLabel: (item) => {
+                const r = recentEB[item.dataIndex];
+                const rate = parseInt(r.tutorial_users) ? (parseInt(r.tutorial_complete_users)/parseInt(r.tutorial_users)*100).toFixed(1) : 0;
+                return `완료율: ${rate}%`;
+              }
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // --- 플테 비교 레이더 차트 ---
+  // 최근 3개 주요 플테 (April Fools 제외)
+  const mainPts = ps.filter(r => !r.playtest_name.includes('April') && !r.playtest_name.includes('Leaks'));
+  const recent3 = mainPts.slice(-3);
+  if (recent3.length < 2) return;
+
+  // 지표 정규화 (각 지표의 max를 100으로)
+  const metrics = ['참여자', '세션/유저', '리텐션율', '튜토리얼완료율', '이벤트/유저'];
+  const radarDatasets = recent3.map((pt, idx) => {
+    const ebRow = eb.find(e => e.playtest_name === pt.playtest_name) || {};
+    const users = parseInt(pt.unique_users) || 1;
+    const sessions = parseInt(pt.total_sessions) || 0;
+    const events = parseInt(pt.total_events) || 0;
+    const tutRate = parseFloat(ebRow.tutorial_rate) || 0;
+    // 리텐션: 이 플테 참여자 중 다음 플테에도 참여한 비율
+    const ptIdx = ptOrder.indexOf(pt.playtest_name);
+    const nextPt = ptIdx < ptOrder.length - 1 ? ptOrder[ptIdx + 1] : null;
+    let retRate = 0;
+    if (nextPt) {
+      const thisUsers = gus.filter(r => (r.played_playtests||'').includes(pt.playtest_name));
+      const retained = thisUsers.filter(r => (r.played_playtests||'').includes(nextPt));
+      retRate = thisUsers.length ? (retained.length / thisUsers.length * 100) : 0;
+    }
+    return {
+      label: pt.playtest_name.replace(' Playtest', ''),
+      data: [users, sessions/users, retRate, tutRate, events/users],
+      borderColor: colors[idx],
+      backgroundColor: colors[idx] + '20',
+      borderWidth: 2,
+      pointRadius: 3
+    };
+  });
+
+  // 각 축 max값으로 정규화
+  const maxVals = [0,0,0,0,0];
+  radarDatasets.forEach(ds => ds.data.forEach((v, i) => { if (v > maxVals[i]) maxVals[i] = v; }));
+  radarDatasets.forEach(ds => { ds.data = ds.data.map((v, i) => maxVals[i] ? Math.round(v / maxVals[i] * 100) : 0); });
+
+  if (playtestRadarInstance) playtestRadarInstance.destroy();
+  playtestRadarInstance = new Chart(document.getElementById('playtestRadar'), {
+    type: 'radar',
+    data: { labels: metrics, datasets: radarDatasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        r: {
+          min: 0, max: 100,
+          ticks: { display: false },
+          grid: { color: 'rgba(255,255,255,0.06)' },
+          angleLines: { color: 'rgba(255,255,255,0.06)' },
+          pointLabels: { color: 'var(--muted)', font: { size: 11 } }
+        }
+      },
+      plugins: {
+        legend: { labels: { color: 'var(--muted)', font: { size: 11 }, usePointStyle: true, pointStyle: 'circle' } },
+        tooltip: { callbacks: { label: (item) => `${item.dataset.label}: ${item.raw}점 (정규화)` } }
+      }
+    }
+  });
+}
+
 function renderSNS() {
   let yt = data.youtube;
   let tt = data.tiktok;
@@ -4489,8 +5366,8 @@ function openUserPanel(discordId) {
               retStatus === '휴면' ? 'background:rgba(234,179,8,0.15);color:var(--yellow)' :
               'background:rgba(239,68,68,0.15);color:var(--red)'
             }">${retStatus}</span></span></div>
-            <div class="detail-row"><span class="detail-label">첫 플레이</span><span class="detail-value">${gameRow.first_play_date || '-'}</span></div>
-            <div class="detail-row"><span class="detail-label">최근 플레이</span><span class="detail-value">${gameRow.last_play_date || '-'}</span></div>
+            <div class="detail-row"><span class="detail-label">첫 플레이</span><span class="detail-value">${displayDateTime(gameRow.first_play_timestamp)}</span></div>
+            <div class="detail-row"><span class="detail-label">최근 플레이</span><span class="detail-value">${displayDateTime(gameRow.last_play_timestamp)}</span></div>
             <div class="detail-row"><span class="detail-label">총 플레이테스트</span><span class="detail-value">${gameRow.total_playtests || 0}회</span></div>
             <div class="detail-row" style="align-items:flex-start"><span class="detail-label">참여 플레이테스트</span><span class="detail-value">${(() => {
               const pts = (gameRow.played_playtests || '').split(',').map(s => s.trim()).filter(Boolean);
@@ -4503,7 +5380,7 @@ function openUserPanel(discordId) {
             <div class="detail-row"><span class="detail-label">총 이벤트</span><span class="detail-value">${fmt(gameRow.total_events || 0)}</span></div>
             <div class="detail-row"><span class="detail-label">국가</span><span class="detail-value">${gameRow.country || '-'}</span></div>
           ` : `
-            <div class="detail-row"><span class="detail-label">첫 플레이</span><span class="detail-value">${u.first_play_date || '-'}</span></div>
+            <div class="detail-row"><span class="detail-label">첫 플레이</span><span class="detail-value">${displayDateTime(u.first_play_timestamp || u.first_play_date)}</span></div>
             <div class="detail-row"><span class="detail-label">총 플레이테스트</span><span class="detail-value">${u.total_playtests || '-'}</span></div>
           `}
         </div>
@@ -5138,8 +6015,8 @@ function fmt(n) {
   return Number(n).toLocaleString();
 }
 
-// 시간대 토글 상태 (기본: UTC — 모든 데이터가 UTC 저장이므로)
-let currentTZ = 'UTC';
+// 시간대 토글 상태 (기본: KST — 표시용. 원본 데이터는 항상 UTC로 저장)
+let currentTZ = 'KST';
 
 function setTimezone(tz) {
   currentTZ = tz;
@@ -5158,28 +6035,70 @@ function setTimezone(tz) {
   renderAll();
 }
 
-// 날짜 표시 변환. 저장 데이터는 UTC, currentTZ에 따라 KST 또는 UTC 그대로 표시
+// ── 날짜/타임스탬프 표시 유틸 ─────────────────────────
+// 시트에 저장된 데이터는 모두 UTC 원본.
+//   - ISO 8601 timestamp: '2025-12-07T09:06:56.340000+00:00'
+//   - 'YYYY-MM-DD HH:MM:SS' 형식 (레거시)
+//   - 'YYYY-MM-DD' 날짜만
+// currentTZ 토글에 따라 KST 또는 UTC로 변환하여 표시.
+
+// 내부 헬퍼: 입력 문자열 → UTC Date 객체 (실패 시 null)
+function _parseUTC(s) {
+  if (!s) return null;
+  const str = String(s).trim();
+  if (!str) return null;
+  // 날짜만(10자)이면 Date 파싱 시 로컬로 해석되는 걸 피하려고 UTC 자정으로 고정
+  if (/^\d{4}-\d{2}-\d{2}$/.test(str)) {
+    const d = new Date(str + 'T00:00:00Z');
+    return isNaN(d.getTime()) ? null : d;
+  }
+  // ISO 8601 (타임존 오프셋 포함)
+  if (/[T\s]\d{1,2}:\d{2}/.test(str)) {
+    // 타임존 오프셋이 없으면 UTC로 간주 (공백 구분자는 T로 변환)
+    let normalized = str.replace(' ', 'T');
+    if (!/[+-]\d{2}:?\d{2}$|Z$/.test(normalized)) normalized += 'Z';
+    const d = new Date(normalized);
+    return isNaN(d.getTime()) ? null : d;
+  }
+  return null;
+}
+
+// 날짜만 표시 (YYYY-MM-DD)
 function displayDate(dateStr) {
   if (!dateStr) return '-';
-  const s = String(dateStr).trim();
-  if (currentTZ === 'UTC') return s;  // UTC 모드면 원본 그대로
-  if (s.length <= 10) return s;  // 날짜만 있으면 그대로
-  try {
-    // '2026-04-05 1:51:56' → '2026-04-05T01:51:56Z' (1자리 시간 패딩)
-    const normalized = s.replace(/(\d{4}-\d{2}-\d{2})\s+(\d{1,2}):(\d{2}):(\d{2})/, (_, date, h, m, sec) =>
-      `${date}T${h.padStart(2,'0')}:${m}:${sec}Z`
-    );
-    const utc = new Date(normalized.includes('T') ? normalized : s.replace(' ', 'T') + 'Z');
-    if (isNaN(utc.getTime())) return s;
-    const kst = new Date(utc.getTime() + 9 * 60 * 60 * 1000);
-    const y = kst.getUTCFullYear();
-    const m = String(kst.getUTCMonth() + 1).padStart(2, '0');
-    const d = String(kst.getUTCDate()).padStart(2, '0');
-    const hh = String(kst.getUTCHours()).padStart(2, '0');
-    const mm = String(kst.getUTCMinutes()).padStart(2, '0');
-    const ss = String(kst.getUTCSeconds()).padStart(2, '0');
-    return `${y}-${m}-${d} ${hh}:${mm}:${ss}`;
-  } catch (e) { return s; }
+  const str = String(dateStr).trim();
+  if (!str) return '-';
+  const utc = _parseUTC(str);
+  if (!utc) return str;  // 파싱 실패 시 원본
+  const offsetMs = currentTZ === 'KST' ? 9 * 60 * 60 * 1000 : 0;
+  const shifted = new Date(utc.getTime() + offsetMs);
+  const y = shifted.getUTCFullYear();
+  const m = String(shifted.getUTCMonth() + 1).padStart(2, '0');
+  const d = String(shifted.getUTCDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+
+// 타임스탬프 표시 (YYYY-MM-DD HH:MM)
+function displayDateTime(dateStr, withSeconds = false) {
+  if (!dateStr) return '-';
+  const str = String(dateStr).trim();
+  if (!str) return '-';
+  const utc = _parseUTC(str);
+  if (!utc) return str;
+  // 날짜만 입력이면 시간 정보 없음 → 날짜만 반환
+  if (/^\d{4}-\d{2}-\d{2}$/.test(str)) return displayDate(str);
+  const offsetMs = currentTZ === 'KST' ? 9 * 60 * 60 * 1000 : 0;
+  const shifted = new Date(utc.getTime() + offsetMs);
+  const y = shifted.getUTCFullYear();
+  const mo = String(shifted.getUTCMonth() + 1).padStart(2, '0');
+  const d = String(shifted.getUTCDate()).padStart(2, '0');
+  const hh = String(shifted.getUTCHours()).padStart(2, '0');
+  const mm = String(shifted.getUTCMinutes()).padStart(2, '0');
+  if (withSeconds) {
+    const ss = String(shifted.getUTCSeconds()).padStart(2, '0');
+    return `${y}-${mo}-${d} ${hh}:${mm}:${ss}`;
+  }
+  return `${y}-${mo}-${d} ${hh}:${mm}`;
 }
 
 // 하위 호환 (toKST → displayDate로 통합)
@@ -5223,6 +6142,89 @@ function chartOpts(yLabel) {
   };
 }
 
+// ========== 차트 내보내기 (R-3-5) ==========
+function downloadChart(canvasId, filename) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) { console.warn('canvas not found:', canvasId); return; }
+  const chart = Chart.getChart(canvas);
+  if (!chart) { console.warn('chart instance not found:', canvasId); return; }
+
+  // 배경을 다크 테마에 맞게 그려서 캡처
+  const tempCanvas = document.createElement('canvas');
+  tempCanvas.width = canvas.width;
+  tempCanvas.height = canvas.height;
+  const ctx = tempCanvas.getContext('2d');
+  // 브랜드 배경색
+  const bgColor = getComputedStyle(document.documentElement).getPropertyValue('--card').trim() || '#1a1a1e';
+  ctx.fillStyle = bgColor;
+  ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+  ctx.drawImage(canvas, 0, 0);
+
+  // 다운로드
+  const link = document.createElement('a');
+  const today = new Date().toISOString().slice(0,10);
+  link.download = `${filename}_${today}.png`;
+  link.href = tempCanvas.toDataURL('image/png');
+  link.click();
+}
+
+// ========== 보고서 시스템 (R-3) ==========
+let _reportsList = null;
+async function loadReports() {
+  try {
+    const res = await fetch('reports/reports.json');
+    if (!res.ok) throw new Error('reports.json 로드 실패');
+    _reportsList = await res.json();
+  } catch(e) {
+    console.warn('보고서 목록 로드 실패:', e.message);
+    _reportsList = [];
+  }
+  renderReportCards();
+}
+
+function renderReportCards() {
+  const container = document.getElementById('reportCards');
+  if (!container) return;
+  if (!_reportsList || _reportsList.length === 0) {
+    container.innerHTML = `
+      <div class="chart-container" style="text-align:center;padding:48px 20px;grid-column:1/-1;">
+        <div style="font-size:40px;margin-bottom:12px;opacity:0.5">📋</div>
+        <div style="font-size:15px;color:var(--muted)">등록된 보고서가 없습니다</div>
+      </div>`;
+    return;
+  }
+  container.innerHTML = _reportsList.map(r => `
+    <div class="report-card" onclick="openReport('${r.id}','${r.file}','${r.title.replace(/'/g,"\\'")}')">
+      <div class="rc-badge">${r.playtest}</div>
+      <div class="rc-title">${r.title}</div>
+      <div class="rc-period">${r.period}</div>
+      <div class="rc-summary">${r.summary}</div>
+      <div class="rc-date">작성일: ${r.date}</div>
+    </div>
+  `).join('');
+}
+
+function openReport(id, file, title) {
+  document.getElementById('reportListView').style.display = 'none';
+  document.getElementById('reportViewer').style.display = '';
+  document.getElementById('reportViewerTitle').textContent = title;
+  const iframe = document.getElementById('reportFrame');
+  iframe.src = 'reports/' + file;
+  // iframe 높이 자동 조정
+  iframe.onload = function() {
+    try {
+      const h = iframe.contentDocument.body.scrollHeight;
+      iframe.style.height = Math.max(h + 40, 600) + 'px';
+    } catch(e) { iframe.style.height = '85vh'; }
+  };
+}
+
+function closeReportViewer() {
+  document.getElementById('reportViewer').style.display = 'none';
+  document.getElementById('reportListView').style.display = '';
+  document.getElementById('reportFrame').src = '';
+}
+
 // ========== 정보 페이지 ==========
 function renderInfo() {
   let um = data.userMaster;
@@ -5259,7 +6261,7 @@ function renderInfo() {
   const ddWithActivity = dd.filter(r => r.messages_count || r.voice_participants).length;
 
   // 데이터 필드 상태 체크
-  const hasFirstPlay = um.some(u => u.first_play_date && u.first_play_date !== '');
+  const hasFirstPlay = um.some(u => (u.first_play_timestamp && u.first_play_timestamp !== '') || (u.first_play_date && u.first_play_date !== ''));
   const hasTotalPlay = um.some(u => u.total_playtests && u.total_playtests !== '' && u.total_playtests !== '0');
   const hasLeaveDate = um.filter(u => u.leave_date && u.leave_date !== '').length;
   const metaMatched = um.filter(u => u.playfab_matched === 'O').length;
@@ -5477,12 +6479,41 @@ ssh -i "key/ssh-key-2026-03-27.key" opc@134.185.103.73 "sudo systemctl restart r
   document.getElementById('infoGrid').innerHTML = cards.join('');
 }
 
-// ========== NAV ==========
-function showPage(name) {
+// ========== SIDEBAR + NAV ==========
+let sidebarCollapsed = false;
+
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  sidebarCollapsed = !sidebarCollapsed;
+  sidebar.classList.toggle('collapsed', sidebarCollapsed);
+  document.body.classList.toggle('sidebar-collapsed', sidebarCollapsed);
+}
+
+function closeSidebarMobile() {
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  sidebar.classList.remove('mobile-open');
+  overlay.classList.remove('show');
+}
+
+function showPage(name, btn) {
+  // 페이지 전환
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-'+name).classList.add('active');
-  document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
-  event.target.classList.add('active');
+  const target = document.getElementById('page-'+name);
+  if (target) target.classList.add('active');
+  // 사이드바 활성 상태
+  document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
+  if (btn) {
+    btn.classList.add('active');
+  } else {
+    // btn이 없으면 data-page로 찾기
+    const item = document.querySelector('.sidebar-item[data-page="'+name+'"]');
+    if (item) item.classList.add('active');
+  }
+  // 모바일에서 자동 닫기
+  closeSidebarMobile();
+  // 스크롤 맨 위로
+  window.scrollTo(0, 0);
 }
 
 // ========== PAGE NAVIGATION (KPI Card Clickable) ==========
@@ -5490,22 +6521,23 @@ const TAB_LABEL_MAP = {
   'overview': '개요',
   'funnel': '퍼널',
   'discord': '디스코드',
-  'sns': '유튜브 / 틱톡',
+  'playtest': '플레이테스트',
+  'retention': '리텐션',
+  'sns': 'SNS',
   'users': '유저',
+  'reports': '보고서',
   'info': '정보',
   'settings': '설정'
 };
 
 function showPageDirect(name) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page-'+name).classList.add('active');
-  document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
-  const targetLabel = TAB_LABEL_MAP[name];
-  document.querySelectorAll('.nav button').forEach(b => {
-    if (b.textContent.trim() === targetLabel) {
-      b.classList.add('active');
-    }
-  });
+  const target = document.getElementById('page-'+name);
+  if (target) target.classList.add('active');
+  // 사이드바 활성 상태 업데이트
+  document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
+  const item = document.querySelector('.sidebar-item[data-page="'+name+'"]');
+  if (item) item.classList.add('active');
 }
 
 // ========== USER TABLE SORTING ==========
