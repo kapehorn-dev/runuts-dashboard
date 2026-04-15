@@ -661,6 +661,16 @@ startAutoRefresh();
   .kpi-card .change.up { color: var(--green); }
   .kpi-card .change.down { color: var(--red); }
   .kpi-card .change.flat { color: var(--muted); }
+  /* Sub 계정 부가 정보 (투명성용, 매우 작게) */
+  .kpi-card .sub-note {
+    font-size: 10px;
+    color: var(--muted);
+    opacity: 0.55;
+    margin-top: 4px;
+    padding-top: 4px;
+    border-top: 1px dashed rgba(255,255,255,0.06);
+    letter-spacing: 0.02em;
+  }
   .sparkline {
     height: 24px;
     width: 80px;
@@ -3355,6 +3365,26 @@ function renderKPI() {
   const testersLinked = scopeUsers.filter(u =>
     (u.tester_approved === 'O' || u.tester_approved === 'TRUE') && u.playfab_matched === 'O'
   ).length;
+
+  // ── Sub Discord 계정 카운트 (투명성용) ──
+  // Sub Accounts 시트에서 sub_discord_id로 등록된 유저들 = "부계정"
+  // 이들도 KPI 카운트에 포함되지만, 별도로 몇 명인지 작게 표시
+  const subDiscordIdSet = new Set(
+    (data.subAccounts || [])
+      .filter(s => s.account_type === 'discord' && s.sub_discord_id)
+      .map(s => s.sub_discord_id)
+  );
+  const subInScope = scopeUsers.filter(u => subDiscordIdSet.has(u.discord_id));
+  const subInScopeActive = subInScope.filter(u => u.status === 'active').length;
+  const subInApplied = subInScope.filter(u => u.tester_applied === 'O' || u.tester_applied === 'TRUE').length;
+  const subInTesters = subInScope.filter(u => u.tester_approved === 'O' || u.tester_approved === 'TRUE').length;
+  const subInLinked = subInScope.filter(u => u.playfab_matched === 'O' && (u.tester_approved === 'O' || u.tester_approved === 'TRUE')).length;
+  const subInLeft = subInScope.filter(u => u.status === 'left' || u.status === '탈퇴').length;
+
+  // subNote 생성 헬퍼 (값이 0이면 빈 문자열)
+  function subNote(count) {
+    return count > 0 ? `중 부계정 ${fmt(count)}명` : '';
+  }
   // 미매칭 카드 데이터
   // 1) 테스터인데 Playfab 미매칭
   const testerUnmatched = scopeUsers.filter(u =>
@@ -3435,11 +3465,11 @@ function renderKPI() {
   const joinsWk = lastWeekJoins > 0 ? weekDelta(thisWeekJoins, lastWeekJoins) : { text: '', dir: 'flat' };
 
   const kpis = [
-    { label: showLSDData ? '현재 멤버' : 'RUNuts 멤버', value: memberValue, change: memberSub, change2: memberWk.text ? memberWk.text + ' 전주 대비' : '', dir: memberWk.dir, tooltip: showLSDData ? '디스코드 서버의 실제 총 멤버 수 (Discord Server Insights 기준)' : 'RUNuts 유저 중 현재 디스코드에 남아있는 활동 멤버 수', link: 'users', spark: sparklineMembers },
+    { label: showLSDData ? '현재 멤버' : 'RUNuts 멤버', value: memberValue, change: memberSub, change2: memberWk.text ? memberWk.text + ' 전주 대비' : '', dir: memberWk.dir, tooltip: showLSDData ? '디스코드 서버의 실제 총 멤버 수 (Discord Server Insights 기준)' : 'RUNuts 유저 중 현재 디스코드에 남아있는 활동 멤버 수', link: 'users', spark: sparklineMembers, subNote: subNote(subInScopeActive) },
     { label: '주간 가입', value: fmt(thisWeekJoins), change: joinsWk.text ? joinsWk.text + ' 전주 대비' : '최근 7일', dir: joinsWk.dir, tooltip: '최근 7일간 새로 가입한 유저 수', link: 'discord', spark: sparklineWeekly },
-    { label: '테스터 신청', value: fmt(applied), change: `현재 멤버 대비 ${activeCount > 0 ? Math.round(applied/activeCount*100) : 0}%`, dir: 'flat', tooltip: `${scopeLabel} 유저 중 테스터 신청서를 작성한 유저 수`, link: 'funnel' },
-    { label: '테스터 승인', value: fmt(testers), change: `신청 대비 ${applied > 0 ? Math.round(testers/applied*100) : 0}%`, dir: 'flat', tooltip: `${scopeLabel} 유저 중 디스코드에서 테스터 역할을 부여받은 수`, link: 'funnel' },
-    { label: 'Playfab 등록', value: fmt(testersLinked), change: `승인 대비 ${testers > 0 ? Math.round(testersLinked/testers*100) : 0}%`, change2: `Meta 계정 ${fmt(totalMetaAccounts)}개 중 ${fmt(playfabUnmatched)}개 미매칭`, dir: 'flat', tooltip: `테스터 승인 유저 중 PlayFab 계정이 매칭된 수. 미매칭은 PlayFab에 존재하지만 디스코드 유저와 연결되지 않은 Meta 계정 수 (Matching Fail Users 시트 기준).`, link: 'funnel' },
+    { label: '테스터 신청', value: fmt(applied), change: `현재 멤버 대비 ${activeCount > 0 ? Math.round(applied/activeCount*100) : 0}%`, dir: 'flat', tooltip: `${scopeLabel} 유저 중 테스터 신청서를 작성한 유저 수`, link: 'funnel', subNote: subNote(subInApplied) },
+    { label: '테스터 승인', value: fmt(testers), change: `신청 대비 ${applied > 0 ? Math.round(testers/applied*100) : 0}%`, dir: 'flat', tooltip: `${scopeLabel} 유저 중 디스코드에서 테스터 역할을 부여받은 수`, link: 'funnel', subNote: subNote(subInTesters) },
+    { label: 'Playfab 등록', value: fmt(testersLinked), change: `승인 대비 ${testers > 0 ? Math.round(testersLinked/testers*100) : 0}%`, change2: `Meta 계정 ${fmt(totalMetaAccounts)}개 중 ${fmt(playfabUnmatched)}개 미매칭`, dir: 'flat', tooltip: `테스터 승인 유저 중 PlayFab 계정이 매칭된 수. 미매칭은 PlayFab에 존재하지만 디스코드 유저와 연결되지 않은 Meta 계정 수 (Matching Fail Users 시트 기준).`, link: 'funnel', subNote: subNote(subInLinked) },
     { label: '잔존율', value: retentionPct + '%', change: `${fmt(activeCount)}명 활동 / ${fmt(leftCount)}명 이탈`, dir: 'flat', tooltip: `${scopeLabel} 유저 ${fmt(joinedTotal)}명 중 현재 서버에 남아있는 비율`, link: 'funnel' },
     { label: '테스터 미매칭', value: fmt(testerUnmatched), change: `테스터 중 Playfab 미등록`, dir: 'flat', tooltip: `테스터 승인을 받았지만 아직 PlayFab 계정이 매칭되지 않은 유저 수 (${scopeLabel} 기준)`, onClick: 'tester_unmatched', isAlert: testerUnmatched > 0 },
     { label: 'Playfab 미매칭', value: fmt(playfabUnmatched), change: `Playfab에 있지만 디스코드 미연결`, dir: 'flat', tooltip: 'PlayFab에 계정이 존재하지만 디스코드 유저와 매칭할 수 없는 Meta 계정 수 (Matching Fail Users 시트 기준)', onClick: 'playfab_unmatched', isAlert: playfabUnmatched > 0 }
@@ -3452,6 +3482,7 @@ function renderKPI() {
       ${k.spark ? k.spark : ''}
       <div class="change ${k.dir}">${k.change}</div>
       ${k.change2 ? '<div class="change flat" style="font-size:11px;margin-top:2px;opacity:0.7">' + k.change2 + '</div>' : ''}
+      ${k.subNote ? '<div class="sub-note" data-tooltip="한 사람이 가진 여러 Discord 계정 중 본 계정이 아닌 부계정 수. KPI 숫자에는 포함되어 있습니다.">' + k.subNote + '</div>' : ''}
     </div>
   `).join('');
 
