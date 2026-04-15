@@ -2184,6 +2184,11 @@ startAutoRefresh();
         <canvas id="chartMessageActivity"></canvas>
       </div>
     </div>
+    <!-- 건강도/등급 분포 (Phase R-5 2단계 B-2) -->
+    <div class="chart-container" id="healthTierDistContainer" style="display:none">
+      <div class="section-title">건강도/등급 분포 <span style="font-size:11px;color:var(--muted);font-weight:400">오늘 + 전주 대비</span></div>
+      <div id="healthTierDistContent"></div>
+    </div>
     <!-- 건강도 추이 (Health Snapshot) -->
     <div class="chart-container" id="healthTrendContainer" style="display:none">
       <div class="section-title">건강도 추이 <span style="font-size:11px;color:var(--muted);font-weight:400">일일 스냅샷 · 메시지 활동 기준</span></div>
@@ -4248,8 +4253,160 @@ function renderDiscordPage() {
     </tr>`;
   }).join('');
 
+  // 건강도/등급 분포 카드 (오늘 + 전주 대비) — Phase R-5 B-2
+  renderHealthTierDistribution();
   // 건강도 추이 차트 렌더링
   renderHealthTrend();
+}
+
+// ========== 건강도/등급 분포 카드 (오늘 + 전주 대비) ==========
+// Health Snapshot 컬럼:
+//   col_c~col_g: 건강도 (Active, Casual, Fading, 장기부재, 신규)
+//   col_h: 이탈
+//   col_i~col_l: 등급 (Core, Regular, Visitor, Silent)
+//   col_m: 총합
+function renderHealthTierDistribution() {
+  const container = document.getElementById('healthTierDistContainer');
+  const content = document.getElementById('healthTierDistContent');
+  if (!container || !content) return;
+
+  const hs = (data.healthSnapshot || []).filter(r => r.type === 'summary');
+  if (hs.length < 1) {
+    container.style.display = 'none';
+    return;
+  }
+  container.style.display = '';
+
+  // 날짜순 정렬 (오래된 것부터)
+  hs.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+
+  // 최신 스냅샷
+  const latest = hs[hs.length - 1];
+  const latestDate = latest.date;
+
+  // 전주 비교 대상: 최신 날짜에서 7일 전 스냅샷 (없으면 가장 가까운 이전 스냅샷)
+  const target = (() => {
+    const latestDateObj = new Date(latestDate);
+    const targetDateObj = new Date(latestDateObj.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const targetStr = targetDateObj.toISOString().substring(0, 10);
+    // 정확히 7일 전이 없으면 가장 가까운 이전
+    let best = null;
+    for (const r of hs) {
+      if (r.date === targetStr) { best = r; break; }
+      if (r.date < targetStr) best = r; // 이전 중 가장 가까운 것
+    }
+    return best;
+  })();
+
+  function parseVal(row, key) {
+    return parseInt((row && row[key]) || 0) || 0;
+  }
+
+  // 오늘 값
+  const cur = {
+    active: parseVal(latest, 'col_c'),
+    casual: parseVal(latest, 'col_d'),
+    fading: parseVal(latest, 'col_e'),
+    inactive: parseVal(latest, 'col_f'),
+    newcomer: parseVal(latest, 'col_g'),
+    left: parseVal(latest, 'col_h'),
+    core: parseVal(latest, 'col_i'),
+    regular: parseVal(latest, 'col_j'),
+    visitor: parseVal(latest, 'col_k'),
+    silent: parseVal(latest, 'col_l'),
+    total: parseVal(latest, 'col_m'),
+  };
+
+  // 전주 값 (target 없으면 null)
+  const prev = target ? {
+    active: parseVal(target, 'col_c'),
+    casual: parseVal(target, 'col_d'),
+    fading: parseVal(target, 'col_e'),
+    inactive: parseVal(target, 'col_f'),
+    newcomer: parseVal(target, 'col_g'),
+    left: parseVal(target, 'col_h'),
+    core: parseVal(target, 'col_i'),
+    regular: parseVal(target, 'col_j'),
+    visitor: parseVal(target, 'col_k'),
+    silent: parseVal(target, 'col_l'),
+    total: parseVal(target, 'col_m'),
+  } : null;
+
+  // delta 표시 헬퍼
+  function delta(cur, prev) {
+    if (!prev && prev !== 0) return '';
+    const d = cur - prev;
+    if (d === 0) return '<span style="font-size:11px;color:var(--muted);margin-left:6px">±0</span>';
+    const color = d > 0 ? 'var(--green)' : 'var(--red)';
+    const arrow = d > 0 ? '▲' : '▼';
+    return `<span style="font-size:11px;color:${color};margin-left:6px">${arrow}${Math.abs(d)}</span>`;
+  }
+
+  // 건강도 세그먼트 정의
+  const healthSegs = [
+    { key: 'active',   label: 'Active',   color: '#22c55e', desc: '7일 내 활발' },
+    { key: 'casual',   label: 'Casual',   color: '#06b6d4', desc: '7일 내 ≤5개' },
+    { key: 'fading',   label: 'Fading',   color: '#eab308', desc: '8~30일' },
+    { key: 'inactive', label: '장기부재', color: '#ef4444', desc: '31일+' },
+    { key: 'newcomer', label: '신규',     color: '#6366f1', desc: '가입 14일 내' },
+  ];
+  const tierSegs = [
+    { key: 'core',    label: 'Core',    color: '#f59e0b', desc: '핵심 멤버' },
+    { key: 'regular', label: 'Regular', color: '#FFB340', desc: '정기 참여' },
+    { key: 'visitor', label: 'Visitor', color: '#64748b', desc: '가끔 방문' },
+    { key: 'silent',  label: 'Silent',  color: '#475569', desc: '메시지 없음' },
+  ];
+
+  const healthTotal = healthSegs.reduce((s, seg) => s + cur[seg.key], 0) || 1;
+  const tierTotal = tierSegs.reduce((s, seg) => s + cur[seg.key], 0) || 1;
+
+  // 세그먼트 바 렌더 헬퍼
+  function renderSegmentBar(segs, total, title, subInfo) {
+    return `<div style="flex:1;min-width:280px">
+      <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px">
+        <div style="font-size:13px;font-weight:600;color:var(--text)">${title}</div>
+        <div style="font-size:11px;color:var(--muted)">${subInfo}</div>
+      </div>
+      <!-- 스택 바 -->
+      <div style="display:flex;height:24px;border-radius:6px;overflow:hidden;background:var(--bg);margin-bottom:12px">
+        ${segs.map(seg => {
+          const v = cur[seg.key];
+          const pct = total > 0 ? (v / total * 100) : 0;
+          if (pct < 0.1) return '';
+          return `<div data-tooltip="${seg.label}: ${v}명 (${pct.toFixed(1)}%)" style="background:${seg.color};width:${pct}%;min-width:0"></div>`;
+        }).join('')}
+      </div>
+      <!-- 세부 목록 -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 12px">
+        ${segs.map(seg => {
+          const v = cur[seg.key];
+          const p = prev ? prev[seg.key] : null;
+          const pct = total > 0 ? (v / total * 100).toFixed(1) : '0.0';
+          return `<div style="display:flex;align-items:center;gap:6px;font-size:12px">
+            <span style="width:8px;height:8px;border-radius:2px;background:${seg.color};flex-shrink:0"></span>
+            <span style="color:var(--muted);flex:1">${seg.label}</span>
+            <span style="color:var(--text);font-weight:600">${v}</span>
+            <span style="color:var(--muted);font-size:10px;min-width:34px;text-align:right">${pct}%</span>
+            ${p !== null ? delta(v, p) : ''}
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }
+
+  const currentLabel = `${latestDate} 기준`;
+  const prevLabel = prev ? `전주(${target.date}) 대비` : '전주 데이터 없음';
+
+  content.innerHTML = `
+    <div style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start">
+      ${renderSegmentBar(healthSegs, healthTotal, '건강도 (Health)', `${currentLabel} · 합계 ${healthTotal}명`)}
+      ${renderSegmentBar(tierSegs, tierTotal, '등급 (Tier)', `${currentLabel} · 합계 ${tierTotal}명`)}
+    </div>
+    <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:11px;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px">
+      <span>${prevLabel}</span>
+      <span>활동 멤버 ${cur.total}명 · 이탈 ${cur.left}명 ${prev ? delta(cur.left, prev.left) : ''}</span>
+    </div>
+  `;
 }
 
 // ========== 건강도 추이 차트 ==========
@@ -6523,6 +6680,183 @@ function closeReportViewer() {
 }
 
 // ========== 정보 페이지 ==========
+// ========== 데이터 정합성 체크 (Phase R-5 B-1) ==========
+// 7개 정합성 체크를 실시간 계산하여 정보 탭에 카드로 표시
+function computeDataIntegrityChecks() {
+  const um = data.userMaster || [];
+  const gus = data.gameUserSummary || [];
+  const subs = data.subAccounts || [];
+
+  // 인덱스 준비
+  const gusById = {};
+  gus.forEach(r => {
+    const uid = String(r.user_id || '').trim();
+    if (uid) gusById[uid] = r;
+  });
+  const umByMeta = {};  // 단일 매칭
+  const umByMetaAll = {};  // 다중 매칭 (배열)
+  um.forEach(u => {
+    const mid = String(u.meta_id || '').trim();
+    if (!mid) return;
+    if (!umByMeta[mid]) umByMeta[mid] = u;
+    if (!umByMetaAll[mid]) umByMetaAll[mid] = [];
+    umByMetaAll[mid].push(u);
+  });
+  const subMetaToParent = {};
+  subs.forEach(s => {
+    const sm = String(s.sub_meta_id || '').trim();
+    const pd = String(s.discord_id || '').trim();
+    if (sm && pd) subMetaToParent[sm] = pd;
+  });
+  const subDiscordIds = new Set(
+    subs.filter(s => s.account_type === 'discord' && s.sub_discord_id)
+        .map(s => s.sub_discord_id)
+  );
+
+  // Check 1: 플테 참여 이력 있는데 tester_approved ≠ O (sub discord 포함 매칭)
+  const check1 = [];
+  gus.forEach(r => {
+    const uid = String(r.user_id || '').trim();
+    if (!uid) return;
+    const played = parseInt(r.total_playtests || 0) || 0;
+    if (played < 1) return;
+    let matched = umByMeta[uid];
+    if (!matched) {
+      const parentDid = subMetaToParent[uid];
+      if (parentDid) matched = um.find(u => u.discord_id === parentDid);
+    }
+    if (!matched) return;
+    const approved = String(matched.tester_approved || '').trim().toUpperCase();
+    if (approved !== 'O') {
+      check1.push({ username: matched.discord_username, plays: played });
+    }
+  });
+
+  // Check 2: User Master total_playtests 컬럼 존재 여부 (deprecated)
+  // Phase R-5에서 삭제됨. 체크는 "컬럼이 다시 생겼는지" 감시용
+  const hasDeprecatedColumn = um.some(u => u.first_play_date || u.total_playtests);
+
+  // Check 3: meta_id + playfab_id 있는데 playfab_matched ≠ O
+  const check3 = [];
+  um.forEach(u => {
+    const mid = String(u.meta_id || '').trim();
+    const pfid = String(u.playfab_id || '').trim();
+    if (!mid || !pfid) return;
+    const matched = String(u.playfab_matched || '').trim().toUpperCase();
+    if (matched !== 'O') check3.push(u.discord_username);
+  });
+
+  // Check 4: meta_id 중복 (Sub Accounts 연결 여부와 무관하게 모두 카운트)
+  const check4All = {};
+  Object.entries(umByMetaAll).forEach(([mid, users]) => {
+    if (users.length > 1) check4All[mid] = users;
+  });
+  // Sub Accounts로 연결된 중복 vs 실제 미연결 중복 구분
+  const check4Connected = [];
+  const check4Orphan = [];
+  Object.entries(check4All).forEach(([mid, users]) => {
+    // 이 users 중 어느 하나가 sub discord 계정인지 (Sub Accounts에 등록됐는지)
+    const connected = users.some(u => subDiscordIds.has(u.discord_id));
+    if (connected) check4Connected.push({ mid, users });
+    else check4Orphan.push({ mid, users });
+  });
+
+  // Check 5: Game 고아 유저 (Discord 매칭 없음)
+  const orphan = [];
+  gus.forEach(r => {
+    const uid = String(r.user_id || '').trim();
+    if (!uid) return;
+    if (umByMeta[uid]) return;
+    if (subMetaToParent[uid]) return;
+    orphan.push(r);
+  });
+
+  // Check 6: tester_approved = O 인데 Meta 미연동
+  const check6 = um.filter(u => {
+    const approved = String(u.tester_approved || '').trim().toUpperCase() === 'O';
+    const noMeta = !String(u.meta_id || '').trim();
+    return approved && noMeta;
+  });
+
+  return {
+    check1: check1.length,
+    check1_samples: check1.slice(0, 3),
+    hasDeprecatedColumn: hasDeprecatedColumn,
+    check3: check3.length,
+    check4Connected: check4Connected.length,
+    check4Orphan: check4Orphan.length,
+    check4Total: Object.keys(check4All).length,
+    check5: orphan.length,
+    check5_top_events: orphan.sort((a,b) => (parseInt(b.total_events||0))-(parseInt(a.total_events||0))).slice(0,3),
+    check6: check6.length,
+  };
+}
+
+function buildDataIntegrityCheckSection() {
+  const c = computeDataIntegrityChecks();
+
+  function statusBadge(count, severity) {
+    if (count === 0) return `<span style="color:var(--green);font-weight:700">✓ 정상</span>`;
+    const color = severity === 'critical' ? 'var(--red)' : severity === 'warning' ? 'var(--yellow)' : 'var(--muted)';
+    return `<span style="color:${color};font-weight:700">${count}건</span>`;
+  }
+
+  function checkCard(num, title, desc, severity, count, extra = '') {
+    const borderColor = count > 0
+      ? (severity === 'critical' ? 'rgba(239,68,68,0.3)' : severity === 'warning' ? 'rgba(234,179,8,0.3)' : 'rgba(156,163,175,0.2)')
+      : 'rgba(34,197,94,0.25)';
+    return `<div class="info-card" style="border-color:${borderColor}">
+      <h3 style="display:flex;align-items:center;justify-content:space-between">
+        <span><span class="icon">Check ${num}</span> ${title}</span>
+        ${statusBadge(count, severity)}
+      </h3>
+      <p style="font-size:12px;color:var(--muted);margin-top:4px;line-height:1.6">${desc}</p>
+      ${extra ? `<div style="font-size:11px;color:var(--muted);margin-top:6px">${extra}</div>` : ''}
+    </div>`;
+  }
+
+  const total = c.check1 + c.check3 + c.check4Orphan + c.check5 + c.check6;
+
+  const summary = total === 0
+    ? '<span style="color:var(--green)">✓ 모든 정합성 체크 통과</span>'
+    : `<span style="color:var(--yellow)">주의 ${total}건</span>`;
+
+  return `<div>
+    <h2 class="info-section-title">데이터 정합성 체크
+      <span style="font-size:12px;color:var(--muted);font-weight:400;margin-left:8px">실시간 계산 · ${summary}</span>
+    </h2>
+    <div class="info-section-grid" style="margin-top:12px">
+      ${checkCard(1, '플테 참여 x 미승인',
+        '게임 플레이 이력이 있으나 tester_approved가 O가 아닌 유저. 자동 보정 권장.',
+        'critical', c.check1,
+        c.check1_samples.length ? `최근: ${c.check1_samples.map(x => `@${x.username}(${x.plays}회)`).join(', ')}` : '')}
+
+      ${checkCard(2, 'UM deprecated 컬럼',
+        'User Master의 first_play_date / total_playtests 컬럼이 존재하는지 감시. Phase R-5에서 삭제됨.',
+        'warning', c.hasDeprecatedColumn ? 1 : 0,
+        c.hasDeprecatedColumn ? '⚠️ 컬럼이 재생성됨. sync 스크립트 확인 필요' : '컬럼 삭제 유지 중')}
+
+      ${checkCard(3, 'playfab_matched 플래그 누락',
+        'meta_id와 playfab_id가 모두 있으나 playfab_matched가 O가 아닌 유저. BigQuery 재검증 후 보정 가능.',
+        'warning', c.check3)}
+
+      ${checkCard(4, 'meta_id 중복 (전체)',
+        '같은 meta_id를 여러 Discord 계정이 공유. Sub Accounts로 연결된 경우는 정상, 미연결은 검토 필요.',
+        'info', c.check4Orphan,
+        c.check4Total > 0 ? `총 ${c.check4Total}건 중 ${c.check4Connected}건은 Sub Accounts 연결됨 (합산 표시), ${c.check4Orphan}건 미연결` : '')}
+
+      ${checkCard(5, 'Game 고아 유저',
+        'Game User Summary에 기록 있지만 User Master 매칭 없는 유저. Discord 서버 밖 or 매칭 미완료.',
+        'info', c.check5,
+        c.check5_top_events.length ? `상위: ${c.check5_top_events.map(r => r.meta_name).join(', ')}` : '')}
+
+      ${checkCard(6, '승인 but Meta 미연동',
+        'tester_approved = O 이나 meta_id 없음. 승인만 받고 아직 게임 설치 안 한 유저 다수 포함 (정상 케이스).',
+        'info', c.check6)}
+    </div>
+  </div>`;
+}
+
 function renderInfo() {
   let um = data.userMaster;
   let dd = data.discordDaily.filter(r => r.date >= DATA_CUTOFF);
@@ -6759,7 +7093,10 @@ ssh -i "key/ssh-key-2026-03-27.key" opc@134.185.103.73 "sudo systemctl restart r
     </div>
   </div>`);
 
-  // ━━━ 섹션 5: 제약사항 ━━━
+  // ━━━ 섹션 5: 데이터 정합성 체크 (Phase R-5 B-1) ━━━
+  cards.push(buildDataIntegrityCheckSection());
+
+  // ━━━ 섹션 6: 제약사항 ━━━
   cards.push(`<div>
     <h2 class="info-section-title">알려진 제약사항</h2>
     <div class="info-section-grid" style="margin-top:12px;grid-template-columns:1fr">
