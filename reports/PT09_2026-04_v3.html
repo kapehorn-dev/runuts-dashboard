@@ -41,6 +41,17 @@
   .badge-green{background:#dcfce7;color:#166534}.badge-yellow{background:#fef9c3;color:#854d0e}.badge-red{background:#fee2e2;color:#991b1b}.badge-blue{background:#dbeafe;color:#1e40af}.badge-gray{background:#f3f4f6;color:#374151}
   .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0}
   .placeholder{background:#f3f4f6;border:2px dashed #d1d5db;border-radius:8px;padding:24px;text-align:center;color:#9ca3af;font-size:14px;margin:16px 0}
+  /* 토글 스위치 */
+  .toggle-bar{display:flex;align-items:center;gap:12px;margin-bottom:16px;font-size:14px;color:#555}
+  .toggle-bar label{font-weight:600}
+  .switch{position:relative;display:inline-block;width:48px;height:26px}
+  .switch input{opacity:0;width:0;height:0}
+  .slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#d1d5db;border-radius:26px;transition:.3s}
+  .slider:before{content:'';position:absolute;height:20px;width:20px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s}
+  .switch input:checked+.slider{background:#FF9900}
+  .switch input:checked+.slider:before{transform:translateX(22px)}
+  .col-pt7{display:none}
+  .show3 .col-pt7{display:table-cell}
   details{margin:12px 0}summary{cursor:pointer;font-weight:600;font-size:15px;color:#555;padding:8px 0}summary:hover{color:#FF9900}
   .report-footer{margin-top:48px;padding-top:16px;border-top:1px solid #e9ecef;font-size:14px;color:#aaa;text-align:center}
   .highlight-row{background:#fffbeb}
@@ -66,6 +77,14 @@
   이 보고서는 플테당 60~80명 규모의 탐색적 데이터 분석(EDA) 결과입니다. 통계적 유의성 검정은 포함되지 않으며, 수치는 <strong>경향성 참고</strong>로 봐주세요.
 </div>
 
+<!-- 글로벌 비교 토글 -->
+<div class="toggle-bar">
+  <label>비교 범위:</label>
+  <span>2개 플테 (8차↔9차)</span>
+  <label class="switch"><input type="checkbox" id="toggle3pt" onchange="toggle3PT()"><span class="slider"></span></label>
+  <span>3개 플테 (7차↔8차↔9차)</span>
+</div>
+
 <!-- ===== 1. Executive Summary ===== -->
 <div class="section">
   <div class="section-heading">1. Executive Summary</div>
@@ -78,30 +97,18 @@
     <div class="kpi-box"><div class="label">Obby 클리어율</div><div class="value">14.2%</div><div class="sub">8차: 8.5%</div></div>
   </div>
 
-  <!-- 3개 플테 비교 토글 -->
-  <div style="margin-top:16px">
-    <button id="toggleCompare" onclick="toggle3PT()" style="background:#FF9900;color:#fff;border:none;padding:8px 16px;border-radius:6px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit">
-      ▶ 7차~9차 3개 플테 비교 보기
-    </button>
-    <div id="compare3" style="display:none;margin-top:12px">
-      <table>
-        <thead><tr><th>지표</th><th class="r">7차</th><th class="r">8차</th><th class="r bold">9차</th><th class="r">추세</th></tr></thead>
-        <tbody>
-          <tr><td>참여자</td><td class="r">87</td><td class="r">81</td><td class="r bold">68</td><td class="r">↘ 감소</td></tr>
-          <tr><td>총 세션</td><td class="r">1,280</td><td class="r">1,187</td><td class="r bold">965</td><td class="r">↘ 감소</td></tr>
-          <tr><td>총 이벤트</td><td class="r">24,024</td><td class="r">20,885</td><td class="r bold">18,505</td><td class="r">↘ 감소</td></tr>
-          <tr><td>총 체류</td><td class="r">54.6h</td><td class="r">48.9h</td><td class="r bold">55.5h</td><td class="r">↗ 반등</td></tr>
-          <tr><td>인당 세션</td><td class="r">14.7</td><td class="r">14.7</td><td class="r bold">14.2</td><td class="r">→ 유지</td></tr>
-          <tr><td>인당 체류</td><td class="r">37.7분</td><td class="r">36.2분</td><td class="r bold">60.5분</td><td class="r">↗ 증가</td></tr>
-          <tr><td>Obby 클리어율</td><td class="r">—</td><td class="r">8.5%</td><td class="r bold">14.2%</td><td class="r">↗ 증가</td></tr>
-        </tbody>
-      </table>
-      <div class="obs" style="margin-top:8px">
-        <div class="tag">3회 추세 관찰</div>
-        참여자 수는 87→81→68로 줄고 있으나, <strong>인당 체류시간은 37.7→36.2→60.5분으로 증가</strong>했다. 총 체류시간도 9차에서 55.5h로 반등하여, 참여 규모는 줄었지만 참여 깊이는 깊어지고 있다. 인당 세션(14~15)은 3회 연속 안정적.
-      </div>
-    </div>
-  </div>
+  <!-- 3개 플테 비교 테이블 (토글 연동) -->
+  <table class="compare-table">
+    <thead><tr><th>지표</th><th class="r col-pt7">7차</th><th class="r">8차</th><th class="r bold">9차</th><th class="r col-pt7">추세</th></tr></thead>
+    <tbody>
+      <tr><td>참여자</td><td class="r col-pt7">87</td><td class="r">81</td><td class="r bold">68</td><td class="r col-pt7">↘</td></tr>
+      <tr><td>총 세션</td><td class="r col-pt7">1,280</td><td class="r">1,187</td><td class="r bold">965</td><td class="r col-pt7">↘</td></tr>
+      <tr><td>총 체류</td><td class="r col-pt7">54.6h</td><td class="r">48.9h</td><td class="r bold">55.5h</td><td class="r col-pt7">↗ 반등</td></tr>
+      <tr><td>인당 세션</td><td class="r col-pt7">14.7</td><td class="r">14.7</td><td class="r bold">14.2</td><td class="r col-pt7">→ 유지</td></tr>
+      <tr><td>인당 체류</td><td class="r col-pt7">37.7분</td><td class="r">36.2분</td><td class="r bold">60.5분</td><td class="r col-pt7">↗ 증가</td></tr>
+      <tr><td>Obby 클리어율</td><td class="r col-pt7">—</td><td class="r">8.5%</td><td class="r bold">14.2%</td><td class="r col-pt7">↗ 증가</td></tr>
+    </tbody>
+  </table>
 </div>
 
 <!-- ===== 2. 변경점 ↔ 지표 매핑 ===== -->
@@ -483,8 +490,9 @@ new Chart(document.getElementById('chartPlaytime'),{
 new Chart(document.getElementById('chartModeTime'),{
   type:'bar',
   data:{labels:['Casual','Infection','Sky Tower','Horror','Circuit'],datasets:[
-    {label:'9차 (시간)',data:[32.1,14.6,4.5,2.1,2.1],backgroundColor:C.primary,borderRadius:3},
-    {label:'8차 (시간)',data:[32.1,9.7,0.7,2.6,3.4],backgroundColor:C.gray,borderRadius:3}
+    {label:'9차',data:[32.1,14.6,4.5,2.1,2.1],backgroundColor:C.primary,borderRadius:3},
+    {label:'8차',data:[32.1,9.7,0.7,2.6,3.4],backgroundColor:C.gray,borderRadius:3},
+    {label:'7차',data:[0,0,0,0,0],backgroundColor:'#94a3b8',borderRadius:3,hidden:true}
   ]},
   options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{position:'top',labels:{font:{size:11},boxWidth:12}}},scales:{x:{beginAtZero:true,title:{display:true,text:'시간',font:{size:11}},grid:{color:C.grid}},y:{grid:{display:false}}}}
 });
@@ -505,12 +513,10 @@ new Chart(document.getElementById('chartUserType'),{
   options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'bottom',labels:{font:{size:14},padding:12}}}}
 });
 
-// 토글 함수
+// 글로벌 3플테 토글
 function toggle3PT(){
-  var el=document.getElementById('compare3');
-  var btn=document.getElementById('toggleCompare');
-  if(el.style.display==='none'){el.style.display='block';btn.textContent='▼ 3개 플테 비교 접기';}
-  else{el.style.display='none';btn.textContent='▶ 7차~9차 3개 플테 비교 보기';}
+  var on=document.getElementById('toggle3pt').checked;
+  document.body.classList.toggle('show3',on);
 }
 </script>
 </body>
