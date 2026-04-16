@@ -41,15 +41,12 @@
   .badge-green{background:#dcfce7;color:#166534}.badge-yellow{background:#fef9c3;color:#854d0e}.badge-red{background:#fee2e2;color:#991b1b}.badge-blue{background:#dbeafe;color:#1e40af}.badge-gray{background:#f3f4f6;color:#374151}
   .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0}
   .placeholder{background:#f3f4f6;border:2px dashed #d1d5db;border-radius:8px;padding:24px;text-align:center;color:#9ca3af;font-size:14px;margin:16px 0}
-  /* 토글 스위치 */
-  .toggle-bar{display:flex;align-items:center;gap:12px;margin-bottom:16px;font-size:14px;color:#555}
-  .toggle-bar label{font-weight:600}
-  .switch{position:relative;display:inline-block;width:48px;height:26px}
-  .switch input{opacity:0;width:0;height:0}
-  .slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#d1d5db;border-radius:26px;transition:.3s}
-  .slider:before{content:'';position:absolute;height:20px;width:20px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.3s}
-  .switch input:checked+.slider{background:#FF9900}
-  .switch input:checked+.slider:before{transform:translateX(22px)}
+  /* 비교 범위 칩 */
+  .chip-bar{display:flex;align-items:center;gap:8px;margin-bottom:16px;font-size:14px}
+  .chip-bar span{font-weight:600;color:#555}
+  .chip{padding:6px 16px;border-radius:20px;font-size:14px;font-weight:600;cursor:pointer;border:2px solid #e9ecef;background:#fff;color:#555;transition:.2s}
+  .chip.active{background:#FF9900;color:#fff;border-color:#FF9900}
+  .chip:hover:not(.active){background:#f8f9fa}
   .col-pt7{display:none}
   .show3 .col-pt7{display:table-cell}
   details{margin:12px 0}summary{cursor:pointer;font-weight:600;font-size:15px;color:#555;padding:8px 0}summary:hover{color:#FF9900}
@@ -77,12 +74,11 @@
   이 보고서는 플테당 60~80명 규모의 탐색적 데이터 분석(EDA) 결과입니다. 통계적 유의성 검정은 포함되지 않으며, 수치는 <strong>경향성 참고</strong>로 봐주세요.
 </div>
 
-<!-- 글로벌 비교 토글 -->
-<div class="toggle-bar">
-  <label>비교 범위:</label>
-  <span>2개 플테 (8차↔9차)</span>
-  <label class="switch"><input type="checkbox" id="toggle3pt" onchange="toggle3PT()"><span class="slider"></span></label>
-  <span>3개 플테 (7차↔8차↔9차)</span>
+<!-- 글로벌 비교 범위 칩 -->
+<div class="chip-bar">
+  <span>비교 범위:</span>
+  <div class="chip active" onclick="setCompare(2,this)">2개 플테</div>
+  <div class="chip" onclick="setCompare(3,this)">3개 플테</div>
 </div>
 
 <!-- ===== 1. Executive Summary ===== -->
@@ -513,10 +509,11 @@ new Chart(document.getElementById('chartUserType'),{
   options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'bottom',labels:{font:{size:14},padding:12}}}}
 });
 
-// 글로벌 3플테 토글
-function toggle3PT(){
-  var on=document.getElementById('toggle3pt').checked;
-  document.body.classList.toggle('show3',on);
+// 글로벌 비교 범위 칩
+function setCompare(n,el){
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  document.body.classList.toggle('show3',n===3);
 }
 </script>
 </body>
