@@ -77,6 +77,31 @@
     <div class="kpi-box"><div class="label">총 체류</div><div class="value">55.5h</div><div class="sub">인당 중앙값 24.7분</div></div>
     <div class="kpi-box"><div class="label">Obby 클리어율</div><div class="value">14.2%</div><div class="sub">8차: 8.5%</div></div>
   </div>
+
+  <!-- 3개 플테 비교 토글 -->
+  <div style="margin-top:16px">
+    <button id="toggleCompare" onclick="toggle3PT()" style="background:#FF9900;color:#fff;border:none;padding:8px 16px;border-radius:6px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit">
+      ▶ 7차~9차 3개 플테 비교 보기
+    </button>
+    <div id="compare3" style="display:none;margin-top:12px">
+      <table>
+        <thead><tr><th>지표</th><th class="r">7차</th><th class="r">8차</th><th class="r bold">9차</th><th class="r">추세</th></tr></thead>
+        <tbody>
+          <tr><td>참여자</td><td class="r">87</td><td class="r">81</td><td class="r bold">68</td><td class="r">↘ 감소</td></tr>
+          <tr><td>총 세션</td><td class="r">1,280</td><td class="r">1,187</td><td class="r bold">965</td><td class="r">↘ 감소</td></tr>
+          <tr><td>총 이벤트</td><td class="r">24,024</td><td class="r">20,885</td><td class="r bold">18,505</td><td class="r">↘ 감소</td></tr>
+          <tr><td>총 체류</td><td class="r">54.6h</td><td class="r">48.9h</td><td class="r bold">55.5h</td><td class="r">↗ 반등</td></tr>
+          <tr><td>인당 세션</td><td class="r">14.7</td><td class="r">14.7</td><td class="r bold">14.2</td><td class="r">→ 유지</td></tr>
+          <tr><td>인당 체류</td><td class="r">37.7분</td><td class="r">36.2분</td><td class="r bold">60.5분</td><td class="r">↗ 증가</td></tr>
+          <tr><td>Obby 클리어율</td><td class="r">—</td><td class="r">8.5%</td><td class="r bold">14.2%</td><td class="r">↗ 증가</td></tr>
+        </tbody>
+      </table>
+      <div class="obs" style="margin-top:8px">
+        <div class="tag">3회 추세 관찰</div>
+        참여자 수는 87→81→68로 줄고 있으나, <strong>인당 체류시간은 37.7→36.2→60.5분으로 증가</strong>했다. 총 체류시간도 9차에서 55.5h로 반등하여, 참여 규모는 줄었지만 참여 깊이는 깊어지고 있다. 인당 세션(14~15)은 3회 연속 안정적.
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- ===== 2. 변경점 ↔ 지표 매핑 ===== -->
@@ -159,14 +184,16 @@
 <!-- ===== 5. 유저 유형별 분석 ===== -->
 <div class="section">
   <div class="section-heading">5. 유저 유형별 분석</div>
+  <div class="section-desc">리텐션(8차 연속 참여) / 복귀(8차 불참, 이전 참여 있음) / 신규(첫 플테) 3분할. 플레이어별 합산 기준.</div>
+
   <div class="grid-2">
     <div>
       <table>
         <thead><tr><th>유형</th><th class="r">인원</th><th class="r">비율</th></tr></thead>
         <tbody>
-          <tr><td><span class="badge badge-green">리텐션</span> 8차에도 참여</td><td class="r bold">45</td><td class="r">66%</td></tr>
-          <tr><td><span class="badge badge-blue">복귀</span> 8차 불참</td><td class="r">13</td><td class="r">19%</td></tr>
-          <tr><td><span class="badge badge-yellow">신규</span> 첫 플테</td><td class="r">10</td><td class="r">15%</td></tr>
+          <tr><td><span class="badge badge-green">리텐션</span></td><td class="r bold">28</td><td class="r">41%</td></tr>
+          <tr><td><span class="badge badge-blue">복귀</span></td><td class="r">30</td><td class="r">44%</td></tr>
+          <tr><td><span class="badge badge-yellow">신규</span></td><td class="r">10</td><td class="r">15%</td></tr>
         </tbody>
       </table>
     </div>
@@ -175,9 +202,35 @@
       <canvas id="chartUserType" height="160"></canvas>
     </div>
   </div>
-  <div class="hold">
-    <div class="tag">유보</div>
-    유저 유형별 인당 체류시간/모드 이용 차이 분석은 체류 데이터를 유저별로 분리한 후 가능하다. 다음 보고서에서 추가 예정.
+
+  <div style="font-weight:700;font-size:15px;margin:20px 0 8px;color:#555">유형별 참여 깊이 비교</div>
+  <table>
+    <thead><tr><th>지표</th><th class="r">리텐션 (28명)</th><th class="r">복귀 (30명)</th><th class="r">신규 (10명)</th></tr></thead>
+    <tbody>
+      <tr><td>인당 체류 (중앙값)</td><td class="r bold">24.1분</td><td class="r">5.8분</td><td class="r">20.9분</td></tr>
+      <tr><td>인당 체류 (평균)</td><td class="r">48.0분</td><td class="r">42.6분</td><td class="r bold">70.6분</td></tr>
+      <tr><td>인당 세션</td><td class="r">15.0</td><td class="r">11.8</td><td class="r bold">18.9</td></tr>
+      <tr><td>인당 이벤트</td><td class="r">279</td><td class="r">233</td><td class="r bold">370</td></tr>
+      <tr><td>인당 상점 방문</td><td class="r">9.3</td><td class="r">8.3</td><td class="r bold">10.5</td></tr>
+      <tr><td>인당 구매</td><td class="r">0.9</td><td class="r bold">1.1</td><td class="r">0.9</td></tr>
+      <tr><td>인당 Obby 시작</td><td class="r bold">7.7</td><td class="r">3.8</td><td class="r">3.6</td></tr>
+      <tr><td>인당 태그</td><td class="r">0.8</td><td class="r bold">2.5</td><td class="r">0.3</td></tr>
+      <tr><td>인당 퀘스트</td><td class="r">8.0</td><td class="r">6.5</td><td class="r bold">11.2</td></tr>
+      <tr><td>인당 도전과제</td><td class="r bold">4.5</td><td class="r">3.9</td><td class="r">4.3</td></tr>
+      <tr><td>인당 테크트리</td><td class="r bold">9.1</td><td class="r">5.8</td><td class="r">3.9</td></tr>
+    </tbody>
+  </table>
+
+  <div class="obs">
+    <div class="tag">관찰</div>
+    <strong>신규(10명)가 가장 적극적이다.</strong> 인당 체류 70.6분, 세션 18.9회, 퀘스트 11.2개로 모든 지표에서 높다. 온보딩 퀘스트(Flight/Seed/WindFan)를 처음 받으므로 퀘스트 수가 많은 것은 자연스럽다.<br><br>
+    <strong>복귀(30명)는 양극화되어 있다.</strong> 중앙값 5.8분이지만 평균 42.6분으로, "잠깐 접속하고 나간 유저"와 "제대로 복귀한 유저"가 혼재한다. 태그 모드 이용(인당 2.5회)이 다른 유형보다 높다.<br><br>
+    <strong>리텐션(28명)은 Obby와 테크트리에 집중한다.</strong> Obby 시작(7.7회)과 테크트리 해금(9.1회)이 가장 높아, 콘텐츠 진행에 집중하는 코어 플레이어 패턴이다.
+  </div>
+
+  <div class="review">
+    <div class="tag">검토 사항</div>
+    복귀 유저의 중앙값(5.8분)이 리텐션·신규 대비 크게 낮다. 복귀 유저 30명 중 "5분 미만 체류" 비율을 확인하고, 이들의 이탈 원인(접속 장애? 콘텐츠 부족? 친구 미접속?)을 파악하면 리텐션 개선에 도움이 될 수 있다.
   </div>
 </div>
 
@@ -448,9 +501,17 @@ new Chart(document.getElementById('chartCross'),{
 // 유저 유형
 new Chart(document.getElementById('chartUserType'),{
   type:'doughnut',
-  data:{labels:['리텐션 (45)','복귀 (13)','신규 (10)'],datasets:[{data:[45,13,10],backgroundColor:[C.green,C.blue,C.yellow],borderWidth:0}]},
-  options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'bottom',labels:{font:{size:11},padding:12}}}}
+  data:{labels:['리텐션 (28)','복귀 (30)','신규 (10)'],datasets:[{data:[28,30,10],backgroundColor:[C.green,C.blue,C.yellow],borderWidth:0}]},
+  options:{responsive:true,maintainAspectRatio:false,cutout:'55%',plugins:{legend:{position:'bottom',labels:{font:{size:14},padding:12}}}}
 });
+
+// 토글 함수
+function toggle3PT(){
+  var el=document.getElementById('compare3');
+  var btn=document.getElementById('toggleCompare');
+  if(el.style.display==='none'){el.style.display='block';btn.textContent='▼ 3개 플테 비교 접기';}
+  else{el.style.display='none';btn.textContent='▶ 7차~9차 3개 플테 비교 보기';}
+}
 </script>
 </body>
 </html>
