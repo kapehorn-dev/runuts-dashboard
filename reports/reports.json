@@ -1,5 +1,15 @@
 [
   {
+    "id": "PT10",
+    "title": "10차 Playtest 보고서",
+    "playtest": "10차 Playtest",
+    "period": "2026-04-26 ~ 2026-04-27 KST",
+    "date": "2026-05-06",
+    "summary": "참여자 85명(+25%), 잔존율 97.8%, Tutorial 완료율 91.9%(+28.3%p), 태그 +156%. Sprint 006(온보딩·튜토리얼) 효과 가시화. 1차 시도(0.14.0) 무효 처리, 정식(0.14.0_0425) 데이터.",
+    "file": "PT10_2026-04.html",
+    "status": "published"
+  },
+  {
     "id": "PT09",
     "title": "9차 Playtest 보고서",
     "playtest": "9차 Playtest",

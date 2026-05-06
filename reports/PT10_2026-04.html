@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PT10 — 10차 Playtest 분석 보고서</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css');
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Pretendard Variable',Pretendard,-apple-system,sans-serif;background:#fff;color:#1a1a2e;line-height:1.8;font-size:15px;max-width:960px;margin:0 auto;padding:40px 32px}
+  .report-header{border-bottom:3px solid #FF9900;padding-bottom:24px;margin-bottom:32px}
+  .report-header h1{font-weight:900;font-size:28px;color:#1a1a2e;margin-bottom:4px}
+  .report-header .subtitle{font-size:15px;color:#666;margin-bottom:12px}
+  .report-meta{display:flex;flex-wrap:wrap;gap:16px 24px;font-size:14px;color:#888}
+  .disclaimer{background:#f8f9fa;border:1px solid #e9ecef;border-radius:8px;padding:12px 16px;margin-bottom:24px;font-size:14px;color:#666;line-height:1.7}
+  .section{margin-bottom:36px}
+  .section-heading{font-weight:900;font-size:20px;color:#1a1a2e;border-left:4px solid #FF9900;padding-left:12px;margin-bottom:16px}
+  .section-desc{font-size:14px;color:#555;margin-bottom:12px;line-height:1.7}
+  .kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px}
+  .kpi-box{background:#f8f9fa;border-radius:8px;padding:16px;text-align:center;border:1px solid #e9ecef}
+  .kpi-box .label{font-size:14px;color:#888;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+  .kpi-box .value{font-size:24px;font-weight:700;color:#1a1a2e}
+  .kpi-box .sub{font-size:14px;color:#999;margin-top:2px}
+  .obs{border-left:4px solid #94a3b8;background:#f8fafc;padding:14px 16px;border-radius:0 8px 8px 0;margin:16px 0;font-size:14px;line-height:1.8}
+  .obs .tag{font-weight:700;font-size:14px;color:#475569;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+  .review{border-left:4px solid #f59e0b;background:#fffbeb;padding:14px 16px;border-radius:0 8px 8px 0;margin:16px 0;font-size:14px;line-height:1.8}
+  .review .tag{font-weight:700;font-size:14px;color:#92400e;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+  .hold{border-left:4px solid #d1d5db;background:#f9fafb;padding:14px 16px;border-radius:0 8px 8px 0;margin:16px 0;font-size:14px;line-height:1.8;color:#6b7280}
+  .hold .tag{font-weight:700;font-size:14px;color:#9ca3af;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+  .chart-wrap{background:#f8f9fa;border-radius:8px;padding:16px;margin:16px 0;border:1px solid #e9ecef}
+  .chart-wrap canvas{max-height:300px}
+  .chart-title{font-size:13px;font-weight:600;margin-bottom:8px;color:#555}
+  table{width:100%;border-collapse:collapse;font-size:14px;margin:12px 0}
+  th{background:#f1f3f5;padding:8px 12px;text-align:left;font-weight:600;font-size:14px;color:#555;border-bottom:2px solid #dee2e6}
+  td{padding:8px 12px;border-bottom:1px solid #e9ecef}
+  tr:hover td{background:#f8f9fa}
+  .r{text-align:right;font-variant-numeric:tabular-nums}
+  .bold{font-weight:600}
+  .badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:14px;font-weight:600}
+  .badge-green{background:#dcfce7;color:#166534}.badge-yellow{background:#fef9c3;color:#854d0e}.badge-red{background:#fee2e2;color:#991b1b}.badge-blue{background:#dbeafe;color:#1e40af}.badge-gray{background:#f3f4f6;color:#374151}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0}
+  .placeholder{background:#f3f4f6;border:2px dashed #d1d5db;border-radius:8px;padding:24px;text-align:center;color:#9ca3af;font-size:14px;margin:16px 0}
+  .delta-up{color:#16a34a;font-weight:600}.delta-down{color:#dc2626;font-weight:600}.delta-flat{color:#6b7280}
+  details{margin:12px 0}summary{cursor:pointer;font-weight:600;font-size:15px;color:#555;padding:8px 0}summary:hover{color:#FF9900}
+  .report-footer{margin-top:48px;padding-top:16px;border-top:1px solid #e9ecef;font-size:14px;color:#aaa;text-align:center}
+  .highlight-row{background:#fffbeb}
+  @media(max-width:640px){body{padding:20px 16px}.report-header h1{font-size:22px}.kpi-row{grid-template-columns:repeat(2,1fr)}.grid-2{grid-template-columns:1fr}}
+  @media print{body{padding:20px;font-size:12px}.chart-wrap,.section{break-inside:avoid}}
+</style>
+</head>
+<body>
+
+<div class="report-header">
+  <h1>10차 Playtest 분석 보고서</h1>
+  <div class="subtitle">RUNuts — 비행 기반 소셜 VR 멀티플레이 게임</div>
+  <div class="report-meta">
+    <span>플테 기간: 2026-04-26(일) ~ 04-27(월) KST</span>
+    <span>빌드: v0.14.0_0425</span>
+    <span>비교: 9차 (v0.13.0)</span>
+    <span>참여자: 85명</span>
+    <span>작성일: 2026-05-06</span>
+  </div>
+</div>
+
+<div class="disclaimer">
+  이 보고서는 플테당 60~90명 규모의 탐색적 데이터 분석(EDA) 결과입니다. 통계적 유의성 검정은 포함되지 않으며, 수치는 <strong>경향성 참고</strong>로 봐주세요.<br><br>
+  <strong>10차 1차 시도(v0.14.0, 4/20-21 KST, 31명/5,215 events)</strong>는 빌드 문제로 무효 처리되어 본 보고서에서 제외되었습니다. 정식(v0.14.0_0425) 데이터만 사용합니다. 직전 정규 플테 비교 대상은 <strong>9차 Playtest (v0.13.0)</strong>입니다.
+</div>
+
+<!-- ===== 1. Executive Summary ===== -->
+<div class="section">
+  <div class="section-heading">1. Executive Summary</div>
+  <div class="kpi-row">
+    <div class="kpi-box"><div class="label">참여자</div><div class="value">85</div><div class="sub">9차: 68 (<span class="delta-up">+17, +25%</span>)</div></div>
+    <div class="kpi-box"><div class="label">신규</div><div class="value">12</div><div class="sub">재참여 73 (86%)</div></div>
+    <div class="kpi-box"><div class="label">잔존율</div><div class="value">97.8%</div><div class="sub">잔존 91 / 이탈 2</div></div>
+    <div class="kpi-box"><div class="label">피크 DAU</div><div class="value">65</div><div class="sub">9차: 57 (<span class="delta-up">+14%</span>)</div></div>
+    <div class="kpi-box"><div class="label">총 세션</div><div class="value">1,355</div><div class="sub">9차: 965 (<span class="delta-up">+40%</span>)</div></div>
+    <div class="kpi-box"><div class="label">총 이벤트</div><div class="value">25,610</div><div class="sub">9차: 18,505 (<span class="delta-up">+38%</span>)</div></div>
+  </div>
+
+  <table>
+    <thead><tr><th>지표</th><th class="r">8차</th><th class="r">9차</th><th class="r bold">10차</th><th class="r">추세</th></tr></thead>
+    <tbody>
+      <tr><td>참여자</td><td class="r">81</td><td class="r">68</td><td class="r bold">85</td><td class="r"><span class="delta-up">↗ 반등</span></td></tr>
+      <tr><td>총 세션</td><td class="r">1,187</td><td class="r">965</td><td class="r bold">1,355</td><td class="r"><span class="delta-up">↗ 증가</span></td></tr>
+      <tr><td>총 이벤트</td><td class="r">20,885</td><td class="r">18,505</td><td class="r bold">25,610</td><td class="r"><span class="delta-up">↗ 증가</span></td></tr>
+      <tr><td>인당 세션</td><td class="r">14.7</td><td class="r">14.2</td><td class="r bold">14.6</td><td class="r"><span class="delta-flat">→ 유지</span></td></tr>
+      <tr><td>인당 이벤트</td><td class="r">258</td><td class="r">272</td><td class="r bold">275</td><td class="r"><span class="delta-flat">→ 유지</span></td></tr>
+      <tr><td>피크 DAU</td><td class="r">69</td><td class="r">57</td><td class="r bold">65</td><td class="r"><span class="delta-up">↗ 반등</span></td></tr>
+      <tr><td>Tutorial 완료율</td><td class="r">56.5%</td><td class="r">63.6%</td><td class="r bold">91.9%</td><td class="r"><span class="delta-up">↗ 대폭 개선</span></td></tr>
+      <tr><td>Obby 클리어율</td><td class="r">8.5%</td><td class="r">14.2%</td><td class="r bold">9.2%</td><td class="r"><span class="delta-down">↘ 후퇴</span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="obs">
+    <div class="tag">관찰</div>
+    참여자 수가 9차 68명에서 <strong>85명(+25%)</strong>으로 반등했고, 세션·이벤트는 모두 +38~40% 증가했다. 인당 참여 밀도(세션 14.6, 이벤트 275)는 8/9차와 유사하게 유지되어, 증가분이 전적으로 참여자 수 증가에 기인함을 보여준다. <strong>Tutorial 완료율은 91.9%로 9차 63.6% 대비 28.3%p 개선</strong>되어, Sprint 006의 "온보딩·튜토리얼" 주제 작업 효과가 가장 두드러진다.
+  </div>
+</div>
+
+<!-- ===== 2. 변경점 ↔ 지표 변화 ===== -->
+<div class="section">
+  <div class="section-heading">2. 변경점 ↔ 지표 변화</div>
+  <div class="section-desc">v0.14.0_0425는 Stage 1 마지막 빌드로 Sprint 006(온보딩·튜토리얼·제품 안정성·마케팅 에셋) 결과물을 통합. 빌드 변경점과 지표 변화를 나란히 정리합니다.</div>
+  <table>
+    <thead><tr><th>빌드 변경사항 (Sprint 006)</th><th>관련 지표</th><th class="r">변화</th></tr></thead>
+    <tbody>
+      <tr><td>온보딩·튜토리얼 정비 (씨드·제트팩 소개 레벨 보충, UXUI 개선)</td><td>Tutorial 완료율</td><td class="r"><span class="delta-up">63.6% → 91.9% (+28.3%p)</span></td></tr>
+      <tr><td>온보딩·일일 퀘스트 시스템 정리</td><td>퀘스트 달성</td><td class="r"><span class="delta-up">531 → 680 (+28%)</span></td></tr>
+      <tr><td>Fly/Chase/Run 3축 도전과제 체계화 (태그 게임 중심)</td><td>태그 모드 종료</td><td class="r"><span class="delta-up">102 → 261 (+156%)</span></td></tr>
+      <tr><td>플라자 형태 상점 + 코스메틱 종류·등급 명확화</td><td>상점 진입</td><td class="r"><span class="delta-up">614 → 1,013 (+65%)</span></td></tr>
+      <tr><td>줄기 구조 순차 해금 테크트리</td><td>아이템 장착 / 궁극기 사용</td><td class="r"><span class="delta-up">+12% / +35%</span></td></tr>
+      <tr><td>PlayFab Economy v1→v2 재구축 (70% 진행)</td><td>제품 안정성</td><td class="r">정성적 — 활성일 3일 안정</td></tr>
+      <tr><td>(검토 필요) Obby 난이도 조정 또는 신규 유저 비율 영향</td><td>Obby 클리어율</td><td class="r"><span class="delta-down">14.2% → 9.2% (-5.0%p)</span></td></tr>
+    </tbody>
+  </table>
+  <div class="review">
+    <div class="tag">검토 사항</div>
+    <strong>태그 모드 +156% 폭증과 Obby 클리어율 -5%p 후퇴</strong>가 동시 발생했다. Fly/Chase/Run 도전과제가 태그 중심으로 설계되어 유저 동선이 태그로 쏠렸을 가능성과, Obby 난이도/맵 변경 또는 신규 유저(12명) 비중 증가의 영향이 섞여 있을 수 있다. 모드별 동선·진입 데이터(roomConnect 기준)와 신규 vs 재참여 클리어율 분리 비교가 추가로 필요하다.
+  </div>
+</div>
+
+<!-- ===== 3. 일별 추이 ===== -->
+<div class="section">
+  <div class="section-heading">3. 일별 추이</div>
+  <div class="section-desc">UTC 기준 적재 일자. KST로는 +1일 오프셋(예: UTC 04-25 → KST 04-26).</div>
+  <table>
+    <thead><tr><th>날짜 (UTC)</th><th>KST 환산</th><th class="r">DAU</th><th class="r">세션</th><th class="r">이벤트</th></tr></thead>
+    <tbody>
+      <tr><td>2026-04-25</td><td>4/26 (일)</td><td class="r">38</td><td class="r">308</td><td class="r">5,865</td></tr>
+      <tr class="highlight-row"><td>2026-04-26</td><td>4/27 (월)</td><td class="r bold">65</td><td class="r bold">920</td><td class="r bold">16,820</td></tr>
+      <tr><td>2026-04-27</td><td>4/28 (화)</td><td class="r">19</td><td class="r">127</td><td class="r">2,925</td></tr>
+    </tbody>
+  </table>
+  <div class="chart-wrap">
+    <div class="chart-title">일별 DAU + 세션 + 이벤트 (KST 기준)</div>
+    <canvas id="chartDaily" height="220"></canvas>
+  </div>
+  <div class="obs">
+    <div class="tag">관찰</div>
+    <strong>2일차(4/27 월요일) 피크</strong>가 65명/16,820 이벤트로 전체의 65%를 차지했다. 1일차(38명)는 늦은 시간대 시작, 3일차(19명)는 종료 후 늦게 접속한 잔여 유저로 보인다. 주말(4/26 일)보다 평일 시작(4/27 월)이 더 활발한 패턴은 9차에서도 관찰된 바 있다.
+  </div>
+</div>
+
+<!-- ===== 4. 모드별 점유율 (이벤트 기준) ===== -->
+<div class="section">
+  <div class="section-heading">4. 모드별 이벤트 점유율</div>
+  <div class="section-desc">BigQuery 이벤트 카운트 기준 모드별 활동량. 인당 체류시간(roomDisconnect.elapsedTime) 분석은 추가 BigQuery 쿼리가 필요해 본 보고서에서는 이벤트 카운트로만 비교합니다.</div>
+  <table>
+    <thead><tr><th>모드 / 이벤트</th><th class="r">9차</th><th class="r bold">10차</th><th class="r">변화</th><th class="r">변화율</th></tr></thead>
+    <tbody>
+      <tr><td>Obby 시작 (obbyStart)</td><td class="r">366</td><td class="r bold">424</td><td class="r"><span class="delta-up">+58</span></td><td class="r"><span class="delta-up">+15.8%</span></td></tr>
+      <tr><td>Obby 클리어 (obbyClear)</td><td class="r">52</td><td class="r bold">39</td><td class="r"><span class="delta-down">-13</span></td><td class="r"><span class="delta-down">-25.0%</span></td></tr>
+      <tr><td>Obby 사망 (obbyDeath)</td><td class="r">1,020</td><td class="r bold">1,118</td><td class="r"><span class="delta-up">+98</span></td><td class="r"><span class="delta-up">+9.6%</span></td></tr>
+      <tr class="highlight-row"><td class="bold">태그 종료 (tagGameEnd)</td><td class="r">102</td><td class="r bold">261</td><td class="r"><span class="delta-up">+159</span></td><td class="r"><span class="delta-up">+155.9%</span></td></tr>
+      <tr><td>게임 진행 (gameRunning)</td><td class="r">1,329</td><td class="r bold">1,912</td><td class="r"><span class="delta-up">+583</span></td><td class="r"><span class="delta-up">+43.9%</span></td></tr>
+      <tr><td>궁극기 사용 (useUltimate)</td><td class="r">2,573</td><td class="r bold">3,482</td><td class="r"><span class="delta-up">+909</span></td><td class="r"><span class="delta-up">+35.3%</span></td></tr>
+    </tbody>
+  </table>
+  <div class="chart-wrap">
+    <div class="chart-title">주요 모드 이벤트 비교 (10차 vs 9차)</div>
+    <canvas id="chartModes" height="220"></canvas>
+  </div>
+  <div class="obs">
+    <div class="tag">관찰</div>
+    <strong>태그 모드가 +156%로 가장 큰 증가</strong>를 보였다. 이는 Sprint 006의 도전과제 3축(Fly/Chase/Run) 중 Chase 트랙(MostTagsInOneGame)이 태그 중심으로 설계된 영향으로 보인다. <strong>Obby는 시작(+16%)과 사망(+10%)은 늘었으나 클리어(-25%)는 감소</strong>해, 진입은 활발해졌으나 완료는 어려워졌다. 클리어율 14.2% → 9.2%로 5%p 후퇴.
+  </div>
+  <div class="review">
+    <div class="tag">검토 사항</div>
+    Obby 클리어율 후퇴의 원인 후보 — ① 신규 유저 비율 증가(10명→12명, 14.7%→14.1%)에 의한 통계적 효과인지, ② 맵/난이도 변경에 의한 것인지 구분이 어렵다. 신규 vs 재참여 그룹 별 클리어율을 분리 비교하면 명확해진다.
+  </div>
+</div>
+
+<!-- ===== 5. 유저 유형별 분석 ===== -->
+<div class="section">
+  <div class="section-heading">5. 유저 유형별 분석</div>
+  <div class="section-desc">신규(첫 플테) / 재참여(이전 플테 경험 있음) 2분할. 9차 플테에서 사용한 리텐션·복귀·신규 3분할은 별도 코호트 분석 시 가능합니다.</div>
+
+  <div class="grid-2">
+    <div>
+      <table>
+        <thead><tr><th>유형</th><th class="r">인원</th><th class="r">비율</th></tr></thead>
+        <tbody>
+          <tr><td><span class="badge badge-blue">재참여</span> (이전 플테 경험)</td><td class="r bold">73</td><td class="r">86%</td></tr>
+          <tr><td><span class="badge badge-yellow">신규</span> (첫 플테)</td><td class="r">12</td><td class="r">14%</td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:12px;font-size:14px;color:#666">
+        <strong>9차 vs 10차 신규 비율</strong>: 9차 14.7% (10/68) → 10차 14.1% (12/85). 거의 동일.<br>
+        <strong>9차 → 10차 복귀</strong>: 9차 참여 68명 중 약 81%가 10차에 참여한 것으로 추정 (정확한 코호트 매칭은 추가 분석 필요).
+      </div>
+    </div>
+    <div class="chart-wrap" style="margin:0">
+      <div class="chart-title">유저 유형 분포</div>
+      <canvas id="chartUserType" height="220"></canvas>
+    </div>
+  </div>
+
+  <div class="obs">
+    <div class="tag">관찰</div>
+    재참여 86% / 신규 14%로 9차(재참여 85% / 신규 15%)와 매우 유사한 구성. <strong>참여자 +25% 증가의 대부분이 재참여 유저 +15명</strong>(58→73, +26%)이며, 신규는 +2명(10→12, +20%)으로 비슷한 비율로 증가했다. 모집 채널/홍보 시점이 9차와 유사했음을 시사한다.
+  </div>
+</div>
+
+<!-- ===== 6. 잔존 분석 ===== -->
+<div class="section">
+  <div class="section-heading">6. 잔존 분석</div>
+  <div class="section-desc">PT10 참여자(85명) + 직전 PT(9차) 참여자 조합 기준. retained = 둘 다 참여, churned = 9차 참여 후 10차 미참여.</div>
+  <div class="grid-2">
+    <div>
+      <table>
+        <thead><tr><th>분류</th><th class="r">인원</th></tr></thead>
+        <tbody>
+          <tr><td><span class="badge badge-green">잔존 (Retained)</span></td><td class="r bold">91</td></tr>
+          <tr><td><span class="badge badge-gray">휴면 (Dormant)</span></td><td class="r">0</td></tr>
+          <tr><td><span class="badge badge-red">이탈 (Churned)</span></td><td class="r">2</td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:8px;font-size:14px;color:#666">
+        <strong>잔존율 97.8%</strong> (91 / (91+2)). 9차 99% 대비 -1.2%p로 코어 유저 기반은 안정적으로 유지.
+      </div>
+    </div>
+    <div class="chart-wrap" style="margin:0">
+      <div class="chart-title">잔존 분포</div>
+      <canvas id="chartRetention" height="200"></canvas>
+    </div>
+  </div>
+  <div class="obs">
+    <div class="tag">관찰</div>
+    <strong>이탈 2명에 그쳐 잔존율 97.8% 유지</strong>. 9차 → 10차 사이 약 3주 간격에도 코어 기반은 안정. 10차 신규 12명을 합치면 다음 11차 코호트 추적 시 신규 유지율 측정 가능.
+  </div>
+</div>
+
+<!-- ===== 7. Shop + 경제 (간소) ===== -->
+<div class="section">
+  <div class="section-heading">7. Shop + 경제 활동</div>
+  <div class="section-desc">상점 진입·아이템 장착 카운트만 비교. Golden Nuts 잔액·구매 단가 등 상세 경제 분석은 별도 BigQuery 쿼리(VIRTUAL_CURRENCY_JSON, purchaseItem) 필요.</div>
+  <table>
+    <thead><tr><th>지표</th><th class="r">9차</th><th class="r bold">10차</th><th class="r">변화율</th><th>인당 (10차)</th></tr></thead>
+    <tbody>
+      <tr><td>상점 진입 (shopEnter)</td><td class="r">614</td><td class="r bold">1,013</td><td class="r"><span class="delta-up">+65.0%</span></td><td>11.9</td></tr>
+      <tr><td>아이템 장착 (equipItem)</td><td class="r">648</td><td class="r bold">728</td><td class="r"><span class="delta-up">+12.3%</span></td><td>8.6</td></tr>
+      <tr><td>퀘스트 달성 (dailyQuestClaimed)</td><td class="r">531</td><td class="r bold">680</td><td class="r"><span class="delta-up">+28.1%</span></td><td>8.0</td></tr>
+    </tbody>
+  </table>
+  <div class="obs">
+    <div class="tag">관찰</div>
+    <strong>상점 진입 +65%로 가장 큰 증가</strong>. Sprint 006에서 도입한 "플라자 형태 상점 + 코스메틱 종류·등급 명확화" 효과로 보인다. 인당 11.9회 진입은 9차 9.0회 대비 32% 증가. 다만 장착(+12%)은 진입 증가 대비 완만하여, <strong>탐색은 늘었으나 구매·장착 전환은 비례하지 않았을 가능성</strong>이 있다.
+  </div>
+  <div class="hold">
+    <div class="tag">유보 — 데이터만으로 판단 어려움</div>
+    Golden Nuts 발행/소비 균형, 인기 코스메틱 TOP 5, 테크트리 해금 패턴 등은 본 보고서에서 다루지 않았다. 9차 보고서 수준의 경제 분석을 위해서는 <code>purchaseItem</code> + <code>VIRTUAL_CURRENCY_JSON</code> + <code>achievementClaimed</code> 별도 쿼리 필요.
+  </div>
+</div>
+
+<!-- ===== 8. 온보딩 + 튜토리얼 ===== -->
+<div class="section">
+  <div class="section-heading">8. 온보딩 · 튜토리얼</div>
+  <div class="section-desc">tutorialStart/End/Skip 이벤트 기반. 단계별 이탈 지점 분석은 EVENT_JSON 파라미터 별도 추출 필요.</div>
+  <div class="kpi-row">
+    <div class="kpi-box"><div class="label">튜토리얼 진입</div><div class="value">62</div><div class="sub">9차: 11 (<span class="delta-up">+464%</span>)</div></div>
+    <div class="kpi-box"><div class="label">완료</div><div class="value">57</div><div class="sub">9차: 7</div></div>
+    <div class="kpi-box"><div class="label">스킵</div><div class="value">10</div><div class="sub">9차: 3</div></div>
+    <div class="kpi-box"><div class="label">완료율</div><div class="value">91.9%</div><div class="sub">9차: 63.6% (<span class="delta-up">+28.3%p</span>)</div></div>
+  </div>
+  <div class="obs">
+    <div class="tag">관찰</div>
+    <strong>튜토리얼 완료율이 63.6% → 91.9%로 28.3%p 대폭 개선</strong>. Sprint 006의 "온보딩·튜토리얼" 주제(씨드·제트팩 소개 레벨 보충, UXUI 미완성 프로토타입 대폭 개선)의 직접 효과로 해석된다. 진입자 수도 11 → 62명으로 5.6배 증가했다. 단순 신규 유저 증가만으로는 설명되지 않는 규모.
+  </div>
+  <div class="review">
+    <div class="tag">검토 사항</div>
+    9차 튜토리얼 진입자 11명은 신규 유저 10명과 거의 일치(재참여는 튜토리얼 안 봄)했지만, <strong>10차는 진입자 62명으로 재참여 유저 다수가 튜토리얼을 다시 거쳤음</strong>을 시사한다. 빌드 변경에 따른 강제 재경험인지, UI/진입 동선 변경에 의한 자발적 재경험인지 확인이 필요하다.
+  </div>
+</div>
+
+<!-- ===== 9. 크로스 플랫폼 (간소) ===== -->
+<div class="section">
+  <div class="section-heading">9. 크로스 플랫폼 행동 (Discord × 인게임)</div>
+  <div class="section-desc">Discord 멤버 수 변화. 인게임 참여 깊이 × Discord 활동 매칭 분석은 별도 User Activity Log 분석 필요.</div>
+
+  <div class="kpi-row">
+    <div class="kpi-box"><div class="label">PT 시작 (4/26)</div><div class="value">1,105</div></div>
+    <div class="kpi-box"><div class="label">PT 종료 (4/27)</div><div class="value">1,118</div><div class="sub"><span class="delta-up">+13명</span></div></div>
+    <div class="kpi-box"><div class="label">현재 (5/6)</div><div class="value">1,134</div><div class="sub">PT 종료 후 +16</div></div>
+    <div class="kpi-box"><div class="label">활성 (Active+Casual)</div><div class="value">51</div><div class="sub">전체 1,176 중</div></div>
+  </div>
+
+  <div class="obs">
+    <div class="tag">관찰</div>
+    PT 기간(4/26-27) Discord 멤버 +13명 증가. 종료 후 약 9일간 +16명 추가 유입. <strong>전체 유저 1,176명 중 활성(Active+Casual) 51명(4.3%)</strong>. Core+Regular 등급 152명(13%)이 인게임 코어 유저의 주 풀로 추정된다.
+  </div>
+  <div class="hold">
+    <div class="tag">유보 — 다음 보고서 보강 항목</div>
+    9차 보고서에서 다룬 "Discord 메시지 활동 × 인게임 평균 체류" 매칭 분석은 본 보고서에서 다루지 않았다. User Activity Log 누적 메시지와 Game Users 매칭 분석을 통해 다음 보고서에 추가할 수 있다.
+  </div>
+</div>
+
+<!-- ===== 10. 관찰 & 검토 사항 ===== -->
+<div class="section">
+  <div class="section-heading">10. 관찰 & 검토 사항</div>
+
+  <div class="obs">
+    <div class="tag">긍정적으로 변화한 것</div>
+    <ul style="margin:8px 0 0 16px;padding:0;line-height:2">
+      <li><strong>참여자 반등</strong>: 8차 81 → 9차 68 → 10차 85 (+25%)</li>
+      <li><strong>튜토리얼 완료율 +28.3%p</strong> (63.6% → 91.9%) — Sprint 006 직접 효과</li>
+      <li><strong>퀘스트 달성 +28%</strong> (531 → 680) — 일일 퀘스트 시스템 정착</li>
+      <li><strong>태그 모드 +156%</strong> (102 → 261) — Chase 도전과제 트랙 효과</li>
+      <li><strong>상점 진입 +65%</strong> (614 → 1,013) — 플라자 상점 도입 효과</li>
+      <li><strong>잔존율 97.8% 유지</strong> — 코어 유저 기반 안정</li>
+    </ul>
+  </div>
+
+  <div class="review">
+    <div class="tag">검토 사항</div>
+    <table style="margin-top:8px">
+      <thead><tr><th>관찰</th><th>맥락 / 다음 액션 후보</th></tr></thead>
+      <tbody>
+        <tr><td>Obby 클리어율 14.2% → 9.2% (-5%p)</td><td>난이도 변경 vs 신규 유저 비율 영향 구분 필요. 신규 vs 재참여 클리어율 분리 비교</td></tr>
+        <tr><td>상점 진입 +65% vs 장착 +12%</td><td>탐색은 늘었으나 구매·장착 전환은 미흡. 구매 전환율(상점→장착)과 인기 코스메틱 변화 추적 필요</td></tr>
+        <tr><td>튜토리얼 진입자 11 → 62명</td><td>재참여 유저 다수가 튜토리얼 재경험. 빌드 변경에 따른 강제 재경험인지 자발적인지 확인</td></tr>
+        <tr><td>Obby 사망 1,118건 (인당 13.2회)</td><td>사망 패턴(맵/단계별 사망 위치)을 분석하면 난이도 핫스팟 식별 가능</td></tr>
+        <tr><td>태그 +156% 폭증</td><td>한쪽으로 쏠린 동선이 다른 모드(Horror, Sky Tower)를 잠식했는지 모드별 유저 중복 매트릭스 필요</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="hold">
+    <div class="tag">유보 — 본 보고서에서 다루지 못한 영역</div>
+    <ul style="margin:8px 0 0 16px;padding:0;line-height:2">
+      <li><strong>플레이타임 (roomDisconnect.elapsedTime)</strong> — 9차 보고서의 인당 체류 분포(중앙값 24.7분 등) 미작성. EVENT_JSON 파싱 별도 쿼리 필요</li>
+      <li><strong>유저 유형 3분할 (리텐션/복귀/신규)</strong> — 9차 보고서의 유형별 참여 깊이 비교 미작성. Game User Summary의 played_playtests 시퀀스 분석 필요</li>
+      <li><strong>모드별 인당 체류 + 진입률</strong> — gameplayType 별 roomConnect/Disconnect 매핑 필요</li>
+      <li><strong>Shop + Golden Nuts 경제</strong> — 인기 코스메틱 TOP, 테크트리 해금 TOP, GN 잔액 분포 미작성</li>
+      <li><strong>튜토리얼 단계별 이탈 지점</strong> — Rotation/Glide/JetPack 등 단계별 분석 미작성</li>
+      <li><strong>도전과제 달성 분포</strong> — Fly/Chase/Run 트랙별 달성률, GN 지급 분석</li>
+      <li><strong>크로스 플랫폼 매칭</strong> — Discord 누적 메시지 × 인게임 체류 상관</li>
+      <li><strong>Discord 가입/이탈 = 0</strong> 데이터 검증 — discord_context 가입/이탈 0 표기는 데이터 추출 이슈일 가능성</li>
+    </ul>
+  </div>
+
+  <div class="hold">
+    <div class="tag">데이터 정합성 메모</div>
+    <ul style="margin:8px 0 0 16px;padding:0;line-height:2">
+      <li>10차 1차 시도(v0.14.0, 4/20-21 KST, 31명/5,215 events)는 빌드 문제로 무효 처리. <code>playtest_config.py</code>에 <code>"10차 Playtest 시도1": is_regular=False</code>로 분리 등록되어 BigQuery↔Sheets 동일성 유지하되 보고서 비교 대상에서 자동 제외됨.</li>
+      <li>참여자 85명 = 신규 12 + 재참여 73 (재참여는 9차 또는 그 이전 정규 플테 참여 경험자, 1차 시도(0.14.0) 참여자는 정규 미포함)</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ===== 부록 ===== -->
+<div class="section">
+  <div class="section-heading">부록</div>
+  <details>
+    <summary>국가별 분포</summary>
+    <table style="margin-top:8px">
+      <thead><tr><th>국가</th><th class="r">참여자</th><th class="r">비율</th></tr></thead>
+      <tbody>
+        <tr><td>US</td><td class="r bold">61</td><td class="r bold">65.6%</td></tr>
+        <tr><td>GB</td><td class="r">9</td><td class="r">9.7%</td></tr>
+        <tr><td>CA</td><td class="r">8</td><td class="r">8.6%</td></tr>
+        <tr><td>LT</td><td class="r">2</td><td class="r">2.2%</td></tr>
+        <tr><td>NL</td><td class="r">2</td><td class="r">2.2%</td></tr>
+        <tr><td>기타 (DK, BR, SE, NZ, CR)</td><td class="r">5</td><td class="r">5.4%</td></tr>
+      </tbody>
+    </table>
+  </details>
+
+  <details>
+    <summary>일별 상세 데이터</summary>
+    <table style="margin-top:8px">
+      <thead><tr><th>날짜 (UTC)</th><th>KST</th><th>요일</th><th class="r">DAU</th><th class="r">세션</th><th class="r">이벤트</th></tr></thead>
+      <tbody>
+        <tr><td>2026-04-25</td><td>4/26</td><td>일</td><td class="r">38</td><td class="r">308</td><td class="r">5,865</td></tr>
+        <tr class="highlight-row"><td>2026-04-26</td><td>4/27</td><td>월</td><td class="r bold">65</td><td class="r bold">920</td><td class="r bold">16,820</td></tr>
+        <tr><td>2026-04-27</td><td>4/28</td><td>화</td><td class="r">19</td><td class="r">127</td><td class="r">2,925</td></tr>
+      </tbody>
+    </table>
+  </details>
+
+  <details>
+    <summary>커뮤니티 건강도 분포 (5/5 기준, 전체 1,176명)</summary>
+    <table style="margin-top:8px">
+      <thead><tr><th>건강도</th><th class="r">인원</th></tr></thead>
+      <tbody>
+        <tr><td><span class="badge badge-green">Active</span> (7일 내 메시지 6+)</td><td class="r">32</td></tr>
+        <tr><td><span class="badge badge-blue">Casual</span> (7일 내 메시지 1-5)</td><td class="r">19</td></tr>
+        <tr><td><span class="badge badge-yellow">Fading</span> (8-30일 미접)</td><td class="r">148</td></tr>
+        <tr><td><span class="badge badge-gray">Inactive</span> (31일+ 미접)</td><td class="r">894</td></tr>
+        <tr><td><span class="badge badge-blue">신규</span> (가입 14일 이내)</td><td class="r">7</td></tr>
+        <tr><td><span class="badge badge-red">이탈</span> (Discord 탈퇴)</td><td class="r">76</td></tr>
+      </tbody>
+    </table>
+    <table style="margin-top:8px">
+      <thead><tr><th>등급 (누적 참여)</th><th class="r">인원</th></tr></thead>
+      <tbody>
+        <tr><td><span class="badge badge-green">Core</span> (일평균 0.5+, 50개+)</td><td class="r">54</td></tr>
+        <tr><td><span class="badge badge-blue">Regular</span> (일평균 0.02+, 10개+)</td><td class="r">98</td></tr>
+        <tr><td><span class="badge badge-yellow">Visitor</span> (메시지 있지만 드뭄)</td><td class="r">930</td></tr>
+        <tr><td><span class="badge badge-gray">Silent</span> (0)</td><td class="r">94</td></tr>
+      </tbody>
+    </table>
+  </details>
+
+  <details>
+    <summary>데이터 출처</summary>
+    <div style="padding:12px 0;font-size:13px;color:#555;line-height:1.8">
+      <table>
+        <tbody>
+          <tr><td class="bold">게임 이벤트</td><td>BigQuery <code>runuts-analytics.runuts.events_with_users</code></td></tr>
+          <tr><td class="bold">집계 시트</td><td>Game Users / Playtest Summary / Playtest Daily / Event Breakdown</td></tr>
+          <tr><td class="bold">파이프라인</td><td>BigQuery → <code>sync_game_data.py</code> → Google Sheets → <code>generate_report_data.py</code> → JSON → 본 HTML</td></tr>
+          <tr><td class="bold">Discord 데이터</td><td>Discord Bot (회사 PC Docker) + Health Snapshot 시트</td></tr>
+          <tr><td class="bold">비교 기준</td><td>9차 Playtest (v0.13.0, 직전 정규 플테)</td></tr>
+          <tr><td class="bold">정규 분류</td><td><code>sns_scripts/playtest_config.py</code> <code>is_regular</code> 플래그 (이벤트 플테 자동 제외)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+</div>
+
+<div class="report-footer">
+  RUNuts Analytics · PT10 · 2026-05-06<br>
+  EDA 기술통계 보고서 · BigQuery + Google Sheets 기반 · Sprint 006 (Stage 1 마지막) 빌드 v0.14.0_0425
+</div>
+
+<script>
+const C={primary:'#FF9900',gray:'#d1d5db',green:'#22c55e',blue:'#60a5fa',yellow:'#eab308',red:'#dc2626',grid:'#e9ecef'};
+
+// 일별 추이
+new Chart(document.getElementById('chartDaily'),{
+  type:'bar',
+  data:{
+    labels:['4/26 (일)','4/27 (월)','4/28 (화)'],
+    datasets:[
+      {type:'bar',label:'DAU',data:[38,65,19],backgroundColor:C.primary,borderRadius:3,yAxisID:'y'},
+      {type:'line',label:'세션',data:[308,920,127],borderColor:C.blue,backgroundColor:'rgba(96,165,250,0.1)',tension:0.3,yAxisID:'y1'},
+      {type:'line',label:'이벤트',data:[5865,16820,2925],borderColor:C.green,backgroundColor:'rgba(34,197,94,0.1)',tension:0.3,yAxisID:'y2',hidden:true}
+    ]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{position:'top',labels:{font:{size:13},boxWidth:12}}},
+    scales:{
+      y:{beginAtZero:true,position:'left',title:{display:true,text:'DAU (명)',font:{size:11}},grid:{color:C.grid}},
+      y1:{beginAtZero:true,position:'right',title:{display:true,text:'세션',font:{size:11}},grid:{display:false}},
+      y2:{display:false},
+      x:{grid:{display:false}}
+    }
+  }
+});
+
+// 모드별 비교 (10차 vs 9차)
+new Chart(document.getElementById('chartModes'),{
+  type:'bar',
+  data:{
+    labels:['Obby 시작','Obby 클리어','Obby 사망','태그 종료','게임 진행','궁극기 사용'],
+    datasets:[
+      {label:'10차',data:[424,39,1118,261,1912,3482],backgroundColor:C.primary,borderRadius:3},
+      {label:'9차',data:[366,52,1020,102,1329,2573],backgroundColor:C.gray,borderRadius:3}
+    ]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,indexAxis:'y',
+    plugins:{legend:{position:'top',labels:{font:{size:13},boxWidth:12}}},
+    scales:{
+      x:{beginAtZero:true,grid:{color:C.grid},title:{display:true,text:'이벤트 카운트',font:{size:11}}},
+      y:{grid:{display:false},ticks:{font:{size:13}}}
+    }
+  }
+});
+
+// 유저 유형 분포
+new Chart(document.getElementById('chartUserType'),{
+  type:'doughnut',
+  data:{
+    labels:['재참여 (73명)','신규 (12명)'],
+    datasets:[{data:[73,12],backgroundColor:[C.blue,C.yellow],borderWidth:2,borderColor:'#fff'}]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{position:'bottom',labels:{font:{size:13},boxWidth:12}}}
+  }
+});
+
+// 잔존 분포
+new Chart(document.getElementById('chartRetention'),{
+  type:'doughnut',
+  data:{
+    labels:['잔존 (91명)','이탈 (2명)'],
+    datasets:[{data:[91,2],backgroundColor:[C.green,C.red],borderWidth:2,borderColor:'#fff'}]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{position:'bottom',labels:{font:{size:13},boxWidth:12}}}
+  }
+});
+</script>
+
+</body>
+</html>
