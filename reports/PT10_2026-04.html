@@ -38,9 +38,8 @@
   .r{text-align:right;font-variant-numeric:tabular-nums}
   .bold{font-weight:600}
   .badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:14px;font-weight:600}
-  .badge-green{background:#dcfce7;color:#166534}.badge-yellow{background:#fef9c3;color:#854d0e}.badge-red{background:#fee2e2;color:#991b1b}.badge-blue{background:#dbeafe;color:#1e40af}.badge-gray{background:#f3f4f6;color:#374151}
+  .badge-green{background:#dcfce7;color:#166534}.badge-yellow{background:#fef9c3;color:#854d0e}.badge-red{background:#fee2e2;color:#991b1b}.badge-blue{background:#dbeafe;color:#1e40af}.badge-gray{background:#f3f4f6;color:#374151}.badge-purple{background:#ede9fe;color:#5b21b6}
   .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0}
-  .placeholder{background:#f3f4f6;border:2px dashed #d1d5db;border-radius:8px;padding:24px;text-align:center;color:#9ca3af;font-size:14px;margin:16px 0}
   .delta-up{color:#16a34a;font-weight:600}.delta-down{color:#dc2626;font-weight:600}.delta-flat{color:#6b7280}
   details{margin:12px 0}summary{cursor:pointer;font-weight:600;font-size:15px;color:#555;padding:8px 0}summary:hover{color:#FF9900}
   .report-footer{margin-top:48px;padding-top:16px;border-top:1px solid #e9ecef;font-size:14px;color:#aaa;text-align:center}
@@ -72,12 +71,12 @@
 <div class="section">
   <div class="section-heading">1. Executive Summary</div>
   <div class="kpi-row">
-    <div class="kpi-box"><div class="label">참여자</div><div class="value">85</div><div class="sub">9차: 68 (<span class="delta-up">+17, +25%</span>)</div></div>
-    <div class="kpi-box"><div class="label">신규</div><div class="value">12</div><div class="sub">재참여 73 (86%)</div></div>
+    <div class="kpi-box"><div class="label">참여자</div><div class="value">85</div><div class="sub">9차: 68 (<span class="delta-up">+25%</span>)</div></div>
+    <div class="kpi-box"><div class="label">신규</div><div class="value">17</div><div class="sub">복귀 36 / 리텐션 32</div></div>
     <div class="kpi-box"><div class="label">잔존율</div><div class="value">97.8%</div><div class="sub">잔존 91 / 이탈 2</div></div>
-    <div class="kpi-box"><div class="label">피크 DAU</div><div class="value">65</div><div class="sub">9차: 57 (<span class="delta-up">+14%</span>)</div></div>
-    <div class="kpi-box"><div class="label">총 세션</div><div class="value">1,355</div><div class="sub">9차: 965 (<span class="delta-up">+40%</span>)</div></div>
-    <div class="kpi-box"><div class="label">총 이벤트</div><div class="value">25,610</div><div class="sub">9차: 18,505 (<span class="delta-up">+38%</span>)</div></div>
+    <div class="kpi-box"><div class="label">총 체류</div><div class="value">69.9h</div><div class="sub">9차: 55.5h (<span class="delta-up">+26%</span>)</div></div>
+    <div class="kpi-box"><div class="label">인당 중앙값</div><div class="value">41.9분</div><div class="sub">9차: 24.7분 (<span class="delta-up">+70%</span>)</div></div>
+    <div class="kpi-box"><div class="label">Tutorial 완료율</div><div class="value">91.9%</div><div class="sub">9차: 63.6% (<span class="delta-up">+28.3%p</span>)</div></div>
   </div>
 
   <table>
@@ -85,9 +84,8 @@
     <tbody>
       <tr><td>참여자</td><td class="r">81</td><td class="r">68</td><td class="r bold">85</td><td class="r"><span class="delta-up">↗ 반등</span></td></tr>
       <tr><td>총 세션</td><td class="r">1,187</td><td class="r">965</td><td class="r bold">1,355</td><td class="r"><span class="delta-up">↗ 증가</span></td></tr>
-      <tr><td>총 이벤트</td><td class="r">20,885</td><td class="r">18,505</td><td class="r bold">25,610</td><td class="r"><span class="delta-up">↗ 증가</span></td></tr>
-      <tr><td>인당 세션</td><td class="r">14.7</td><td class="r">14.2</td><td class="r bold">14.6</td><td class="r"><span class="delta-flat">→ 유지</span></td></tr>
-      <tr><td>인당 이벤트</td><td class="r">258</td><td class="r">272</td><td class="r bold">275</td><td class="r"><span class="delta-flat">→ 유지</span></td></tr>
+      <tr><td>총 체류 (roomDisconnect 합산)</td><td class="r">48.9h</td><td class="r">55.5h</td><td class="r bold">69.9h</td><td class="r"><span class="delta-up">↗ 증가</span></td></tr>
+      <tr><td>인당 체류 (중앙값)</td><td class="r">36.2분</td><td class="r">24.7분</td><td class="r bold">41.9분</td><td class="r"><span class="delta-up">↗ 반등</span></td></tr>
       <tr><td>피크 DAU</td><td class="r">69</td><td class="r">57</td><td class="r bold">65</td><td class="r"><span class="delta-up">↗ 반등</span></td></tr>
       <tr><td>Tutorial 완료율</td><td class="r">56.5%</td><td class="r">63.6%</td><td class="r bold">91.9%</td><td class="r"><span class="delta-up">↗ 대폭 개선</span></td></tr>
       <tr><td>Obby 클리어율</td><td class="r">8.5%</td><td class="r">14.2%</td><td class="r bold">9.2%</td><td class="r"><span class="delta-down">↘ 후퇴</span></td></tr>
@@ -96,204 +94,289 @@
 
   <div class="obs">
     <div class="tag">관찰</div>
-    참여자 수가 9차 68명에서 <strong>85명(+25%)</strong>으로 반등했고, 세션·이벤트는 모두 +38~40% 증가했다. 인당 참여 밀도(세션 14.6, 이벤트 275)는 8/9차와 유사하게 유지되어, 증가분이 전적으로 참여자 수 증가에 기인함을 보여준다. <strong>Tutorial 완료율은 91.9%로 9차 63.6% 대비 28.3%p 개선</strong>되어, Sprint 006의 "온보딩·튜토리얼" 주제 작업 효과가 가장 두드러진다.
+    참여자 +25%·총 체류 +26% 외에 <strong>인당 체류 중앙값이 24.7분 → 41.9분(+70%)으로 폭증</strong>해 코어 유저들이 더 오래 머문 패턴을 보여준다. <strong>Tutorial 완료율 91.9%(+28.3%p)</strong>는 Sprint 006 "온보딩·튜토리얼" 주제 작업의 직접 효과로 해석된다. 다만 Obby 클리어율은 9차 14.2% → 10차 9.2%로 -5%p 후퇴.
   </div>
 </div>
 
 <!-- ===== 2. 변경점 ↔ 지표 변화 ===== -->
 <div class="section">
   <div class="section-heading">2. 변경점 ↔ 지표 변화</div>
-  <div class="section-desc">v0.14.0_0425는 Stage 1 마지막 빌드로 Sprint 006(온보딩·튜토리얼·제품 안정성·마케팅 에셋) 결과물을 통합. 빌드 변경점과 지표 변화를 나란히 정리합니다.</div>
+  <div class="section-desc">v0.14.0_0425는 Stage 1 마지막 빌드로 Sprint 006(온보딩·튜토리얼·제품 안정성·마케팅 에셋) 결과물을 통합. 변경점과 지표 변화를 나란히 정리합니다.</div>
   <table>
     <thead><tr><th>빌드 변경사항 (Sprint 006)</th><th>관련 지표</th><th class="r">변화</th></tr></thead>
     <tbody>
       <tr><td>온보딩·튜토리얼 정비 (씨드·제트팩 소개 레벨 보충, UXUI 개선)</td><td>Tutorial 완료율</td><td class="r"><span class="delta-up">63.6% → 91.9% (+28.3%p)</span></td></tr>
       <tr><td>온보딩·일일 퀘스트 시스템 정리</td><td>퀘스트 달성</td><td class="r"><span class="delta-up">531 → 680 (+28%)</span></td></tr>
-      <tr><td>Fly/Chase/Run 3축 도전과제 체계화 (태그 게임 중심)</td><td>태그 모드 종료</td><td class="r"><span class="delta-up">102 → 261 (+156%)</span></td></tr>
-      <tr><td>플라자 형태 상점 + 코스메틱 종류·등급 명확화</td><td>상점 진입</td><td class="r"><span class="delta-up">614 → 1,013 (+65%)</span></td></tr>
+      <tr><td>Fly/Chase/Run 3축 도전과제 체계화 (태그 게임 중심)</td><td>태그 모드 종료 / Run track 활성화</td><td class="r"><span class="delta-up">102 → 261 (+156%)</span></td></tr>
+      <tr><td>플라자 형태 상점 + 코스메틱 종류·등급 명확화 (Wizard 시리즈 등 확장)</td><td>상점 진입 / 인기 코스메틱</td><td class="r"><span class="delta-up">614 → 1,013 (+65%)</span></td></tr>
       <tr><td>줄기 구조 순차 해금 테크트리</td><td>아이템 장착 / 궁극기 사용</td><td class="r"><span class="delta-up">+12% / +35%</span></td></tr>
       <tr><td>PlayFab Economy v1→v2 재구축 (70% 진행)</td><td>제품 안정성</td><td class="r">정성적 — 활성일 3일 안정</td></tr>
-      <tr><td>(검토 필요) Obby 난이도 조정 또는 신규 유저 비율 영향</td><td>Obby 클리어율</td><td class="r"><span class="delta-down">14.2% → 9.2% (-5.0%p)</span></td></tr>
+      <tr class="highlight-row"><td><strong>ObbyR(Sky Tower) 모드 제거</strong> (추정)</td><td>ObbyR 인당 체류</td><td class="r"><span class="delta-down">PT9 4.1h → PT10 0h</span></td></tr>
+      <tr class="highlight-row"><td><strong>Horror 모드 확장</strong> (Room A/B 활성화)</td><td>Horror 참여자</td><td class="r"><span class="delta-up">PT9 5명 → PT10 37명 (+640%)</span></td></tr>
+      <tr><td>(검토 필요) Obby 난이도/맵 변경 또는 신규 유저 비율 영향</td><td>Obby 클리어율</td><td class="r"><span class="delta-down">14.2% → 9.2% (-5.0%p)</span></td></tr>
     </tbody>
   </table>
   <div class="review">
     <div class="tag">검토 사항</div>
-    <strong>태그 모드 +156% 폭증과 Obby 클리어율 -5%p 후퇴</strong>가 동시 발생했다. Fly/Chase/Run 도전과제가 태그 중심으로 설계되어 유저 동선이 태그로 쏠렸을 가능성과, Obby 난이도/맵 변경 또는 신규 유저(12명) 비중 증가의 영향이 섞여 있을 수 있다. 모드별 동선·진입 데이터(roomConnect 기준)와 신규 vs 재참여 클리어율 분리 비교가 추가로 필요하다.
+    <strong>ObbyR(Sky Tower) 제거 + Horror 폭증</strong>이 가장 큰 콘텐츠 구조 변화로 보인다. ObbyR 4.1h가 사라지고 Horror 8.0h가 새로 등장. 이 변경이 의도된 것인지, 그리고 ObbyR 콘텐츠가 어떻게 정리되었는지 (병합·삭제·재배치) 명세 확인 필요. 태그 +156%은 Chase 도전과제 트랙 효과로 보이지만, 신규 유저(17명) 비중 영향과 분리 분석이 필요하다.
   </div>
 </div>
 
-<!-- ===== 3. 일별 추이 ===== -->
+<!-- ===== 3. 플레이타임 ===== -->
 <div class="section">
-  <div class="section-heading">3. 일별 추이</div>
-  <div class="section-desc">UTC 기준 적재 일자. KST로는 +1일 오프셋(예: UTC 04-25 → KST 04-26).</div>
-  <table>
-    <thead><tr><th>날짜 (UTC)</th><th>KST 환산</th><th class="r">DAU</th><th class="r">세션</th><th class="r">이벤트</th></tr></thead>
-    <tbody>
-      <tr><td>2026-04-25</td><td>4/26 (일)</td><td class="r">38</td><td class="r">308</td><td class="r">5,865</td></tr>
-      <tr class="highlight-row"><td>2026-04-26</td><td>4/27 (월)</td><td class="r bold">65</td><td class="r bold">920</td><td class="r bold">16,820</td></tr>
-      <tr><td>2026-04-27</td><td>4/28 (화)</td><td class="r">19</td><td class="r">127</td><td class="r">2,925</td></tr>
-    </tbody>
-  </table>
-  <div class="chart-wrap">
-    <div class="chart-title">일별 DAU + 세션 + 이벤트 (KST 기준)</div>
-    <canvas id="chartDaily" height="220"></canvas>
+  <div class="section-heading">3. 플레이타임</div>
+  <div class="section-desc">roomDisconnect.elapsedTime 합산 기준. 67명(roomDisconnect 기록 유저, 9차 55명)의 총 체류시간 분포.</div>
+  <div class="grid-2">
+    <div>
+      <div class="kpi-row" style="margin-bottom:8px">
+        <div class="kpi-box"><div class="label">평균</div><div class="value">62.6분</div><div class="sub">9차: 60.5분</div></div>
+        <div class="kpi-box"><div class="label">중앙값</div><div class="value bold" style="color:#FF9900">41.9분</div><div class="sub">9차: 24.7분</div></div>
+      </div>
+      <table>
+        <thead><tr><th>구간</th><th class="r">10차 인원</th><th class="r">10차 비율</th><th class="r">9차 인원</th></tr></thead>
+        <tbody>
+          <tr><td>0~5분</td><td class="r">10</td><td class="r">15%</td><td class="r">9 (16%)</td></tr>
+          <tr><td>5~15분</td><td class="r">15</td><td class="r">22%</td><td class="r">9 (16%)</td></tr>
+          <tr><td>15~30분</td><td class="r">3</td><td class="r">4%</td><td class="r">13 (24%)</td></tr>
+          <tr><td>30~60분</td><td class="r">14</td><td class="r">21%</td><td class="r">10 (18%)</td></tr>
+          <tr><td>60~120분</td><td class="r">12</td><td class="r">18%</td><td class="r">6 (11%)</td></tr>
+          <tr class="highlight-row"><td>120분+</td><td class="r bold">13</td><td class="r bold">19%</td><td class="r">8 (15%)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="chart-wrap" style="margin:0">
+      <div class="chart-title">유저별 체류시간 분포 (10차 vs 9차)</div>
+      <canvas id="chartPlaytime" height="220"></canvas>
+    </div>
   </div>
   <div class="obs">
     <div class="tag">관찰</div>
-    <strong>2일차(4/27 월요일) 피크</strong>가 65명/16,820 이벤트로 전체의 65%를 차지했다. 1일차(38명)는 늦은 시간대 시작, 3일차(19명)는 종료 후 늦게 접속한 잔여 유저로 보인다. 주말(4/26 일)보다 평일 시작(4/27 월)이 더 활발한 패턴은 9차에서도 관찰된 바 있다.
+    <strong>중앙값이 24.7분 → 41.9분으로 +70% 증가</strong>. 9차에서 가장 컸던 15~30분 구간이 13명 → 3명으로 축소되고, <strong>30분 이상 구간이 24명 → 39명(+63%)으로 확대</strong>되었다. 콘텐츠 깊이(태그·Horror·도전과제)가 충분해져 코어 유저들이 더 오래 머문 패턴. 120분+ 헤비 플레이어도 8명 → 13명으로 증가.
   </div>
 </div>
 
-<!-- ===== 4. 모드별 점유율 (이벤트 기준) ===== -->
+<!-- ===== 4. 모드별 점유율 + 몰입도 ===== -->
 <div class="section">
-  <div class="section-heading">4. 모드별 이벤트 점유율</div>
-  <div class="section-desc">BigQuery 이벤트 카운트 기준 모드별 활동량. 인당 체류시간(roomDisconnect.elapsedTime) 분석은 추가 BigQuery 쿼리가 필요해 본 보고서에서는 이벤트 카운트로만 비교합니다.</div>
+  <div class="section-heading">4. 모드별 점유율 + 몰입도</div>
+  <div class="section-desc">gameplayType × roomName 조합 별 인당 평균 체류 + 진입 유저 수. roomConnect/Disconnect의 elapsedTime 기준.</div>
   <table>
-    <thead><tr><th>모드 / 이벤트</th><th class="r">9차</th><th class="r bold">10차</th><th class="r">변화</th><th class="r">변화율</th></tr></thead>
+    <thead><tr><th>모드 / 룸</th><th class="r">10차 유저</th><th class="r">10차 진입률</th><th class="r">10차 총 시간</th><th class="r">10차 평균/세션</th><th class="r">9차 총 시간</th><th class="r">변화</th></tr></thead>
     <tbody>
-      <tr><td>Obby 시작 (obbyStart)</td><td class="r">366</td><td class="r bold">424</td><td class="r"><span class="delta-up">+58</span></td><td class="r"><span class="delta-up">+15.8%</span></td></tr>
-      <tr><td>Obby 클리어 (obbyClear)</td><td class="r">52</td><td class="r bold">39</td><td class="r"><span class="delta-down">-13</span></td><td class="r"><span class="delta-down">-25.0%</span></td></tr>
-      <tr><td>Obby 사망 (obbyDeath)</td><td class="r">1,020</td><td class="r bold">1,118</td><td class="r"><span class="delta-up">+98</span></td><td class="r"><span class="delta-up">+9.6%</span></td></tr>
-      <tr class="highlight-row"><td class="bold">태그 종료 (tagGameEnd)</td><td class="r">102</td><td class="r bold">261</td><td class="r"><span class="delta-up">+159</span></td><td class="r"><span class="delta-up">+155.9%</span></td></tr>
-      <tr><td>게임 진행 (gameRunning)</td><td class="r">1,329</td><td class="r bold">1,912</td><td class="r"><span class="delta-up">+583</span></td><td class="r"><span class="delta-up">+43.9%</span></td></tr>
-      <tr><td>궁극기 사용 (useUltimate)</td><td class="r">2,573</td><td class="r bold">3,482</td><td class="r"><span class="delta-up">+909</span></td><td class="r"><span class="delta-up">+35.3%</span></td></tr>
+      <tr><td>Casual / A (메인 로비)</td><td class="r bold">53</td><td class="r">62%</td><td class="r">19.4h</td><td class="r">3.4분</td><td class="r">17.5h</td><td class="r"><span class="delta-up">+11%</span></td></tr>
+      <tr><td>Casual / B</td><td class="r">47</td><td class="r">55%</td><td class="r">8.8h</td><td class="r">3.3분</td><td class="r">12.6h</td><td class="r"><span class="delta-down">-30%</span></td></tr>
+      <tr><td>Casual / D</td><td class="r">22</td><td class="r">26%</td><td class="r">3.7h</td><td class="r">4.6분</td><td class="r">—</td><td class="r"><span class="badge badge-blue">신규</span></td></tr>
+      <tr><td>Casual / H</td><td class="r">28</td><td class="r">33%</td><td class="r">2.4h</td><td class="r">2.5분</td><td class="r">—</td><td class="r"><span class="badge badge-blue">신규</span></td></tr>
+      <tr class="highlight-row"><td><strong>Infection / A (태그 메인)</strong></td><td class="r bold">38</td><td class="r">45%</td><td class="r bold">11.7h</td><td class="r">5.1분</td><td class="r">8.3h</td><td class="r"><span class="delta-up">+41%</span></td></tr>
+      <tr><td>Infection / B</td><td class="r">21</td><td class="r">25%</td><td class="r">5.4h</td><td class="r">7.7분</td><td class="r">5.3h</td><td class="r"><span class="delta-flat">+1%</span></td></tr>
+      <tr><td>Infection / D</td><td class="r">11</td><td class="r">13%</td><td class="r">1.5h</td><td class="r">4.2분</td><td class="r">—</td><td class="r"><span class="badge badge-blue">신규</span></td></tr>
+      <tr class="highlight-row"><td><strong>Horror / A</strong></td><td class="r bold">24</td><td class="r">28%</td><td class="r bold">6.4h</td><td class="r">7.1분</td><td class="r">0h</td><td class="r"><span class="badge badge-blue">신규</span></td></tr>
+      <tr><td>Horror / B</td><td class="r">13</td><td class="r">15%</td><td class="r">1.6h</td><td class="r">3.9분</td><td class="r">1.4h</td><td class="r"><span class="delta-up">+16%</span></td></tr>
+      <tr><td>Obby / A (Circuit)</td><td class="r">15</td><td class="r">18%</td><td class="r">2.0h</td><td class="r">5.2분</td><td class="r">2.1h</td><td class="r"><span class="delta-flat">-5%</span></td></tr>
+      <tr><td>ObbyR / A (Sky Tower)</td><td class="r">0</td><td class="r">—</td><td class="r">—</td><td class="r">—</td><td class="r">1.9h</td><td class="r"><span class="delta-down">제거</span></td></tr>
+      <tr><td>ObbyR / B (Sky Tower)</td><td class="r">0</td><td class="r">—</td><td class="r">—</td><td class="r">—</td><td class="r">2.2h</td><td class="r"><span class="delta-down">제거</span></td></tr>
     </tbody>
   </table>
   <div class="chart-wrap">
-    <div class="chart-title">주요 모드 이벤트 비교 (10차 vs 9차)</div>
-    <canvas id="chartModes" height="220"></canvas>
+    <div class="chart-title">주요 모드별 총 체류시간 (10차 vs 9차)</div>
+    <canvas id="chartModeTime" height="200"></canvas>
   </div>
   <div class="obs">
     <div class="tag">관찰</div>
-    <strong>태그 모드가 +156%로 가장 큰 증가</strong>를 보였다. 이는 Sprint 006의 도전과제 3축(Fly/Chase/Run) 중 Chase 트랙(MostTagsInOneGame)이 태그 중심으로 설계된 영향으로 보인다. <strong>Obby는 시작(+16%)과 사망(+10%)은 늘었으나 클리어(-25%)는 감소</strong>해, 진입은 활발해졌으나 완료는 어려워졌다. 클리어율 14.2% → 9.2%로 5%p 후퇴.
+    <strong>Horror 모드 신규 활성화</strong> (PT9 1.4h → PT10 8.0h, 37명 진입)와 <strong>ObbyR(Sky Tower) 완전 제거</strong> (PT9 4.1h → 0h)가 가장 큰 콘텐츠 구조 변화. <strong>Infection A 태그 메인 룸이 8.3h → 11.7h (+41%)</strong>으로 가장 큰 절대 증가를 보였고, Casual D/H 신규 룸 활성화로 캐주얼 동선이 다양해졌다. Obby Circuit은 PT9와 비슷하게 유지(2.0h vs 2.1h).
   </div>
   <div class="review">
     <div class="tag">검토 사항</div>
-    Obby 클리어율 후퇴의 원인 후보 — ① 신규 유저 비율 증가(10명→12명, 14.7%→14.1%)에 의한 통계적 효과인지, ② 맵/난이도 변경에 의한 것인지 구분이 어렵다. 신규 vs 재참여 그룹 별 클리어율을 분리 비교하면 명확해진다.
+    Casual B의 -30% 감소(12.6h → 8.8h)는 신규 룸 D/H로 분산된 영향으로 보인다. ObbyR 제거가 완전 삭제인지, Stage 2에서 재배치 예정인지 명세 확인 필요. Horror A 7.1분/세션은 다른 모드 대비 길어, 호러 콘텐츠가 짧은 진입에 머물지 않고 깊이 있게 플레이되고 있음을 시사.
   </div>
 </div>
 
 <!-- ===== 5. 유저 유형별 분석 ===== -->
 <div class="section">
   <div class="section-heading">5. 유저 유형별 분석</div>
-  <div class="section-desc">신규(첫 플테) / 재참여(이전 플테 경험 있음) 2분할. 9차 플테에서 사용한 리텐션·복귀·신규 3분할은 별도 코호트 분석 시 가능합니다.</div>
+  <div class="section-desc">리텐션(9차 + 10차 참여) / 복귀(9차 미참여 + 이전 정규 참여) / 신규(첫 정규 플테) 3분할. Game Users 시트 played_playtests 시퀀스 기준.</div>
 
   <div class="grid-2">
     <div>
       <table>
         <thead><tr><th>유형</th><th class="r">인원</th><th class="r">비율</th></tr></thead>
         <tbody>
-          <tr><td><span class="badge badge-blue">재참여</span> (이전 플테 경험)</td><td class="r bold">73</td><td class="r">86%</td></tr>
-          <tr><td><span class="badge badge-yellow">신규</span> (첫 플테)</td><td class="r">12</td><td class="r">14%</td></tr>
+          <tr><td><span class="badge badge-green">리텐션</span> (9차+10차)</td><td class="r bold">32</td><td class="r">38%</td></tr>
+          <tr><td><span class="badge badge-blue">복귀</span> (이전 정규+10차)</td><td class="r">36</td><td class="r">42%</td></tr>
+          <tr><td><span class="badge badge-yellow">신규</span> (첫 정규 플테)</td><td class="r">17</td><td class="r">20%</td></tr>
         </tbody>
       </table>
-      <div style="margin-top:12px;font-size:14px;color:#666">
-        <strong>9차 vs 10차 신규 비율</strong>: 9차 14.7% (10/68) → 10차 14.1% (12/85). 거의 동일.<br>
-        <strong>9차 → 10차 복귀</strong>: 9차 참여 68명 중 약 81%가 10차에 참여한 것으로 추정 (정확한 코호트 매칭은 추가 분석 필요).
-      </div>
     </div>
     <div class="chart-wrap" style="margin:0">
       <div class="chart-title">유저 유형 분포</div>
-      <canvas id="chartUserType" height="220"></canvas>
+      <canvas id="chartUserType" height="160"></canvas>
     </div>
   </div>
 
-  <div class="obs">
-    <div class="tag">관찰</div>
-    재참여 86% / 신규 14%로 9차(재참여 85% / 신규 15%)와 매우 유사한 구성. <strong>참여자 +25% 증가의 대부분이 재참여 유저 +15명</strong>(58→73, +26%)이며, 신규는 +2명(10→12, +20%)으로 비슷한 비율로 증가했다. 모집 채널/홍보 시점이 9차와 유사했음을 시사한다.
-  </div>
-</div>
-
-<!-- ===== 6. 잔존 분석 ===== -->
-<div class="section">
-  <div class="section-heading">6. 잔존 분석</div>
-  <div class="section-desc">PT10 참여자(85명) + 직전 PT(9차) 참여자 조합 기준. retained = 둘 다 참여, churned = 9차 참여 후 10차 미참여.</div>
-  <div class="grid-2">
-    <div>
-      <table>
-        <thead><tr><th>분류</th><th class="r">인원</th></tr></thead>
-        <tbody>
-          <tr><td><span class="badge badge-green">잔존 (Retained)</span></td><td class="r bold">91</td></tr>
-          <tr><td><span class="badge badge-gray">휴면 (Dormant)</span></td><td class="r">0</td></tr>
-          <tr><td><span class="badge badge-red">이탈 (Churned)</span></td><td class="r">2</td></tr>
-        </tbody>
-      </table>
-      <div style="margin-top:8px;font-size:14px;color:#666">
-        <strong>잔존율 97.8%</strong> (91 / (91+2)). 9차 99% 대비 -1.2%p로 코어 유저 기반은 안정적으로 유지.
-      </div>
-    </div>
-    <div class="chart-wrap" style="margin:0">
-      <div class="chart-title">잔존 분포</div>
-      <canvas id="chartRetention" height="200"></canvas>
-    </div>
-  </div>
-  <div class="obs">
-    <div class="tag">관찰</div>
-    <strong>이탈 2명에 그쳐 잔존율 97.8% 유지</strong>. 9차 → 10차 사이 약 3주 간격에도 코어 기반은 안정. 10차 신규 12명을 합치면 다음 11차 코호트 추적 시 신규 유지율 측정 가능.
-  </div>
-</div>
-
-<!-- ===== 7. Shop + 경제 (간소) ===== -->
-<div class="section">
-  <div class="section-heading">7. Shop + 경제 활동</div>
-  <div class="section-desc">상점 진입·아이템 장착 카운트만 비교. Golden Nuts 잔액·구매 단가 등 상세 경제 분석은 별도 BigQuery 쿼리(VIRTUAL_CURRENCY_JSON, purchaseItem) 필요.</div>
+  <div style="font-weight:700;font-size:15px;margin:20px 0 8px;color:#555">유형별 참여 깊이 비교 (Game Users 시트 누적값)</div>
   <table>
-    <thead><tr><th>지표</th><th class="r">9차</th><th class="r bold">10차</th><th class="r">변화율</th><th>인당 (10차)</th></tr></thead>
+    <thead><tr><th>지표</th><th class="r">리텐션 (32명)</th><th class="r">복귀 (36명)</th><th class="r">신규 (17명)</th></tr></thead>
     <tbody>
-      <tr><td>상점 진입 (shopEnter)</td><td class="r">614</td><td class="r bold">1,013</td><td class="r"><span class="delta-up">+65.0%</span></td><td>11.9</td></tr>
-      <tr><td>아이템 장착 (equipItem)</td><td class="r">648</td><td class="r bold">728</td><td class="r"><span class="delta-up">+12.3%</span></td><td>8.6</td></tr>
-      <tr><td>퀘스트 달성 (dailyQuestClaimed)</td><td class="r">531</td><td class="r bold">680</td><td class="r"><span class="delta-up">+28.1%</span></td><td>8.0</td></tr>
+      <tr><td>총 누적 세션 (인당 평균)</td><td class="r bold">250.2</td><td class="r">96.5</td><td class="r">25.8</td></tr>
+      <tr><td>총 누적 이벤트 (인당 평균)</td><td class="r bold">3,788</td><td class="r">1,586</td><td class="r">473</td></tr>
+      <tr><td>총 참여 플테 수 (인당 평균)</td><td class="r bold">8.5+</td><td class="r">3~4</td><td class="r">1</td></tr>
+    </tbody>
+  </table>
+
+  <div class="obs">
+    <div class="tag">관찰</div>
+    9차의 리텐션 28명 → 10차 32명(+14%)으로 증가했고, 복귀가 30명 → 36명(+20%), 신규는 10명 → 17명(+70%)으로 모든 유형에서 증가. 특히 <strong>신규 17명은 9차 10명의 1.7배</strong>로 모집 채널 효과가 9차 대비 강해진 것으로 보인다. 리텐션 그룹의 누적 세션 250+은 이 코어 유저들이 거의 모든 정규 플테를 거쳐온 진성 베테랑임을 시사.
+  </div>
+  <div class="hold">
+    <div class="tag">유보 — 본 보고서 한계</div>
+    9차 보고서에서는 유형별 인당 체류·세션·태그·Obby·퀘스트·도전과제 분포까지 분리 비교했으나, 본 보고서는 시간 제약으로 누적 세션·이벤트만 분리 비교했다. 다음 PT11 보고서에서 BigQuery 유저 매칭 + 시간대별 분리 집계로 확장 예정.
+  </div>
+</div>
+
+<!-- ===== 6. 코호트 잔존 ===== -->
+<div class="section">
+  <div class="section-heading">6. 신규 유저 코호트 잔존</div>
+  <div class="section-desc">각 플테에서 첫 정규 참여한 신규 유저(코호트)가 후속 플테에 얼마나 남아있는지 추적. PT10 정식 기준 + 시도1(0.14.0) 제외.</div>
+  <table>
+    <thead><tr><th>코호트</th><th class="r">크기</th><th class="r">→ 8차 유지</th><th class="r">→ 9차 유지</th><th class="r">→ 10차 유지</th><th class="r">10차 잔존율</th></tr></thead>
+    <tbody>
+      <tr><td>7차 신규</td><td class="r">16</td><td class="r">4 (25%)</td><td class="r">2 (13%)</td><td class="r">1 (6%)</td><td class="r">6%</td></tr>
+      <tr class="highlight-row"><td>8차 신규</td><td class="r">16</td><td class="r">—</td><td class="r">3 (19%)</td><td class="r bold">5 (31%)</td><td class="r bold">31%</td></tr>
+      <tr><td>9차 신규</td><td class="r">10</td><td class="r">—</td><td class="r">—</td><td class="r">2 (20%)</td><td class="r">20%</td></tr>
+      <tr><td>10차 신규</td><td class="r">17</td><td class="r">—</td><td class="r">—</td><td class="r">17 (100%)</td><td class="r">—</td></tr>
     </tbody>
   </table>
   <div class="obs">
     <div class="tag">관찰</div>
-    <strong>상점 진입 +65%로 가장 큰 증가</strong>. Sprint 006에서 도입한 "플라자 형태 상점 + 코스메틱 종류·등급 명확화" 효과로 보인다. 인당 11.9회 진입은 9차 9.0회 대비 32% 증가. 다만 장착(+12%)은 진입 증가 대비 완만하여, <strong>탐색은 늘었으나 구매·장착 전환은 비례하지 않았을 가능성</strong>이 있다.
-  </div>
-  <div class="hold">
-    <div class="tag">유보 — 데이터만으로 판단 어려움</div>
-    Golden Nuts 발행/소비 균형, 인기 코스메틱 TOP 5, 테크트리 해금 패턴 등은 본 보고서에서 다루지 않았다. 9차 보고서 수준의 경제 분석을 위해서는 <code>purchaseItem</code> + <code>VIRTUAL_CURRENCY_JSON</code> + <code>achievementClaimed</code> 별도 쿼리 필요.
-  </div>
-</div>
-
-<!-- ===== 8. 온보딩 + 튜토리얼 ===== -->
-<div class="section">
-  <div class="section-heading">8. 온보딩 · 튜토리얼</div>
-  <div class="section-desc">tutorialStart/End/Skip 이벤트 기반. 단계별 이탈 지점 분석은 EVENT_JSON 파라미터 별도 추출 필요.</div>
-  <div class="kpi-row">
-    <div class="kpi-box"><div class="label">튜토리얼 진입</div><div class="value">62</div><div class="sub">9차: 11 (<span class="delta-up">+464%</span>)</div></div>
-    <div class="kpi-box"><div class="label">완료</div><div class="value">57</div><div class="sub">9차: 7</div></div>
-    <div class="kpi-box"><div class="label">스킵</div><div class="value">10</div><div class="sub">9차: 3</div></div>
-    <div class="kpi-box"><div class="label">완료율</div><div class="value">91.9%</div><div class="sub">9차: 63.6% (<span class="delta-up">+28.3%p</span>)</div></div>
-  </div>
-  <div class="obs">
-    <div class="tag">관찰</div>
-    <strong>튜토리얼 완료율이 63.6% → 91.9%로 28.3%p 대폭 개선</strong>. Sprint 006의 "온보딩·튜토리얼" 주제(씨드·제트팩 소개 레벨 보충, UXUI 미완성 프로토타입 대폭 개선)의 직접 효과로 해석된다. 진입자 수도 11 → 62명으로 5.6배 증가했다. 단순 신규 유저 증가만으로는 설명되지 않는 규모.
+    <strong>8차 신규 16명 중 5명(31%)이 10차에 복귀</strong>해 가장 높은 코호트 유지율을 보였다. 9차 신규 10명 중 2명(20%) 유지는 직전 플테와의 짧은 간격(3주)에도 일정 부분 이탈이 있었음을 시사. 7차 신규 16명 중 1명(6%)은 3회 경과 후 자연스러운 감소. <strong>10차 신규 17명은 다음 11차 추적 시 코호트 유지율 측정 가능</strong>.
   </div>
   <div class="review">
     <div class="tag">검토 사항</div>
-    9차 튜토리얼 진입자 11명은 신규 유저 10명과 거의 일치(재참여는 튜토리얼 안 봄)했지만, <strong>10차는 진입자 62명으로 재참여 유저 다수가 튜토리얼을 다시 거쳤음</strong>을 시사한다. 빌드 변경에 따른 강제 재경험인지, UI/진입 동선 변경에 의한 자발적 재경험인지 확인이 필요하다.
+    8차 신규의 9차 미참여 후 10차 복귀(3 + 5명 중 8차→9차→10차 동시 = ?)는 "건너뛴 후 복귀" 패턴으로 흥미롭다. 표본이 작아(10~16명) 비율 변동이 크므로 참고치로 활용. 다음 보고서에서는 PT9 보고서처럼 매주/플테 간격별 자연 감소율도 함께 표시 예정.
   </div>
 </div>
 
-<!-- ===== 9. 크로스 플랫폼 (간소) ===== -->
+<!-- ===== 7. Shop + Golden Nuts 경제 ===== -->
 <div class="section">
-  <div class="section-heading">9. 크로스 플랫폼 행동 (Discord × 인게임)</div>
-  <div class="section-desc">Discord 멤버 수 변화. 인게임 참여 깊이 × Discord 활동 매칭 분석은 별도 User Activity Log 분석 필요.</div>
+  <div class="section-heading">7. Shop + Golden Nuts 경제</div>
+  <div class="section-desc">Golden Nuts(GN, C2)는 도전과제/퀘스트로만 획득하고, 코스메틱 구매/테크트리 해금에 소비하는 프리미엄 화폐. Seeds(C1)는 무료 화폐.</div>
 
   <div class="kpi-row">
-    <div class="kpi-box"><div class="label">PT 시작 (4/26)</div><div class="value">1,105</div></div>
-    <div class="kpi-box"><div class="label">PT 종료 (4/27)</div><div class="value">1,118</div><div class="sub"><span class="delta-up">+13명</span></div></div>
-    <div class="kpi-box"><div class="label">현재 (5/6)</div><div class="value">1,134</div><div class="sub">PT 종료 후 +16</div></div>
-    <div class="kpi-box"><div class="label">활성 (Active+Casual)</div><div class="value">51</div><div class="sub">전체 1,176 중</div></div>
+    <div class="kpi-box"><div class="label">코스메틱 구매</div><div class="value">42</div><div class="sub">20종, ~30+ 명</div></div>
+    <div class="kpi-box"><div class="label">GN 잔액 평균</div><div class="value">19.7</div><div class="sub">9차: ~29</div></div>
+    <div class="kpi-box"><div class="label">GN 잔액 중앙값</div><div class="value bold" style="color:#FF9900">13</div><div class="sub">최대 110</div></div>
+    <div class="kpi-box"><div class="label">Seeds 중앙값</div><div class="value">3,492</div><div class="sub">평균 3,562, 최대 37,895</div></div>
+  </div>
+
+  <div class="grid-2">
+    <div>
+      <div style="font-weight:600;font-size:13px;margin-bottom:8px;color:#555">인기 코스메틱 TOP 10 (10차)</div>
+      <table>
+        <thead><tr><th>아이템</th><th class="r">구매</th></tr></thead>
+        <tbody>
+          <tr><td>Cool DJ Suit</td><td class="r">6</td></tr>
+          <tr><td>Purple Wizard Hat</td><td class="r">4</td></tr>
+          <tr><td>Top Hat</td><td class="r">4</td></tr>
+          <tr><td>Pixel Suit</td><td class="r">4</td></tr>
+          <tr><td>Brown Wizard Suit</td><td class="r">3</td></tr>
+          <tr><td>Green Wizard Hat</td><td class="r">2</td></tr>
+          <tr><td>Purple Wizard Suit</td><td class="r">2</td></tr>
+          <tr><td>Brown Wizard Hat</td><td class="r">2</td></tr>
+          <tr><td>Red Suit / Blue Suit</td><td class="r">2 (각 1)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <div style="font-weight:600;font-size:13px;margin-bottom:8px;color:#555">GN 잔액 분포 (10차 85명)</div>
+      <table>
+        <thead><tr><th>구간</th><th class="r">인원</th><th class="r">비율</th></tr></thead>
+        <tbody>
+          <tr><td>0 GN</td><td class="r">6</td><td class="r">7%</td></tr>
+          <tr><td>1~49 GN</td><td class="r">70</td><td class="r">82%</td></tr>
+          <tr><td>50~99 GN</td><td class="r">8</td><td class="r">9%</td></tr>
+          <tr><td>100+ GN</td><td class="r">1</td><td class="r">1%</td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:8px;font-size:13px;color:#666">최대 보유: 110 GN (1명)</div>
+    </div>
   </div>
 
   <div class="obs">
     <div class="tag">관찰</div>
-    PT 기간(4/26-27) Discord 멤버 +13명 증가. 종료 후 약 9일간 +16명 추가 유입. <strong>전체 유저 1,176명 중 활성(Active+Casual) 51명(4.3%)</strong>. Core+Regular 등급 152명(13%)이 인게임 코어 유저의 주 풀로 추정된다.
+    <strong>9차에서 인기 1·2위였던 DJ 세트(8+7 = 15명)가 10차에는 DJ Suit 6명으로 감소</strong>한 반면, <strong>Wizard 시리즈가 13명 합계로 신규 인기 카테고리</strong>로 부상. Sprint 006 "코스메틱 종류·등급 명확화" 작업으로 새 wizard 분류가 도입된 효과로 보인다. <strong>GN 잔액 중앙값 29 → 13으로 절반</strong>은 신규 코스메틱 구매로 GN이 적극 소비되었음을 시사. Seeds 중앙값 3,492는 매우 풍부 — 무료 화폐가 어느 정도 수준에서 안정.
+  </div>
+  <div class="review">
+    <div class="tag">검토 사항</div>
+    GN 잔액 0 명 6명(7%) — GN 인플레이션은 통제되고 있으나, 100+ GN 보유자 1명만 있어 헤비 코어층이 모든 코스메틱을 구매한 후 잔액을 쌓을 수단이 부족할 수 있다. Seeds 최대 37,895는 잠재적 인플레이션 신호 — 소비처(가젯·총·제트팩) 사용 빈도와 균형 검토 필요.
+  </div>
+</div>
+
+<!-- ===== 8. 온보딩 + 도전과제 ===== -->
+<div class="section">
+  <div class="section-heading">8. 온보딩 · 도전과제</div>
+  <div class="section-desc">튜토리얼 완료 + Fly/Chase/Run 3축 도전과제 달성 분석.</div>
+
+  <div style="font-weight:600;font-size:13px;margin-bottom:8px;color:#555">튜토리얼 (tutorialEnd 이벤트 기준)</div>
+  <div class="kpi-row">
+    <div class="kpi-box"><div class="label">진입자</div><div class="value">62</div><div class="sub">9차: 11 (<span class="delta-up">+464%</span>)</div></div>
+    <div class="kpi-box"><div class="label">완료</div><div class="value">57</div><div class="sub">9차: 7</div></div>
+    <div class="kpi-box"><div class="label">스킵</div><div class="value">10</div><div class="sub">9차: 3</div></div>
+    <div class="kpi-box"><div class="label">완료율</div><div class="value bold" style="color:#FF9900">91.9%</div><div class="sub">9차: 63.6% (<span class="delta-up">+28.3%p</span>)</div></div>
+    <div class="kpi-box"><div class="label">평균 소요</div><div class="value">155.7초</div><div class="sub">9차: 90.6초</div></div>
   </div>
   <div class="hold">
-    <div class="tag">유보 — 다음 보고서 보강 항목</div>
-    9차 보고서에서 다룬 "Discord 메시지 활동 × 인게임 평균 체류" 매칭 분석은 본 보고서에서 다루지 않았다. User Activity Log 누적 메시지와 Game Users 매칭 분석을 통해 다음 보고서에 추가할 수 있다.
+    <div class="tag">유보 — 단계별 분석 한계</div>
+    EVENT_JSON에 단계 식별 필드(<code>step</code>)가 없어 본 보고서에서는 단계별(Rotation/Glide/JetPack/Weapon 등) 이탈 분석을 수행하지 못했다. 9차 v3 보고서의 단계별 분석은 별도 이벤트 기반이었던 것으로 추정. 다음 빌드(0.15+)에서 tutorialEnd에 단계 파라미터 추가 검토 필요.
+  </div>
+
+  <div style="font-weight:600;font-size:13px;margin:20px 0 8px;color:#555">도전과제 달성 TOP 10 (10차) — Fly/Chase/Run 3축</div>
+  <table>
+    <thead><tr><th>도전과제</th><th>트랙</th><th class="r">달성</th><th class="r">유저</th><th class="r">9차 비교</th></tr></thead>
+    <tbody>
+      <tr><td>GlideSpeed Lv1 (60km/h)</td><td><span class="badge badge-blue">Fly</span></td><td class="r">39</td><td class="r">34</td><td class="r">9차: 39 (<span class="delta-flat">→</span>)</td></tr>
+      <tr><td>GlideDistance Lv1 (1,000m)</td><td><span class="badge badge-blue">Fly</span></td><td class="r">32</td><td class="r">32</td><td class="r">9차: 33 (<span class="delta-flat">→</span>)</td></tr>
+      <tr><td>GlideSpeed Lv2 (100km/h)</td><td><span class="badge badge-blue">Fly</span></td><td class="r">31</td><td class="r">30</td><td class="r">9차: 31 (<span class="delta-flat">→</span>)</td></tr>
+      <tr><td>GlideSpeed Lv3 (150km/h)</td><td><span class="badge badge-blue">Fly</span></td><td class="r">31</td><td class="r">31</td><td class="r">9차: 28 (<span class="delta-up">+3</span>)</td></tr>
+      <tr><td>GlideDistance Lv2 (10,000m)</td><td><span class="badge badge-blue">Fly</span></td><td class="r">25</td><td class="r">21</td><td class="r">9차: 17 (<span class="delta-up">+8</span>)</td></tr>
+      <tr><td>GlideSpeed Lv4 (200km/h)</td><td><span class="badge badge-blue">Fly</span></td><td class="r">21</td><td class="r">21</td><td class="r">9차: 23 (<span class="delta-flat">-2</span>)</td></tr>
+      <tr class="highlight-row"><td>RunnerFlightDistance Lv1 (1,000m)</td><td><span class="badge badge-purple">Run</span></td><td class="r">21</td><td class="r">20</td><td class="r">9차: 18 (<span class="delta-up">+3</span>)</td></tr>
+      <tr><td>MostTagsInOneGame Lv1 (3태그)</td><td><span class="badge badge-yellow">Chase</span></td><td class="r">20</td><td class="r">20</td><td class="r">9차: 21 (<span class="delta-flat">-1</span>)</td></tr>
+      <tr class="highlight-row"><td>RunnerFlightDistance Lv2</td><td><span class="badge badge-purple">Run</span></td><td class="r">19</td><td class="r">18</td><td class="r"><span class="badge badge-blue">신규</span></td></tr>
+      <tr><td>MostTagsInOneGame Lv3 (6태그)</td><td><span class="badge badge-yellow">Chase</span></td><td class="r">17</td><td class="r">16</td><td class="r">9차: 14 (<span class="delta-up">+3</span>)</td></tr>
+    </tbody>
+  </table>
+  <div class="obs">
+    <div class="tag">관찰</div>
+    <strong>Fly 트랙</strong>이 여전히 가장 활발 (GlideSpeed Lv1~4까지 21~39명). <strong>Run 트랙</strong>(RunnerFlightDistance)이 PT10에서 활성화 — Lv1 21명·Lv2 19명으로 새로 진입. <strong>Chase 트랙</strong>(MostTagsInOneGame)은 Lv1 20명·Lv3 17명으로 9차와 유사. Sprint 006의 "Fly/Chase/Run 3축 체계화"로 트랙별 도전과제가 정리되어 진입이 분산된 효과로 보인다.
+  </div>
+</div>
+
+<!-- ===== 9. 크로스 플랫폼 ===== -->
+<div class="section">
+  <div class="section-heading">9. 크로스 플랫폼 행동 (Discord × 인게임)</div>
+  <div class="section-desc">User Master meta_id↔discord_id 매핑 + User Activity Log 누적 메시지 기준. PT10 85명 중 61명 매칭(Discord 매칭 미정 24명 제외).</div>
+
+  <table>
+    <thead><tr><th>Discord 활동</th><th class="r">인원</th><th class="r">평균 메시지</th><th class="r">평균 세션</th><th class="r">평균 이벤트</th></tr></thead>
+    <tbody>
+      <tr><td><span class="badge badge-gray">Silent</span> (0 메시지)</td><td class="r">1</td><td class="r">0</td><td class="r">187.0</td><td class="r">2,357</td></tr>
+      <tr><td><span class="badge badge-yellow">Visitor</span> (1~10)</td><td class="r">14</td><td class="r">4.2</td><td class="r">60.1</td><td class="r">1,095</td></tr>
+      <tr class="highlight-row"><td><span class="badge badge-blue">Regular</span> (11~50)</td><td class="r bold">16</td><td class="r">32.1</td><td class="r bold">127.1</td><td class="r bold">1,931</td></tr>
+      <tr class="highlight-row"><td><span class="badge badge-green">Core</span> (51+)</td><td class="r bold">30</td><td class="r">971.8</td><td class="r bold">269.2</td><td class="r bold">4,131</td></tr>
+    </tbody>
+  </table>
+
+  <div class="chart-wrap">
+    <div class="chart-title">Discord 메시지 활동 × 인게임 평균 세션 (10차)</div>
+    <canvas id="chartCross" height="200"></canvas>
+  </div>
+
+  <div class="obs">
+    <div class="tag">관찰</div>
+    <strong>Core(51+ 메시지) 30명의 평균 인게임 세션 269회</strong>는 Visitor 14명의 60회 대비 <strong>4.5배</strong>. Regular(16명) 127회 vs Visitor 60회는 약 2.1배. 9차 보고서의 "Discord 활동 ↔ 인게임 몰입 강한 상관" 패턴이 10차에서도 일관되게 재현된다. Silent 1명(187 세션)은 이상치로 보이며, 이 유저는 Discord에 가입했지만 메시지 활동 없이 게임만 활발히 한 케이스.
+  </div>
+  <div class="review">
+    <div class="tag">검토 사항</div>
+    Discord 매칭 24명(28%) 미달 — User Master에 등록되지 않은 신규 유저(첫 플테 참여자) 또는 매칭 fail 케이스. 매칭률 향상을 위해 PT10 신규 17명 매칭 우선순위 검토 필요. Core 그룹의 평균 메시지 971은 매우 높음 — Discord 헤비 활동 그룹이 인게임도 가장 적극.
   </div>
 </div>
 
@@ -304,12 +387,15 @@
   <div class="obs">
     <div class="tag">긍정적으로 변화한 것</div>
     <ul style="margin:8px 0 0 16px;padding:0;line-height:2">
-      <li><strong>참여자 반등</strong>: 8차 81 → 9차 68 → 10차 85 (+25%)</li>
-      <li><strong>튜토리얼 완료율 +28.3%p</strong> (63.6% → 91.9%) — Sprint 006 직접 효과</li>
+      <li><strong>참여자 반등</strong>: 8차 81 → 9차 68 → 10차 85 (+25%, 신규 17명 +70%)</li>
+      <li><strong>인당 체류 중앙값 +70%</strong> (24.7분 → 41.9분) — 콘텐츠 깊이 효과</li>
+      <li><strong>Tutorial 완료율 +28.3%p</strong> (63.6% → 91.9%) — Sprint 006 직접 효과</li>
+      <li><strong>Horror 모드 신규 활성화</strong> (37명 진입, 8.0h)</li>
+      <li><strong>태그 메인 룸 +41%</strong> (Infection A) + Run 트랙 도전과제 활성화</li>
+      <li><strong>상점 진입 +65%</strong> + Wizard 시리즈 신규 인기</li>
       <li><strong>퀘스트 달성 +28%</strong> (531 → 680) — 일일 퀘스트 시스템 정착</li>
-      <li><strong>태그 모드 +156%</strong> (102 → 261) — Chase 도전과제 트랙 효과</li>
-      <li><strong>상점 진입 +65%</strong> (614 → 1,013) — 플라자 상점 도입 효과</li>
       <li><strong>잔존율 97.8% 유지</strong> — 코어 유저 기반 안정</li>
+      <li><strong>Discord ↔ 인게임 상관 재확인</strong> — Core 그룹 4.5배 차이</li>
     </ul>
   </div>
 
@@ -318,34 +404,24 @@
     <table style="margin-top:8px">
       <thead><tr><th>관찰</th><th>맥락 / 다음 액션 후보</th></tr></thead>
       <tbody>
-        <tr><td>Obby 클리어율 14.2% → 9.2% (-5%p)</td><td>난이도 변경 vs 신규 유저 비율 영향 구분 필요. 신규 vs 재참여 클리어율 분리 비교</td></tr>
-        <tr><td>상점 진입 +65% vs 장착 +12%</td><td>탐색은 늘었으나 구매·장착 전환은 미흡. 구매 전환율(상점→장착)과 인기 코스메틱 변화 추적 필요</td></tr>
-        <tr><td>튜토리얼 진입자 11 → 62명</td><td>재참여 유저 다수가 튜토리얼 재경험. 빌드 변경에 따른 강제 재경험인지 자발적인지 확인</td></tr>
-        <tr><td>Obby 사망 1,118건 (인당 13.2회)</td><td>사망 패턴(맵/단계별 사망 위치)을 분석하면 난이도 핫스팟 식별 가능</td></tr>
-        <tr><td>태그 +156% 폭증</td><td>한쪽으로 쏠린 동선이 다른 모드(Horror, Sky Tower)를 잠식했는지 모드별 유저 중복 매트릭스 필요</td></tr>
+        <tr><td>ObbyR(Sky Tower) PT9 4.1h → PT10 0h</td><td>완전 제거인지, Stage 2 재배치 예정인지 명세 확인</td></tr>
+        <tr><td>Obby 클리어율 14.2% → 9.2% (-5%p)</td><td>Obby 시작 +16% 사망 +10% but 클리어 -25% — 난이도/맵 변경 또는 신규 비율 영향. 신규 vs 재참여 분리 필요</td></tr>
+        <tr><td>15~30분 구간 13명 → 3명 (-77%)</td><td>중간 길이 세션이 줄고 30분+ 또는 15분 미만으로 양극화 — 콘텐츠 깊이 양극화 가능성</td></tr>
+        <tr><td>Casual B -30% (12.6h → 8.8h)</td><td>신규 룸 D/H 분산 효과 vs 메인 캐주얼 동선 변화 구분 필요</td></tr>
+        <tr><td>Discord 매칭 미달 24명 (28%)</td><td>PT10 신규 17명 매칭 우선순위 — Tester Pipeline 매칭 강화</td></tr>
+        <tr><td>GN 100+ 보유자 1명만</td><td>헤비 코어층 GN 소비처 부족 가능성 — 고가 코스메틱·테크트리 추가 시점 검토</td></tr>
+        <tr><td>tutorialEnd EVENT_JSON에 단계 정보 없음</td><td>다음 빌드에서 step 파라미터 추가 시 단계별 이탈 분석 가능</td></tr>
       </tbody>
     </table>
   </div>
 
   <div class="hold">
-    <div class="tag">유보 — 본 보고서에서 다루지 못한 영역</div>
-    <ul style="margin:8px 0 0 16px;padding:0;line-height:2">
-      <li><strong>플레이타임 (roomDisconnect.elapsedTime)</strong> — 9차 보고서의 인당 체류 분포(중앙값 24.7분 등) 미작성. EVENT_JSON 파싱 별도 쿼리 필요</li>
-      <li><strong>유저 유형 3분할 (리텐션/복귀/신규)</strong> — 9차 보고서의 유형별 참여 깊이 비교 미작성. Game User Summary의 played_playtests 시퀀스 분석 필요</li>
-      <li><strong>모드별 인당 체류 + 진입률</strong> — gameplayType 별 roomConnect/Disconnect 매핑 필요</li>
-      <li><strong>Shop + Golden Nuts 경제</strong> — 인기 코스메틱 TOP, 테크트리 해금 TOP, GN 잔액 분포 미작성</li>
-      <li><strong>튜토리얼 단계별 이탈 지점</strong> — Rotation/Glide/JetPack 등 단계별 분석 미작성</li>
-      <li><strong>도전과제 달성 분포</strong> — Fly/Chase/Run 트랙별 달성률, GN 지급 분석</li>
-      <li><strong>크로스 플랫폼 매칭</strong> — Discord 누적 메시지 × 인게임 체류 상관</li>
-      <li><strong>Discord 가입/이탈 = 0</strong> 데이터 검증 — discord_context 가입/이탈 0 표기는 데이터 추출 이슈일 가능성</li>
-    </ul>
-  </div>
-
-  <div class="hold">
     <div class="tag">데이터 정합성 메모</div>
     <ul style="margin:8px 0 0 16px;padding:0;line-height:2">
-      <li>10차 1차 시도(v0.14.0, 4/20-21 KST, 31명/5,215 events)는 빌드 문제로 무효 처리. <code>playtest_config.py</code>에 <code>"10차 Playtest 시도1": is_regular=False</code>로 분리 등록되어 BigQuery↔Sheets 동일성 유지하되 보고서 비교 대상에서 자동 제외됨.</li>
-      <li>참여자 85명 = 신규 12 + 재참여 73 (재참여는 9차 또는 그 이전 정규 플테 참여 경험자, 1차 시도(0.14.0) 참여자는 정규 미포함)</li>
+      <li>10차 1차 시도(v0.14.0, 4/20-21 KST, 31명/5,215 events)는 빌드 문제로 무효 처리. <code>playtest_config.py</code>에 <code>"10차 Playtest 시도1": is_regular=False</code>로 분리 등록 — BigQuery↔Sheets 동일성 유지하되 보고서 비교 대상에서 자동 제외.</li>
+      <li>유저 3분할(리텐션 32 + 복귀 36 + 신규 17 = 85)은 Game Users 시트 played_playtests 시퀀스 기준. generate_report_data.py의 단순 분류(returning 81 + new 12)와 정의가 다름.</li>
+      <li>Discord 매칭 61/85 (71.7%) — User Master meta_id↔discord_id 매핑 기준. 24명 미달은 신규 유저 매칭 미완료로 추정.</li>
+      <li>tutorialEnd 진입자 11(9차) → 62(10차) — 재참여 유저 다수가 튜토리얼 재경험. 빌드 변경 강제 재경험 가능성.</li>
     </ul>
   </div>
 </div>
@@ -361,8 +437,7 @@
         <tr><td>US</td><td class="r bold">61</td><td class="r bold">65.6%</td></tr>
         <tr><td>GB</td><td class="r">9</td><td class="r">9.7%</td></tr>
         <tr><td>CA</td><td class="r">8</td><td class="r">8.6%</td></tr>
-        <tr><td>LT</td><td class="r">2</td><td class="r">2.2%</td></tr>
-        <tr><td>NL</td><td class="r">2</td><td class="r">2.2%</td></tr>
+        <tr><td>LT, NL</td><td class="r">2 (각 1.1%)</td><td class="r">2.2%</td></tr>
         <tr><td>기타 (DK, BR, SE, NZ, CR)</td><td class="r">5</td><td class="r">5.4%</td></tr>
       </tbody>
     </table>
@@ -383,36 +458,42 @@
   <details>
     <summary>커뮤니티 건강도 분포 (5/5 기준, 전체 1,176명)</summary>
     <table style="margin-top:8px">
-      <thead><tr><th>건강도</th><th class="r">인원</th></tr></thead>
+      <thead><tr><th>건강도</th><th class="r">인원</th><th>등급</th><th class="r">인원</th></tr></thead>
       <tbody>
-        <tr><td><span class="badge badge-green">Active</span> (7일 내 메시지 6+)</td><td class="r">32</td></tr>
-        <tr><td><span class="badge badge-blue">Casual</span> (7일 내 메시지 1-5)</td><td class="r">19</td></tr>
-        <tr><td><span class="badge badge-yellow">Fading</span> (8-30일 미접)</td><td class="r">148</td></tr>
-        <tr><td><span class="badge badge-gray">Inactive</span> (31일+ 미접)</td><td class="r">894</td></tr>
-        <tr><td><span class="badge badge-blue">신규</span> (가입 14일 이내)</td><td class="r">7</td></tr>
-        <tr><td><span class="badge badge-red">이탈</span> (Discord 탈퇴)</td><td class="r">76</td></tr>
-      </tbody>
-    </table>
-    <table style="margin-top:8px">
-      <thead><tr><th>등급 (누적 참여)</th><th class="r">인원</th></tr></thead>
-      <tbody>
-        <tr><td><span class="badge badge-green">Core</span> (일평균 0.5+, 50개+)</td><td class="r">54</td></tr>
-        <tr><td><span class="badge badge-blue">Regular</span> (일평균 0.02+, 10개+)</td><td class="r">98</td></tr>
-        <tr><td><span class="badge badge-yellow">Visitor</span> (메시지 있지만 드뭄)</td><td class="r">930</td></tr>
-        <tr><td><span class="badge badge-gray">Silent</span> (0)</td><td class="r">94</td></tr>
+        <tr><td><span class="badge badge-green">Active</span> (7일 내 6+ 메시지)</td><td class="r">32</td><td><span class="badge badge-green">Core</span> (일평균 0.5+)</td><td class="r">54</td></tr>
+        <tr><td><span class="badge badge-blue">Casual</span> (7일 내 1-5)</td><td class="r">19</td><td><span class="badge badge-blue">Regular</span> (일평균 0.02+)</td><td class="r">98</td></tr>
+        <tr><td><span class="badge badge-yellow">Fading</span> (8-30일 미접)</td><td class="r">148</td><td><span class="badge badge-yellow">Visitor</span></td><td class="r">930</td></tr>
+        <tr><td><span class="badge badge-gray">Inactive</span> (31일+)</td><td class="r">894</td><td><span class="badge badge-gray">Silent</span></td><td class="r">94</td></tr>
+        <tr><td>신규 (가입 14일)</td><td class="r">7</td><td>이탈 (탈퇴)</td><td class="r">76</td></tr>
       </tbody>
     </table>
   </details>
 
   <details>
-    <summary>데이터 출처</summary>
+    <summary>Discord 멤버 변화</summary>
+    <table style="margin-top:8px">
+      <tbody>
+        <tr><td class="bold">PT 시작 (4/26)</td><td class="r">1,105</td></tr>
+        <tr><td class="bold">PT 종료 (4/27)</td><td class="r">1,118 (+13)</td></tr>
+        <tr><td class="bold">현재 (5/6)</td><td class="r">1,134 (PT 종료 후 +16)</td></tr>
+      </tbody>
+    </table>
+  </details>
+
+  <details>
+    <summary>데이터 출처 + 파이프라인</summary>
     <div style="padding:12px 0;font-size:13px;color:#555;line-height:1.8">
       <table>
         <tbody>
           <tr><td class="bold">게임 이벤트</td><td>BigQuery <code>runuts-analytics.runuts.events_with_users</code></td></tr>
           <tr><td class="bold">집계 시트</td><td>Game Users / Playtest Summary / Playtest Daily / Event Breakdown</td></tr>
-          <tr><td class="bold">파이프라인</td><td>BigQuery → <code>sync_game_data.py</code> → Google Sheets → <code>generate_report_data.py</code> → JSON → 본 HTML</td></tr>
-          <tr><td class="bold">Discord 데이터</td><td>Discord Bot (회사 PC Docker) + Health Snapshot 시트</td></tr>
+          <tr><td class="bold">파이프라인</td><td>BigQuery → <code>sync_game_data.py</code> → Sheets → <code>generate_report_data.py</code> → JSON → 본 HTML (+ 8개 보강 분석은 직접 BigQuery 쿼리)</td></tr>
+          <tr><td class="bold">체류시간</td><td><code>roomDisconnect</code> EVENT_JSON → <code>elapsedTime</code> (초)</td></tr>
+          <tr><td class="bold">모드별</td><td><code>roomDisconnect</code> EVENT_JSON → <code>gameplayType</code> + <code>roomName</code></td></tr>
+          <tr><td class="bold">경제</td><td><code>purchaseItem</code> + <code>VIRTUAL_CURRENCY_JSON</code> (<code>C2</code>=GN, <code>C1</code>=Seeds)</td></tr>
+          <tr><td class="bold">도전과제</td><td><code>achievementClaimed</code> + <code>game_config/Achievements.json</code> (track/reward 매핑)</td></tr>
+          <tr><td class="bold">크로스 플랫폼</td><td>User Master meta_id↔discord_id + User Activity Log 누적 messages</td></tr>
+          <tr><td class="bold">Discord</td><td>회사 PC Docker Bot + Health Snapshot 시트</td></tr>
           <tr><td class="bold">비교 기준</td><td>9차 Playtest (v0.13.0, 직전 정규 플테)</td></tr>
           <tr><td class="bold">정규 분류</td><td><code>sns_scripts/playtest_config.py</code> <code>is_regular</code> 플래그 (이벤트 플테 자동 제외)</td></tr>
         </tbody>
@@ -423,52 +504,43 @@
 
 <div class="report-footer">
   RUNuts Analytics · PT10 · 2026-05-06<br>
-  EDA 기술통계 보고서 · BigQuery + Google Sheets 기반 · Sprint 006 (Stage 1 마지막) 빌드 v0.14.0_0425
+  EDA 기술통계 보고서 · BigQuery + Sheets + 게임 설계 데이터 기반 · Sprint 006 (Stage 1 마지막) 빌드 v0.14.0_0425
 </div>
 
 <script>
-const C={primary:'#FF9900',gray:'#d1d5db',green:'#22c55e',blue:'#60a5fa',yellow:'#eab308',red:'#dc2626',grid:'#e9ecef'};
+const C={primary:'#FF9900',gray:'#d1d5db',green:'#22c55e',blue:'#60a5fa',yellow:'#eab308',red:'#dc2626',purple:'#a855f7',grid:'#e9ecef'};
 
-// 일별 추이
-new Chart(document.getElementById('chartDaily'),{
+// 체류시간 분포 (10차 vs 9차)
+new Chart(document.getElementById('chartPlaytime'),{
   type:'bar',
   data:{
-    labels:['4/26 (일)','4/27 (월)','4/28 (화)'],
+    labels:['0~5분','5~15분','15~30분','30~60분','60~120분','120분+'],
     datasets:[
-      {type:'bar',label:'DAU',data:[38,65,19],backgroundColor:C.primary,borderRadius:3,yAxisID:'y'},
-      {type:'line',label:'세션',data:[308,920,127],borderColor:C.blue,backgroundColor:'rgba(96,165,250,0.1)',tension:0.3,yAxisID:'y1'},
-      {type:'line',label:'이벤트',data:[5865,16820,2925],borderColor:C.green,backgroundColor:'rgba(34,197,94,0.1)',tension:0.3,yAxisID:'y2',hidden:true}
+      {label:'10차',data:[10,15,3,14,12,13],backgroundColor:C.primary,borderRadius:4},
+      {label:'9차',data:[9,9,13,10,6,8],backgroundColor:C.gray,borderRadius:4}
     ]
   },
   options:{
     responsive:true,maintainAspectRatio:false,
     plugins:{legend:{position:'top',labels:{font:{size:13},boxWidth:12}}},
-    scales:{
-      y:{beginAtZero:true,position:'left',title:{display:true,text:'DAU (명)',font:{size:11}},grid:{color:C.grid}},
-      y1:{beginAtZero:true,position:'right',title:{display:true,text:'세션',font:{size:11}},grid:{display:false}},
-      y2:{display:false},
-      x:{grid:{display:false}}
-    }
+    scales:{y:{beginAtZero:true,title:{display:true,text:'명',font:{size:11}},grid:{color:C.grid}},x:{grid:{display:false}}}
   }
 });
 
-// 모드별 비교 (10차 vs 9차)
-new Chart(document.getElementById('chartModes'),{
+// 모드별 총 체류시간 (10차 vs 9차) — 주요 모드만
+new Chart(document.getElementById('chartModeTime'),{
   type:'bar',
   data:{
-    labels:['Obby 시작','Obby 클리어','Obby 사망','태그 종료','게임 진행','궁극기 사용'],
+    labels:['Casual A','Casual B','Infection A','Infection B','Horror A','Horror B','Obby A','ObbyR (제거)'],
     datasets:[
-      {label:'10차',data:[424,39,1118,261,1912,3482],backgroundColor:C.primary,borderRadius:3},
-      {label:'9차',data:[366,52,1020,102,1329,2573],backgroundColor:C.gray,borderRadius:3}
+      {label:'10차',data:[19.4,8.8,11.7,5.4,6.4,1.6,2.0,0],backgroundColor:C.primary,borderRadius:3},
+      {label:'9차',data:[17.5,12.6,8.3,5.3,0,1.4,2.1,4.1],backgroundColor:C.gray,borderRadius:3}
     ]
   },
   options:{
     responsive:true,maintainAspectRatio:false,indexAxis:'y',
     plugins:{legend:{position:'top',labels:{font:{size:13},boxWidth:12}}},
-    scales:{
-      x:{beginAtZero:true,grid:{color:C.grid},title:{display:true,text:'이벤트 카운트',font:{size:11}}},
-      y:{grid:{display:false},ticks:{font:{size:13}}}
-    }
+    scales:{x:{beginAtZero:true,title:{display:true,text:'시간(h)',font:{size:11}},grid:{color:C.grid}},y:{grid:{display:false},ticks:{font:{size:13}}}}
   }
 });
 
@@ -476,25 +548,30 @@ new Chart(document.getElementById('chartModes'),{
 new Chart(document.getElementById('chartUserType'),{
   type:'doughnut',
   data:{
-    labels:['재참여 (73명)','신규 (12명)'],
-    datasets:[{data:[73,12],backgroundColor:[C.blue,C.yellow],borderWidth:2,borderColor:'#fff'}]
+    labels:['리텐션 (32명)','복귀 (36명)','신규 (17명)'],
+    datasets:[{data:[32,36,17],backgroundColor:[C.green,C.blue,C.yellow],borderWidth:2,borderColor:'#fff'}]
   },
-  options:{
-    responsive:true,maintainAspectRatio:false,
-    plugins:{legend:{position:'bottom',labels:{font:{size:13},boxWidth:12}}}
-  }
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:13},boxWidth:12}}}}
 });
 
-// 잔존 분포
-new Chart(document.getElementById('chartRetention'),{
-  type:'doughnut',
+// 크로스 플랫폼 (Discord 메시지 × 인게임 세션)
+new Chart(document.getElementById('chartCross'),{
+  type:'bar',
   data:{
-    labels:['잔존 (91명)','이탈 (2명)'],
-    datasets:[{data:[91,2],backgroundColor:[C.green,C.red],borderWidth:2,borderColor:'#fff'}]
+    labels:['Silent (0)','Visitor (1-10)','Regular (11-50)','Core (51+)'],
+    datasets:[
+      {type:'bar',label:'평균 세션',data:[187,60.1,127.1,269.2],backgroundColor:C.primary,borderRadius:3,yAxisID:'y'},
+      {type:'line',label:'인원',data:[1,14,16,30],borderColor:C.blue,backgroundColor:'rgba(96,165,250,0.1)',tension:0.3,yAxisID:'y1'}
+    ]
   },
   options:{
     responsive:true,maintainAspectRatio:false,
-    plugins:{legend:{position:'bottom',labels:{font:{size:13},boxWidth:12}}}
+    plugins:{legend:{position:'top',labels:{font:{size:13},boxWidth:12}}},
+    scales:{
+      y:{beginAtZero:true,position:'left',title:{display:true,text:'평균 세션',font:{size:11}},grid:{color:C.grid}},
+      y1:{beginAtZero:true,position:'right',title:{display:true,text:'인원',font:{size:11}},grid:{display:false}},
+      x:{grid:{display:false}}
+    }
   }
 });
 </script>
