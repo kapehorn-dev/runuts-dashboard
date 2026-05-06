@@ -42,6 +42,13 @@
   .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0}
   .delta-up{color:#16a34a;font-weight:600}.delta-down{color:#dc2626;font-weight:600}.delta-flat{color:#6b7280}
   details{margin:12px 0}summary{cursor:pointer;font-weight:600;font-size:15px;color:#555;padding:8px 0}summary:hover{color:#FF9900}
+  .chip-bar{display:flex;align-items:center;gap:8px;margin-bottom:16px;font-size:14px}
+  .chip-bar span{font-weight:600;color:#555}
+  .chip{padding:6px 16px;border-radius:20px;font-size:14px;font-weight:600;cursor:pointer;border:2px solid #e9ecef;background:#fff;color:#555;transition:.2s}
+  .chip.active{background:#FF9900;color:#fff;border-color:#FF9900}
+  .chip:hover:not(.active){background:#f8f9fa}
+  .col-pt8{display:none}
+  body.show3 .col-pt8{display:table-cell}
   .report-footer{margin-top:48px;padding-top:16px;border-top:1px solid #e9ecef;font-size:14px;color:#aaa;text-align:center}
   .highlight-row{background:#fffbeb}
   @media(max-width:640px){body{padding:20px 16px}.report-header h1{font-size:22px}.kpi-row{grid-template-columns:repeat(2,1fr)}.grid-2{grid-template-columns:1fr}}
@@ -67,6 +74,13 @@
   <strong>10차 1차 시도(v0.14.0, 4/20-21 KST, 31명/5,215 events)</strong>는 빌드 문제로 무효 처리되어 본 보고서에서 제외되었습니다. 정식(v0.14.0_0425) 데이터만 사용합니다. 직전 정규 플테 비교 대상은 <strong>9차 Playtest (v0.13.0)</strong>입니다.
 </div>
 
+<!-- 글로벌 비교 범위 칩 -->
+<div class="chip-bar">
+  <span>비교 범위:</span>
+  <div class="chip" onclick="setCompare(2,this)">2개 플테 (9차+10차)</div>
+  <div class="chip active" onclick="setCompare(3,this)">3개 플테 (8차+9차+10차)</div>
+</div>
+
 <!-- ===== 1. Executive Summary ===== -->
 <div class="section">
   <div class="section-heading">1. Executive Summary</div>
@@ -80,15 +94,15 @@
   </div>
 
   <table>
-    <thead><tr><th>지표</th><th class="r">8차</th><th class="r">9차</th><th class="r bold">10차</th><th class="r">추세</th></tr></thead>
+    <thead><tr><th>지표</th><th class="r col-pt8">8차</th><th class="r">9차</th><th class="r bold">10차</th><th class="r">추세</th></tr></thead>
     <tbody>
-      <tr><td>참여자</td><td class="r">81</td><td class="r">68</td><td class="r bold">85</td><td class="r"><span class="delta-up">↗ 반등</span></td></tr>
-      <tr><td>총 세션</td><td class="r">1,187</td><td class="r">965</td><td class="r bold">1,355</td><td class="r"><span class="delta-up">↗ 증가</span></td></tr>
-      <tr><td>총 체류 (roomDisconnect 합산)</td><td class="r">48.9h</td><td class="r">55.5h</td><td class="r bold">69.9h</td><td class="r"><span class="delta-up">↗ 증가</span></td></tr>
-      <tr><td>인당 체류 (중앙값)</td><td class="r">36.2분</td><td class="r">24.7분</td><td class="r bold">41.9분</td><td class="r"><span class="delta-up">↗ 반등</span></td></tr>
-      <tr><td>피크 DAU</td><td class="r">69</td><td class="r">57</td><td class="r bold">65</td><td class="r"><span class="delta-up">↗ 반등</span></td></tr>
-      <tr><td>Tutorial 완료율</td><td class="r">56.5%</td><td class="r">63.6%</td><td class="r bold">91.9%</td><td class="r"><span class="delta-up">↗ 대폭 개선</span></td></tr>
-      <tr><td>Obby 클리어율</td><td class="r">8.5%</td><td class="r">14.2%</td><td class="r bold">9.2%</td><td class="r"><span class="delta-down">↘ 후퇴</span></td></tr>
+      <tr><td>참여자</td><td class="r col-pt8">81</td><td class="r">68</td><td class="r bold">85</td><td class="r"><span class="delta-up">↗ 반등</span></td></tr>
+      <tr><td>총 세션</td><td class="r col-pt8">1,187</td><td class="r">965</td><td class="r bold">1,355</td><td class="r"><span class="delta-up">↗ 증가</span></td></tr>
+      <tr><td>총 체류 (roomDisconnect 합산)</td><td class="r col-pt8">48.9h</td><td class="r">55.5h</td><td class="r bold">69.9h</td><td class="r"><span class="delta-up">↗ 증가</span></td></tr>
+      <tr><td>인당 체류 (중앙값)</td><td class="r col-pt8">36.2분</td><td class="r">24.7분</td><td class="r bold">41.9분</td><td class="r"><span class="delta-up">↗ 반등</span></td></tr>
+      <tr><td>피크 DAU</td><td class="r col-pt8">69</td><td class="r">57</td><td class="r bold">65</td><td class="r"><span class="delta-up">↗ 반등</span></td></tr>
+      <tr><td>Tutorial 완료율</td><td class="r col-pt8">56.5%</td><td class="r">63.6%</td><td class="r bold">91.9%</td><td class="r"><span class="delta-up">↗ 대폭 개선</span></td></tr>
+      <tr><td>Obby 클리어율</td><td class="r col-pt8">8.5%</td><td class="r">14.2%</td><td class="r bold">9.2%</td><td class="r"><span class="delta-down">↘ 후퇴</span></td></tr>
     </tbody>
   </table>
 
@@ -323,9 +337,40 @@
     <div class="kpi-box"><div class="label">완료율</div><div class="value bold" style="color:#FF9900">91.9%</div><div class="sub">9차: 63.6% (<span class="delta-up">+28.3%p</span>)</div></div>
     <div class="kpi-box"><div class="label">평균 소요</div><div class="value">155.7초</div><div class="sub">9차: 90.6초</div></div>
   </div>
-  <div class="hold">
-    <div class="tag">유보 — 단계별 분석 한계</div>
-    EVENT_JSON에 단계 식별 필드(<code>step</code>)가 없어 본 보고서에서는 단계별(Rotation/Glide/JetPack/Weapon 등) 이탈 분석을 수행하지 못했다. 9차 v3 보고서의 단계별 분석은 별도 이벤트 기반이었던 것으로 추정. 다음 빌드(0.15+)에서 tutorialEnd에 단계 파라미터 추가 검토 필요.
+  <div style="font-weight:600;font-size:13px;margin:20px 0 8px;color:#555">튜토리얼 단계별 (tutorialStepStart / tutorialStepEnd 이벤트 기반, TU_INIT_ prefix 제거)</div>
+  <table>
+    <thead><tr>
+      <th>단계</th>
+      <th class="r">PT10 진입</th>
+      <th class="r">PT10 완료</th>
+      <th class="r">PT10 평균(초)</th>
+      <th class="r">PT9 진입</th>
+      <th class="r">PT9 완료</th>
+      <th class="r">PT9 평균(초)</th>
+    </tr></thead>
+    <tbody>
+      <tr><td>StartTutorial</td><td class="r">62</td><td class="r">61</td><td class="r">12.2</td><td class="r">11</td><td class="r">11</td><td class="r">14.7</td></tr>
+      <tr><td>ChargeAndLaunch</td><td class="r">55</td><td class="r">55</td><td class="r">10.9</td><td class="r">10</td><td class="r">10</td><td class="r">11.9</td></tr>
+      <tr><td>Rotation</td><td class="r">52</td><td class="r">52</td><td class="r">14.2</td><td class="r">10</td><td class="r">10</td><td class="r">15.1</td></tr>
+      <tr><td>Glide</td><td class="r">52</td><td class="r">52</td><td class="r">8.4</td><td class="r">10</td><td class="r">10</td><td class="r">14.4</td></tr>
+      <tr><td>LiftEffect</td><td class="r">52</td><td class="r">51</td><td class="r">15.3</td><td class="r">10</td><td class="r">10</td><td class="r">11.9</td></tr>
+      <tr class="highlight-row"><td><strong>JetPack</strong></td><td class="r">51</td><td class="r">49</td><td class="r bold" style="color:#dc2626">73.6</td><td class="r">10</td><td class="r">10</td><td class="r">13.3</td></tr>
+      <tr><td>Weapon</td><td class="r">49</td><td class="r">48</td><td class="r">25.6</td><td class="r">10</td><td class="r">8</td><td class="r" style="color:#dc2626">40.7</td></tr>
+      <tr><td>Tag</td><td class="r">48</td><td class="r">48</td><td class="r">19.6</td><td class="r">2</td><td class="r">3</td><td class="r">3.0</td></tr>
+      <tr><td>Ultimate</td><td class="r">—</td><td class="r">—</td><td class="r">—</td><td class="r">8</td><td class="r">2</td><td class="r">14.9</td></tr>
+      <tr><td>EndTutorial</td><td class="r bold">48</td><td class="r bold">48</td><td class="r">5.4</td><td class="r">3</td><td class="r">4</td><td class="r">5.1</td></tr>
+    </tbody>
+  </table>
+  <div style="font-size:13px;color:#666;margin:8px 0">
+    완료율(EndTutorial 진입 ÷ StartTutorial 진입): <strong>PT10 48/62 = 77.4%</strong> · PT9 3/11 = 27.3%
+  </div>
+  <div class="obs">
+    <div class="tag">관찰</div>
+    <strong>JetPack 단계 평균 73.6초</strong>는 PT9 13.3초의 5.5배. 다른 단계 평균(8~26초) 대비 3~9배로 가장 큰 이상치. 한편 <strong>Weapon 단계는 PT9 40.7초(이탈 발생) → PT10 25.6초로 개선</strong>되어 Sprint 006 튜토리얼 정비 효과가 일부 단계에 작용. <strong>Ultimate 단계는 PT10에서 제거</strong> (PT9에서 8명 진입 → 2명 완료로 가장 큰 이탈 발생점이었던 단계). <strong>Tag 단계는 3.0초 → 19.6초로 확장</strong>되어 실질적 태그 체험을 제공한다.
+  </div>
+  <div class="review">
+    <div class="tag">검토 사항</div>
+    <strong>JetPack 73.6초가 가장 시급</strong> — PT9에서는 짧았는데 빌드 변경으로 학습 시간이 5배가 됐다. 새 입력 방식·UX·연출 길이 중 어느 요소가 늘어졌는지 단계 내 세부 동선 확인 필요. Ultimate 제거는 의도된 단순화로 해석되지만, 궁극기 학습 채널이 별도로 마련되어 있는지(인게임 안내·UI 가이드) 점검이 필요하다.
   </div>
 
   <div style="font-weight:600;font-size:13px;margin:20px 0 8px;color:#555">도전과제 달성 TOP 10 (10차) — Fly/Chase/Run 3축</div>
@@ -508,6 +553,15 @@
 </div>
 
 <script>
+// 비교 범위 토글 — 3개 플테 기본
+function setCompare(n, el) {
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  if (n === 3) document.body.classList.add('show3');
+  else document.body.classList.remove('show3');
+}
+document.body.classList.add('show3'); // 페이지 로드 기본: 3개 플테
+
 const C={primary:'#FF9900',gray:'#d1d5db',green:'#22c55e',blue:'#60a5fa',yellow:'#eab308',red:'#dc2626',purple:'#a855f7',grid:'#e9ecef'};
 
 // 체류시간 분포 (10차 vs 9차)
