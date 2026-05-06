@@ -129,7 +129,7 @@
       <tbody>
         <tr><td>온보딩·튜토리얼 정비 (씨드·제트팩 소개 레벨 보충, UXUI 개선)</td><td>Tutorial 완료율</td><td class="r"><span class="alert">63.6% → 91.9% (+28.3%p)</span></td></tr>
         <tr><td>온보딩·일일 퀘스트 시스템 정리</td><td>퀘스트 달성</td><td class="r"><span class="delta-up">531 → 680 (+28%)</span></td></tr>
-        <tr><td>플라자 형태 상점 + 코스메틱 종류·등급 명확화</td><td>상점 진입 / Wizard 시리즈 비중</td><td class="r"><span class="alert">614 → 1,013 (+65%)</span></td></tr>
+        <tr><td>플라자 형태 상점 + 코스메틱 종류·등급 명확화</td><td>상점 진입 / unique 구매자 안정</td><td class="r"><span class="alert">상점 진입 614 → 1,013 (+65%)</span></td></tr>
         <tr><td>줄기 구조 순차 해금 테크트리</td><td>아이템 장착 / 궁극기 사용</td><td class="r"><span class="delta-up">+12% / +35%</span></td></tr>
         <tr><td>PlayFab Economy v1→v2 재구축 (70% 진행)</td><td>제품 안정성</td><td class="r">정성적 — 활성일 3일 안정</td></tr>
         <tr><td>튜토리얼 단계 변경 (Ultimate 단계 제거)</td><td>전체 완료율 (3회 연속 이탈 후 결정)</td><td class="r"><span class="delta-up">PT9 27.3% → PT10 77.4%</span></td></tr>
@@ -260,16 +260,19 @@
     <table>
       <thead><tr><th>지표</th><th class="r">리텐션 (32명)</th><th class="r">복귀 (36명)</th><th class="r">신규 (17명)</th></tr></thead>
       <tbody>
-        <tr><td>총 누적 세션 (인당 평균)</td><td class="r bold">250.2</td><td class="r">96.5</td><td class="r">25.8</td></tr>
-        <tr><td>총 누적 이벤트 (인당 평균)</td><td class="r bold">3,788</td><td class="r">1,586</td><td class="r">473</td></tr>
-        <tr><td>참여 플테 수 (인당 평균)</td><td class="r bold">8.5+</td><td class="r">3~4</td><td class="r">1</td></tr>
+        <tr><td>인당 평균 세션 (누적)</td><td class="r bold">250.2</td><td class="r">96.5</td><td class="r">25.8</td></tr>
+        <tr><td>인당 중앙값 세션 (누적)</td><td class="r">162</td><td class="r">54</td><td class="r">20</td></tr>
+        <tr><td>인당 평균 이벤트 (누적)</td><td class="r bold">3,788</td><td class="r">1,586</td><td class="r">473</td></tr>
+        <tr><td>인당 평균 참여 플테</td><td class="r bold">7.53</td><td class="r">4.39</td><td class="r">1.29</td></tr>
+        <tr><td>인당 중앙값 참여 플테</td><td class="r">8</td><td class="r">4</td><td class="r">1</td></tr>
+        <tr><td>참여 플테 (최소~최대)</td><td class="r">2 ~ 14</td><td class="r">2 ~ 13</td><td class="r">1 ~ 2</td></tr>
       </tbody>
     </table>
   </div>
 
   <div class="obs">
     <div class="tag">관찰</div>
-    모든 유형이 9차 대비 증가했으나 <strong>신규는 +70%로 가장 큰 증가</strong> — 모집 채널 효과가 9차 대비 강해졌음을 시사. 리텐션 그룹의 누적 세션 250+은 거의 모든 정규 플테를 거친 진성 베테랑임을 의미.
+    모든 유형이 9차 대비 증가했으나 <strong>신규는 +70%로 가장 큰 증가</strong> — 모집 채널 효과가 9차 대비 강해졌음을 시사. 리텐션 그룹은 인당 평균 7.53회 정규 플테 참여 + 누적 세션 평균 250.2회로 진성 베테랑. 한편 신규 17명 중 일부(최대 2회 참여)는 10차 시도1에도 참여한 케이스.
   </div>
   <div class="hold">
     <div class="tag">유보 — 본 보고서 한계</div>
@@ -304,42 +307,49 @@
   <div class="section-desc">Golden Nuts(GN, <code>VIRTUAL_CURRENCY_JSON.C2</code>)는 도전과제·퀘스트로만 획득, 코스메틱·테크트리에 소비. Seeds(C1)는 무료 화폐.</div>
 
   <div class="kpi-row">
-    <div class="kpi-box"><div class="label">코스메틱 종류</div><div class="value">20</div><div class="sub">9차 27 (<span class="delta-down">↘ 집중화</span>)</div></div>
-    <div class="kpi-box"><div class="label">GN 잔액 중앙값</div><div class="value alert">13</div><div class="sub">9차 ~29 (<span class="alert">-55%</span>)</div></div>
-    <div class="kpi-box"><div class="label">GN 잔액 최대</div><div class="value">110</div><div class="sub">9차 145</div></div>
-    <div class="kpi-box"><div class="label">Seeds 중앙값</div><div class="value">3,492</div><div class="sub">평균 3,562 / 최대 37,895</div></div>
+    <div class="kpi-box"><div class="label">unique 구매자</div><div class="value">27명</div><div class="sub">9차 28명 (<span class="delta-flat">→ 안정</span>)</div></div>
+    <div class="kpi-box"><div class="label">구매 횟수</div><div class="value">39건</div><div class="sub">9차 65건 (<span class="delta-down">↘ -40%</span>)</div></div>
+    <div class="kpi-box"><div class="label">GN 잔액 중앙값</div><div class="value">13</div><div class="sub">9차 8 (<span class="delta-up">+62%</span>)</div></div>
+    <div class="kpi-box"><div class="label">GN 잔액 평균</div><div class="value">19.7</div><div class="sub">9차 19.4 (<span class="delta-flat">→ 안정</span>)</div></div>
   </div>
 
   <div class="table-wrap">
     <table>
       <thead><tr><th>경제 지표</th><th class="r bold">10차</th><th class="r">9차</th><th class="r col-pt8">8차</th><th class="r">추세</th></tr></thead>
       <tbody>
-        <tr><td>GN 잔액 평균</td><td class="r bold">19.7</td><td class="r">~29</td><td class="r col-pt8">30.3</td><td class="r"><span class="alert">↘ 적극 소비 (-32%)</span></td></tr>
-        <tr><td>GN 잔액 중앙값</td><td class="r bold">13</td><td class="r">~29</td><td class="r col-pt8">28</td><td class="r"><span class="alert">↘ 절반 이하</span></td></tr>
-        <tr><td>GN 100+ 보유자</td><td class="r bold">1명</td><td class="r">—</td><td class="r col-pt8">—</td><td class="r"><span class="delta-down">↘ 헤비 코어 GN 풀 부족</span></td></tr>
-        <tr><td>Seeds 중앙값</td><td class="r bold">3,492</td><td class="r">—</td><td class="r col-pt8">5,040</td><td class="r"><span class="delta-down">PT8 대비 -31%</span></td></tr>
+        <tr><td>코스메틱 unique 구매자</td><td class="r bold">27명</td><td class="r">28명</td><td class="r col-pt8">~10명</td><td class="r"><span class="delta-up">↗ PT8→9 +180%, PT9→10 안정</span></td></tr>
+        <tr><td>코스메틱 구매 횟수</td><td class="r bold">39건</td><td class="r">65건</td><td class="r col-pt8">41건</td><td class="r"><span class="delta-down">↘ PT9→10 -40%</span></td></tr>
+        <tr><td>코스메틱 종류</td><td class="r bold">20종</td><td class="r">27종</td><td class="r col-pt8">~32종</td><td class="r"><span class="delta-down">↘ 종류 감소</span></td></tr>
+        <tr><td>GN 잔액 평균</td><td class="r bold">19.7</td><td class="r">19.4</td><td class="r col-pt8">30.3</td><td class="r"><span class="delta-flat">→ PT9→10 안정 (PT8→9 -36%)</span></td></tr>
+        <tr><td>GN 잔액 중앙값</td><td class="r bold">13</td><td class="r">8</td><td class="r col-pt8">28</td><td class="r"><span class="delta-up">↗ PT9→10 +62% (PT8→9 -71%)</span></td></tr>
+        <tr><td>GN 잔액 최대</td><td class="r bold">110</td><td class="r">145</td><td class="r col-pt8">145</td><td class="r"><span class="delta-down">↘ 최고치 -24%</span></td></tr>
+        <tr><td>GN 100+ 보유자</td><td class="r bold">1명</td><td class="r">2명</td><td class="r col-pt8">2명</td><td class="r"><span class="delta-down">↘ 헤비 코어 감소</span></td></tr>
+        <tr><td>Seeds 평균</td><td class="r bold">3,562</td><td class="r">3,932</td><td class="r col-pt8">4,711</td><td class="r"><span class="delta-down">↘ 지속 감소</span></td></tr>
+        <tr><td>Seeds 중앙값</td><td class="r bold">3,492</td><td class="r">4,829</td><td class="r col-pt8">5,040</td><td class="r"><span class="delta-down">↘ PT9→10 -28%</span></td></tr>
       </tbody>
     </table>
+  </div>
+  <div style="font-size:13px;color:#666;margin:8px 0;padding:8px;background:#fef9c3;border-radius:6px">
+    🔄 <strong>v6 정정</strong>: v6의 "GN 중앙값 ~29 → 13으로 절반 이하" 결론은 추정 표기 인용 오류였음. PT9 GN 중앙값 정확값은 <strong>8</strong>이며, PT10 13은 <strong>+62% 증가</strong>. 출처: BigQuery <code>VIRTUAL_CURRENCY_JSON.C2</code> 마지막 이벤트 기준 직접 산출 (PT9 68명, PT10 85명).
   </div>
 
   <div class="grid-2">
     <div>
-      <div style="font-weight:600;font-size:13px;margin-bottom:8px;color:#555">10차 인기 코스메틱 TOP 5</div>
+      <div style="font-weight:600;font-size:13px;margin-bottom:8px;color:#555">코스메틱 카테고리별 unique 구매자 (3개 PT 비교)</div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>아이템</th><th class="r">10차</th><th class="r">9차</th><th class="r col-pt8">8차</th></tr></thead>
+          <thead><tr><th>카테고리</th><th class="r">10차</th><th class="r">9차</th><th class="r col-pt8">8차</th><th class="r">추세</th></tr></thead>
           <tbody>
-            <tr><td>Cool DJ Suit</td><td class="r bold">6</td><td class="r">8</td><td class="r col-pt8">—</td></tr>
-            <tr><td>Wizard 시리즈 합계*</td><td class="r bold">13</td><td class="r">4</td><td class="r col-pt8">2</td></tr>
-            <tr><td>Top Hat / Pixel Suit</td><td class="r">4 / 4</td><td class="r">— / —</td><td class="r col-pt8">— / 2</td></tr>
-            <tr><td>(8차 1위) Cowboy Hat</td><td class="r">—</td><td class="r">—</td><td class="r col-pt8">3</td></tr>
+            <tr><td>DJ 시리즈 (LIKE %dj%)</td><td class="r bold">7명</td><td class="r">16명</td><td class="r col-pt8">1명</td><td class="r"><span class="delta-down">↘ -56%</span></td></tr>
+            <tr class="highlight-row"><td>Wizard 시리즈 (LIKE %wizard%)</td><td class="r bold">11명</td><td class="r">11명</td><td class="r col-pt8">~5명</td><td class="r"><span class="delta-flat">→ 안정 유지</span></td></tr>
+            <tr><td>전체 코스메틱 unique 구매자</td><td class="r bold">27명</td><td class="r">28명</td><td class="r col-pt8">~10명</td><td class="r"><span class="delta-flat">→ 안정 유지</span></td></tr>
           </tbody>
         </table>
       </div>
-      <div style="font-size:13px;color:#666;margin-top:8px">* Wizard 시리즈: Hat(Purple/Brown/Green) + Suit(Brown/Purple) 합계</div>
+      <div style="font-size:13px;color:#666;margin-top:8px">출처: <code>purchaseItem</code> EVENT_JSON itemId LIKE 검색 + <code>COUNT(DISTINCT USER_ID)</code>. 같은 유저가 여러 wizard·dj 아이템 구매 시 1명으로 카운트.</div>
     </div>
     <div>
-      <div style="font-weight:600;font-size:13px;margin-bottom:8px;color:#555">10차 GN 잔액 분포 (85명)</div>
+      <div style="font-weight:600;font-size:13px;margin-bottom:8px;color:#555">10차 GN 잔액 분포 (전체 85명)</div>
       <div class="table-wrap">
         <table>
           <thead><tr><th>구간</th><th class="r">인원</th><th class="r">비율</th></tr></thead>
@@ -354,16 +364,42 @@
     </div>
   </div>
 
+  <details>
+    <summary>10차 인기 코스메틱 TOP 5 (전체 20종 중 — TOP 5 = 전체 39건 구매의 59%)</summary>
+    <div class="table-wrap">
+      <table style="margin-top:8px">
+        <thead><tr><th>아이템</th><th class="r">10차 구매</th><th class="r">10차 unique</th></tr></thead>
+        <tbody>
+          <tr><td>Cool DJ Suit</td><td class="r bold">6</td><td class="r">6</td></tr>
+          <tr><td>Purple Wizard Hat</td><td class="r">4</td><td class="r">4</td></tr>
+          <tr><td>Top Hat / Pixel Suit (각)</td><td class="r">4 / 4</td><td class="r">4 / 4</td></tr>
+          <tr><td>Brown Wizard Suit</td><td class="r">3</td><td class="r">3</td></tr>
+          <tr><td>(전체 20종, TOP 5 = 23건 / 39건)</td><td class="r">59%</td><td class="r">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+
   <div class="obs">
     <div class="tag">관찰</div>
-    <strong>9차 인기 1·2위 DJ 세트(8+7=15명)가 10차에 DJ Suit 6명으로 감소</strong>한 반면, <strong>Wizard 시리즈가 4명 → 13명(+225%)으로 비중 확대</strong>. Sprint 006 "코스메틱 종류·등급 명확화"로 Wizard 분류가 정리된 효과로 추정.<br>
-    <strong>GN 중앙값 절반 이하</strong> (~29 → 13)는 신규 코스메틱(Wizard)으로 GN이 적극 소비되었음을 시사. Seeds 중앙값은 PT8 대비 -31% 감소 — 무료 화폐도 적극 사용.
+    <strong>DJ 시리즈 unique 구매자 PT9 16명 → PT10 7명 (-56%)</strong>이 가장 큰 카테고리 변화. 한편 <strong>Wizard 시리즈는 PT9 11명 → PT10 11명으로 안정 유지</strong>하고 있으며, 이는 v6 보고서의 "Wizard +225% 비중 확대"가 합산 카운트 오류였음을 정정한 결과다. <strong>전체 unique 구매자도 PT9 28명 → PT10 27명으로 안정</strong>. 다만 <strong>구매 횟수는 65 → 39건으로 -40% 감소</strong>해 인당 구매 빈도가 줄었다.<br>
+    GN 잔액은 PT9 대비 평균(19.4 → 19.7) · 중앙값(8 → 13) 모두 안정 또는 약간 증가 — Sprint 006 도전과제·퀘스트 시스템 정착으로 GN 획득량이 PT9 대비 늘어 잔액이 회복된 패턴으로 보인다.
   </div>
   <div class="review">
     <div class="tag">검토 사항</div>
-    <strong>GN 100+ 보유자 1명만</strong> — 헤비 코어층 GN 소비처 부족 가능성. 고가 코스메틱·테크트리 추가 시점 검토.<br>
-    <strong>Seeds 최대 37,895</strong>는 잠재적 인플레이션 신호 — 소비처(가젯·총·제트팩) 사용 빈도와 균형 검토 필요.
+    <strong>구매 횟수 -40% (65 → 39건)</strong>: unique 구매자(28→27)는 거의 안정인데 구매 횟수만 크게 감소. 코스메틱 종류 27 → 20종 축소가 영향인지, 인당 반복 구매 의향 변화인지 구분 필요.<br>
+    <strong>Seeds 최대 37,895 / 평균 지속 감소</strong> (4,711 → 3,932 → 3,562): 소비처(가젯·총·제트팩)와 균형 검토. 일부 헤비 보유자 vs 평균 감소 양극화.
   </div>
+
+  <div class="hold">
+    <div class="tag">v6 → v7 정정 사항</div>
+    <ul style="margin:8px 0 0 16px;padding:0;line-height:2">
+      <li>"Wizard 4명 → 13명 (+225%)" → <strong>실제 unique buyer 11명 → 11명 (안정)</strong>. 이전 합산 카운트는 같은 유저의 여러 wizard 아이템 구매 중복 포함.</li>
+      <li>"DJ 세트 8+7=15명 → 6명" → <strong>실제 unique buyer 16명 → 7명</strong>. 이전 합산은 DJ Suit + DJ Hat 구매자 합계 (중복 가능).</li>
+      <li>"GN 중앙값 ~29 → 13 절반" → <strong>실제 8 → 13 +62% 증가</strong>. 이전 ~29는 PT9 v3 보고서의 다른 기준(전체 443명) 인용 오류.</li>
+    </ul>
+  </div>
+</div>
 </div>
 
 <!-- ===== 8. 온보딩 + 도전과제 ===== -->
@@ -408,7 +444,7 @@
     🔍 <strong>Weapon 단계 개선</strong> — PT9 40.7초(이탈 발생) → PT10 25.6초.
   </div>
 
-  <div style="font-weight:600;font-size:13px;margin:16px 0 8px;color:#555">10차 도전과제 TOP 10 (Fly/Chase/Run 3축, PT9 도입)</div>
+  <div style="font-weight:600;font-size:13px;margin:16px 0 8px;color:#555">10차 도전과제 TOP 10 — 전체 20종 중 (TOP 10 = 전체 333건 달성의 약 80%)</div>
   <div class="table-wrap">
     <table>
       <thead><tr><th>도전과제</th><th>트랙</th><th class="r">10차 달성 / 유저</th><th class="r">9차 비교</th></tr></thead>
@@ -432,15 +468,17 @@
   </div>
 
   <div class="col-pt8">
-    <div style="font-weight:600;font-size:13px;margin:16px 0 8px;color:#555">8차 도전과제 (참고 — Fly/Chase/Run 트랙 체계 도입 전)</div>
+    <div style="font-weight:600;font-size:13px;margin:16px 0 8px;color:#555">8차 도전과제 — 전체 9종 (Fly/Chase/Run 트랙 체계 도입 전)</div>
     <div class="table-wrap">
       <table>
-        <thead><tr><th>도전과제 ID</th><th class="r">달성 / 유저</th></tr></thead>
+        <thead><tr><th>도전과제 ID</th><th class="r">달성</th><th class="r">unique 유저</th></tr></thead>
         <tbody>
-          <tr><td>WindFanRide_1</td><td class="r">44 / 44</td></tr>
-          <tr><td>SeedCollected_100</td><td class="r">15 / 15</td></tr>
-          <tr><td>ObbyClear_1</td><td class="r">11 / 11</td></tr>
-          <tr><td>LastRunnerCount_20 / TagCount_5</td><td class="r">7 / 6</td></tr>
+          <tr><td>WindFanRide_1</td><td class="r bold">44</td><td class="r bold">44</td></tr>
+          <tr><td>SeedCollected_100</td><td class="r">15</td><td class="r">15</td></tr>
+          <tr><td>ObbyClear_1</td><td class="r">11</td><td class="r">11</td></tr>
+          <tr><td>LastRunnerCount_20</td><td class="r">7</td><td class="r">7</td></tr>
+          <tr><td>TagCount_5</td><td class="r">6</td><td class="r">6</td></tr>
+          <tr><td>(외 4종 합)</td><td class="r">~13</td><td class="r">—</td></tr>
         </tbody>
       </table>
     </div>
@@ -492,7 +530,8 @@
       <li><strong>Tutorial 완료율 +28.3%p</strong> — Sprint 006 직접 효과 (가장 가시적)</li>
       <li><strong>Horror 모드 4.2배 폭증</strong> (2.1h → 8.8h, 11명 → 34명)</li>
       <li><strong>Infection(태그) 지속 증가</strong> (9.7→14.6→18.8h)</li>
-      <li><strong>상점 진입 +65%</strong> + Wizard 시리즈 +225% 비중 확대</li>
+      <li><strong>상점 진입 +65%</strong> (614 → 1,013건) — 탐색 활성화</li>
+      <li><strong>GN 잔액 회복</strong>: 평균 19.4 → 19.7 (안정), 중앙값 8 → 13 (+62%)</li>
       <li><strong>퀘스트 달성 +28%</strong>, 잔존율 97.8% 유지</li>
       <li><strong>Discord ↔ 인게임 상관 재확인</strong> — Core 4.5배 차이</li>
     </ul>
@@ -579,7 +618,7 @@
       <table style="margin-top:8px">
         <thead><tr><th>건강도</th><th class="r">인원</th><th>등급</th><th class="r">인원</th></tr></thead>
         <tbody>
-          <tr><td><span class="badge badge-green">Active</span> (7일 내 6+)</td><td class="r">32</td><td><span class="badge badge-green">Core</span> (일평균 0.5+)</td><td class="r">54</td></tr>
+          <tr><td><span class="badge badge-green">Active</span> (7일 내 6 이상)</td><td class="r">32</td><td><span class="badge badge-green">Core</span> (일평균 0.5 이상)</td><td class="r">54</td></tr>
           <tr><td><span class="badge badge-blue">Casual</span> (7일 내 1-5)</td><td class="r">19</td><td><span class="badge badge-blue">Regular</span></td><td class="r">98</td></tr>
           <tr><td><span class="badge badge-yellow">Fading</span> (8-30일)</td><td class="r">148</td><td><span class="badge badge-yellow">Visitor</span></td><td class="r">930</td></tr>
           <tr><td><span class="badge badge-gray">Inactive</span> (31일+)</td><td class="r">894</td><td><span class="badge badge-gray">Silent</span></td><td class="r">94</td></tr>
