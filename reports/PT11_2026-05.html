@@ -95,7 +95,7 @@
     <div class="kpi-box"><div class="label">참여자 (시트)</div><div class="value alert">49</div><div class="sub">10차 85 (<span class="alert">-42%</span>)</div></div>
     <div class="kpi-box"><div class="label">신규/복귀/리텐션</div><div class="value" style="font-size:20px">7/10/32</div><div class="sub"><span class="alert">신규 -59% / 복귀 -72%</span></div></div>
     <div class="kpi-box"><div class="label">D1 retention (BQ)</div><div class="value">66.7%</div><div class="sub">24/36 (5/10→5/11)</div></div>
-    <div class="kpi-box"><div class="label">인당 체류 중앙값</div><div class="value">29.8분</div><div class="sub">10차 41.9분 (<span class="delta-down">-29%</span>)</div></div>
+    <div class="kpi-box"><div class="label">인당 체류 중앙값</div><div class="value">25.9분</div><div class="sub">47명 보정 / 10차 28.6분 (<span class="delta-down">-9%</span>)</div></div>
     <div class="kpi-box"><div class="label">Tutorial 완료율</div><div class="value alert">94.1%</div><div class="sub">10차 91.9% (<span class="delta-up">+2.2%p</span>)</div></div>
   </div>
 
@@ -105,8 +105,8 @@
       <tbody>
         <tr><td>참여자 (시트 Playtest Summary)</td><td class="r col-pt9">68</td><td class="r">85</td><td class="r bold">49</td><td class="r"><span class="alert">↘ -42%</span></td></tr>
         <tr><td>총 세션 (roomConnect, BigQuery)</td><td class="r col-pt9">965</td><td class="r">1,355</td><td class="r bold">669</td><td class="r"><span class="alert">↘ -51%</span></td></tr>
-        <tr><td>총 체류 (h, roomDisconnect 합산)</td><td class="r col-pt9">55.5</td><td class="r">69.9</td><td class="r bold">36.0</td><td class="r"><span class="alert">↘ -48%</span></td></tr>
-        <tr><td>인당 체류 중앙값 (분)</td><td class="r col-pt9">24.7</td><td class="r">41.9</td><td class="r bold">29.8</td><td class="r"><span class="delta-down">↘ -29%</span></td></tr>
+        <tr><td>총 체류 (h, 보정)</td><td class="r col-pt9">57.0</td><td class="r">71.6</td><td class="r bold">42.3</td><td class="r"><span class="alert">↘ -41%</span></td></tr>
+        <tr><td>인당 체류 중앙값 (분, 보정)</td><td class="r col-pt9">20.9</td><td class="r">28.6</td><td class="r bold">25.9</td><td class="r"><span class="delta-down">↘ -9%</span></td></tr>
         <tr><td>피크 DAU (KST 자정 기준)</td><td class="r col-pt9">49</td><td class="r">65</td><td class="r bold">36</td><td class="r"><span class="alert">↘ -45%</span></td></tr>
         <tr><td>PCCU (분당 동시 max)</td><td class="r col-pt9">19</td><td class="r">19</td><td class="r bold">13</td><td class="r"><span class="delta-down">↘ -32%</span></td></tr>
         <tr><td>Tutorial 완료율 (tutorialEnd 기준)</td><td class="r col-pt9">63.6%</td><td class="r">91.9%</td><td class="r bold">94.1%</td><td class="r"><span class="delta-up">↗ +2.2%p</span></td></tr>
@@ -118,11 +118,11 @@
 
   <div class="obs">
     <div class="tag">관찰</div>
-    참여자 49명으로 PT10 대비 <strong>참여자 -42% / 총 세션 -51%</strong>의 큰 축소. 유저 유형별로는 <strong>리텐션 32명(PT10과 동일 유지)이지만 복귀 -72%(36→10명)·신규 -59%(17→7명)으로 모집 단의 신규·복귀 유입이 모두 큰 폭 후퇴</strong> — 복귀 감소폭이 절대 수치(-26명)·비율 모두 더 크다. 인당 체류 중앙값 29.8분은 PT10(41.9분) 대비 -29%지만 <strong>PT9(24.7분)보다는 +21% 높은 수준</strong>이라 코어 유저의 깊이는 유지된 패턴. <strong>Tutorial 완료율 94.1%(+2.2%p)와 잔존율 98.0%</strong>는 안정적이며, PT10의 효과가 PT11에서도 유지되고 있음을 시사. 신규 기능 도입(<span class="badge badge-indigo">바주카</span>·<span class="badge badge-indigo">Tag PvP 매치</span>·<span class="badge badge-indigo">궁극기 6종</span>) 영향은 별도 섹션에서 분석.
+    참여자 49명으로 PT10 대비 <strong>참여자 -42% / 총 세션 -51%</strong>의 큰 축소. 유저 유형별로는 <strong>리텐션 32명(PT10과 동일 유지)이지만 복귀 -72%(36→10명)·신규 -59%(17→7명)으로 모집 단의 신규·복귀 유입이 모두 큰 폭 후퇴</strong> — 복귀 감소폭이 절대 수치(-26명)·비율 모두 더 크다. 인당 체류 중앙값 25.9분(47명 갭 보정 베이스)은 PT10(28.6분) 대비 -9%지만 <strong>PT9(20.9분)보다는 +24% 높은 수준</strong>이라 코어 유저의 깊이는 유지된 패턴. <strong>Tutorial 완료율 94.1%(+2.2%p)와 잔존율 98.0%</strong>는 안정적이며, PT10의 효과가 PT11에서도 유지되고 있음을 시사. 신규 기능 도입(<span class="badge badge-indigo">바주카</span>·<span class="badge badge-indigo">Tag PvP 매치</span>·<span class="badge badge-indigo">궁극기 6종</span>) 영향은 별도 섹션에서 분석.
   </div>
   <div class="review">
     <div class="tag">검토 사항</div>
-    PT11 참여자 -42% 축소의 원인 분리 필요: ① <strong>PT11 시작일 2026-05-10(일)이 미국 어머니의 날(5월 둘째 일요일)과 정확히 일치</strong> — 미국 베이스 71% 비중 감안 시 외부 일정 영향 가능성 가장 높음 ② 신규 빌드 사전 안내·홍보 채널별 변동 ③ 신규 콘텐츠(바주카) 외 기획·빌드 변경 없음(PT10과 동일 메커닉)이라 콘텐츠 신선도 모멘텀 약화 가능성. <strong>PT 간격 2주는 표준 운영 주기</strong>(이전 PT 모두 2주 간격)이므로 간격 자체는 원인 아님. <strong>F-10 베이스 차이 명시</strong>: 시트 Game Users 49명 / BigQuery roomDisconnect 발생자 39명 / GN balance 보유자 49명 — 모드별·체류 분석은 39명 베이스, KPI는 49명 시트 기준.
+    PT11 참여자 -42% 축소의 원인 분리 필요: ① <strong>PT11 시작일 2026-05-10(일)이 미국 어머니의 날(5월 둘째 일요일)과 정확히 일치</strong> — 미국 베이스 71% 비중 감안 시 외부 일정 영향 가능성 가장 높음 ② 신규 빌드 사전 안내·홍보 채널별 변동 ③ 신규 콘텐츠(바주카) 외 기획·빌드 변경 없음(PT10과 동일 메커닉)이라 콘텐츠 신선도 모멘텀 약화 가능성. <strong>PT 간격 2주는 표준 운영 주기</strong>(이전 PT 모두 2주 간격)이므로 간격 자체는 원인 아님. <strong>F-10 베이스 차이 명시</strong>: 시트 Game Users 49명 / BigQuery sdkStart 활동자 49명 / BigQuery roomConnect 진입자 47명 / BigQuery roomDisconnect 발생자 39명 / GN balance 보유자 49명 — 체류 분석은 47명 보정 베이스(정상 39명 + 갭 8명 추정: 마지막 이벤트 + 20초), KPI 인원수는 49명 시트 기준.
   </div>
 </div>
 
@@ -153,13 +153,13 @@
 <!-- ===== 3. 플레이타임 + 일별 추이 ===== -->
 <div class="section">
   <div class="section-heading">3. 플레이타임 + 일별 추이</div>
-  <div class="section-desc">roomDisconnect.elapsedTime 합산. 시트 기준 참여자(49명) 중 BigQuery roomDisconnect 발생자(39명)만 집계. KST 자정 기준 GROUP BY (BigQuery <code>DATE(TIMESTAMP_ADD(EVENT_TIMESTAMP, INTERVAL 9 HOUR))</code>).</div>
+  <div class="section-desc">47명 보정 베이스 (정상 39명 roomDisconnect.elapsedTime 합산 36.0h + 갭 8명 추정 6.3h: 마지막 이벤트 + 20초). 시트 기준 참여자 49명 / BigQuery roomConnect 47명. 구간 분포 표는 정상 39명 기준. KST 자정 기준 GROUP BY (BigQuery <code>DATE(TIMESTAMP_ADD(EVENT_TIMESTAMP, INTERVAL 9 HOUR))</code>).</div>
 
   <div class="grid-2">
     <div>
       <div class="kpi-row" style="margin-bottom:8px">
-        <div class="kpi-box"><div class="label">평균</div><div class="value">55.4분</div><div class="sub">10차 62.6 / <span class="col-pt9">9차 60.5</span></div></div>
-        <div class="kpi-box"><div class="label">중앙값</div><div class="value">29.8분</div><div class="sub">10차 41.9 / <span class="col-pt9">9차 24.7</span></div></div>
+        <div class="kpi-box"><div class="label">평균 (보정)</div><div class="value">54.0분</div><div class="sub">정상 39명 55.4 / 10차 53.7 / <span class="col-pt9">9차 51.8</span></div></div>
+        <div class="kpi-box"><div class="label">중앙값 (보정)</div><div class="value">25.9분</div><div class="sub">정상 39명 29.8 / 10차 28.6 / <span class="col-pt9">9차 20.9</span></div></div>
       </div>
       <div class="table-wrap">
         <table>
@@ -171,8 +171,9 @@
             <tr><td>30~60분</td><td class="r bold">5 (13%)</td><td class="r">14 (21%)</td><td class="r col-pt9">10 (18%)</td></tr>
             <tr><td>60~120분</td><td class="r bold">10 (26%)</td><td class="r">12 (18%)</td><td class="r col-pt9">6 (11%)</td></tr>
             <tr><td>120분+</td><td class="r bold">4 (10%)</td><td class="r">13 (19%)</td><td class="r col-pt9">8 (15%)</td></tr>
-            <tr><td>총 체류 (h)</td><td class="r bold">36.0</td><td class="r">69.9</td><td class="r col-pt9">55.5</td></tr>
-            <tr><td>합계 (명)</td><td class="r">39</td><td class="r">67</td><td class="r col-pt9">55</td></tr>
+            <tr><td>총 체류 (h, 보정)</td><td class="r bold">42.3</td><td class="r">71.6</td><td class="r col-pt9">57.0</td></tr>
+            <tr><td>보정 베이스 (명)</td><td class="r bold">47</td><td class="r">80</td><td class="r col-pt9">66</td></tr>
+            <tr><td>정상 베이스 (명, 분포 표 기준)</td><td class="r">39</td><td class="r">67</td><td class="r col-pt9">55</td></tr>
           </tbody>
         </table>
       </div>
@@ -871,7 +872,7 @@
           <tr><td><strong>Peak DAU</strong></td><td class="r">36명</td><td class="r">65명</td><td>일별 unique 유저 max (BigQuery)</td></tr>
           <tr><td><strong>D1 Retention</strong></td><td class="r">66.7%</td><td class="r alert">40.0%</td><td>1일차 참여자 중 2일차 복귀 비율 (24/36, BigQuery 기준)</td></tr>
           <tr><td><strong>Avg Session Length</strong> (분, roomDisconnect)</td><td class="r">3.2</td><td class="r">3.1</td><td>roomDisconnect.elapsedTime 평균</td></tr>
-          <tr><td><strong>Median Playtime per User</strong> (분)</td><td class="r">29.8</td><td class="r">41.9</td><td>인당 총 체류 중앙값</td></tr>
+          <tr><td><strong>Median Playtime per User</strong> (분, 보정)</td><td class="r">25.9</td><td class="r">28.6</td><td>인당 총 체류 중앙값 (PT11 47명 / PT10 80명 갭 보정 베이스)</td></tr>
           <tr><td><strong>Sessions per User</strong></td><td class="r">13.7</td><td class="r">14.6</td><td>총 세션 / 참여자 (시트 기준)</td></tr>
           <tr><td><strong>Tutorial Completion Rate</strong></td><td class="r">94.1%</td><td class="r">91.9%</td><td>tutorialEnd 이벤트 기준</td></tr>
           <tr><td><strong>Shop Conversion Rate</strong></td><td class="r">37.1%</td><td class="r">39.1%</td><td>shopEnter unique → purchaseItem unique</td></tr>
@@ -891,7 +892,7 @@
             <tr><td class="bold">게임 이벤트</td><td>BigQuery <code>runuts-analytics.runuts.events_with_users</code></td></tr>
             <tr><td class="bold">집계 시트</td><td>Game Users / Playtest Summary / Playtest Daily / Event Breakdown (UTC GROUP BY 원본)</td></tr>
             <tr><td class="bold">파이프라인</td><td>BigQuery → <code>sync_game_data.py</code> → Sheets → <code>generate_report_data.py</code> → JSON → 본 HTML (+ 보강 분석은 <code>pt_report_data_collector.py</code>로 직접 BigQuery 쿼리)</td></tr>
-            <tr><td class="bold">체류시간</td><td><code>roomDisconnect</code> EVENT_JSON → <code>elapsedTime</code> (초)</td></tr>
+            <tr><td class="bold">체류시간</td><td><code>roomDisconnect</code> EVENT_JSON → <code>elapsedTime</code> (초) — 47명 보정 베이스 (정상 39명 + 갭 8명 추정: 마지막 이벤트 + 20초)</td></tr>
             <tr><td class="bold">모드별</td><td><code>roomDisconnect</code> EVENT_JSON → <code>gameplayType</code> + <code>roomName</code></td></tr>
             <tr><td class="bold">경제 (PlayFab v2)</td><td><code>purchaseItem</code> + <code>VIRTUAL_CURRENCY_JSON</code> (<code>currency-goldennut</code>=GN, <code>currency-seed</code>=Seeds) — 2026-05-12 v1 키(<code>C1</code>/<code>C2</code>)에서 v2 FriendlyId로 변경</td></tr>
             <tr><td class="bold">STATISTICS (PlayFab v2)</td><td><code>STATISTICS_JSON</code> — snake_case + 시간류 <code>_cs</code>(centiseconds) suffix. 동적 키 추출로 견고하게 처리</td></tr>
@@ -918,9 +919,11 @@
   <details>
     <summary>데이터 정합성 메모 (F-10 베이스 차이 · F-14 PlayFab v2 마이그레이션 등)</summary>
     <ul style="margin:8px 0 0 16px;padding:0;line-height:2;font-size:13px;color:#555">
-      <li><strong>F-10 베이스 차이 (PT11)</strong>: 시트 Game Users 49명 / BigQuery roomDisconnect 발생자 39명 / BigQuery sdkStart 활동자 49명 / GN balance 보유자 49명. KPI는 시트 기준 49명, 체류·모드별은 39명 베이스 명시.</li>
+      <li><strong>F-10 베이스 차이 (PT11)</strong>: 시트 Game Users 49명 / BigQuery sdkStart 활동자 49명 / BigQuery roomConnect 진입자 47명 / BigQuery roomDisconnect 발생자 39명 / GN balance 보유자 49명. KPI 인원수는 시트 49명, 체류·모드별은 47명 보정 베이스(정상 39명 + 갭 8명 추정: 마지막 이벤트 + 20초로 6.3h 추가).</li>
       <li><strong>F-14 PlayFab v2 마이그레이션</strong>: 2026-05-12 적용. <code>VIRTUAL_CURRENCY_JSON</code>의 v1 키(<code>C1</code>/<code>C2</code>)와 v2 키(<code>currency-seed</code>/<code>currency-goldennut</code>) 양쪽 모두 지원하는 COALESCE 쿼리로 PT9~PT11 일관 산출. <strong>PT10 GN balance 재수집 시 v2 키로 81명(보고서 85명 - 4명)</strong> — 일부 유저 currency가 v2 마이그레이션 후 NULL 처리됐을 가능성. PT10 보고서 수치는 v1 시점에 산출된 85명 기준 유지.</li>
-      <li>참여자 수 출처 차이: 시트 49명(Playtest Summary, 모든 이벤트 발생 유저) ↔ BigQuery 모드별 unique 39명(roomDisconnect 발생 유저). 본문은 시트 기준을 메인, 모드별·플레이타임 분석은 39명 기준 명시.</li>
+      <li><strong>F-15 elapsedTime 단위 함정 (신규)</strong>: <code>roomDisconnect.elapsedTime</code> 단위는 <strong>초(s)</strong>이지 ms 아님 (max ~2,646초 = 44분이라 합리적). <code>pt_report_data_collector.py</code>는 이미 <code>/3600</code>·<code>/60</code> 처리되어 정확. 다만 다른 분석 쿼리 작성 시 <code>/1000/60</code>(ms 가정)으로 실수하면 ~1000배 작은 값 산출 — Layer 0 검증의 합리적 범위 체크 필요.</li>
+      <li><strong>F-16 disconnect 갭 만성 패턴 (신규)</strong>: PT9 11/66(16.7%) / PT10 13/80(16.2%) / PT11 8/47(17.0%) — roomConnect 후 roomDisconnect 미발생 비율이 모든 PT에서 ~17% 일관. 클라이언트 측 비정상 종료(헤드셋 슬립·앱 강제 종료·크래시 시점에 emit 실패) 가능성. Raya 측 Unity OnApplicationQuit/Pause/Focus 핸들러에서 emit 보장 확인 필요. 검증: PlayFab LastLogin이 BQ 마지막 이벤트보다 항상 이름 — 적재 지연·서버 잔존 가설 기각됨. 보정 추정: 마지막 이벤트 + 20초 (정상 유저의 last_event → roomDisconnect 중앙값 19~20초 캘리브레이션 기준).</li>
+      <li>참여자 수 출처 차이: 시트 49명(Playtest Summary, 모든 이벤트 발생 유저) ↔ BigQuery roomConnect 47명 ↔ BigQuery roomDisconnect 39명. 본문 KPI 인원수는 시트 49명, 체류·모드별 분석은 47명 보정 베이스(F-16 보정 추정 포함).</li>
       <li>유저 3분할(리텐션 32 + 복귀 10 + 신규 7 = 49)은 Game Users 시트 played_playtests 시퀀스 기준.</li>
       <li>Tutorial 완료율 두 측정: <code>tutorialEnd</code> 94.1%(보편적 완료, 16/17) ↔ Step 추적 82.4%(EndTutorial 단계 통과, 14/17). 측정 기준이 다르므로 두 수치 모두 출처와 함께 명시. <strong>EndTutorial step의 end_count=30 vs end_users=14 격차</strong>: end_count 30은 unique users 14의 약 2배 — 동일 유저가 EndTutorial 이벤트를 2회 발생시킨 케이스로 추정(재로딩·재시작 가능성). unique users 기준으로 측정하면 일관됨.</li>
       <li>Shop conversion 13/35 = 37.1% — 시트 기준 funnel과 약간 차이 가능(분석 노트 35%). collector 직접 산출 값을 사용.</li>

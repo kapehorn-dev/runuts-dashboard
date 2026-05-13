@@ -92,7 +92,7 @@
     <div class="kpi-box"><div class="label">참여자 (시트)</div><div class="value">85</div><div class="sub">9차 68 (<span class="delta-up">+25%</span>)</div></div>
     <div class="kpi-box"><div class="label">신규/복귀/리텐션</div><div class="value" style="font-size:20px">17/36/32</div><div class="sub">유저 3분할</div></div>
     <div class="kpi-box"><div class="label">D1 retention</div><div class="value alert">40.0%</div><div class="sub">26/65 (4/26→4/27)</div></div>
-    <div class="kpi-box"><div class="label">인당 체류 중앙값</div><div class="value alert">41.9분</div><div class="sub">9차 24.7분 (<span class="alert">+70%</span>)</div></div>
+    <div class="kpi-box"><div class="label">인당 체류 중앙값</div><div class="value alert">28.6분</div><div class="sub">80명 보정 / 9차 20.9분 (<span class="alert">+37%</span>)</div></div>
     <div class="kpi-box"><div class="label">Tutorial 완료율</div><div class="value alert">91.9%</div><div class="sub">9차 63.6% (<span class="alert">+28.3%p</span>)</div></div>
   </div>
 
@@ -102,8 +102,8 @@
       <tbody>
         <tr><td>참여자 (시트 Playtest Summary)</td><td class="r col-pt8">81</td><td class="r">68</td><td class="r bold">85</td><td class="r"><span class="delta-up">↗ 반등</span></td></tr>
         <tr><td>총 세션</td><td class="r col-pt8">1,187</td><td class="r">965</td><td class="r bold">1,355</td><td class="r"><span class="delta-up">↗ +40%</span></td></tr>
-        <tr><td>총 체류 (h, roomDisconnect 합산)</td><td class="r col-pt8">48.9</td><td class="r">55.5</td><td class="r bold">69.9</td><td class="r"><span class="delta-up">↗ +26%</span></td></tr>
-        <tr><td>인당 체류 중앙값 (분)</td><td class="r col-pt8">24.8</td><td class="r">24.7</td><td class="r bold">41.9</td><td class="r"><span class="alert">↗ +70%</span></td></tr>
+        <tr><td>총 체류 (h, 보정)</td><td class="r col-pt8">48.9</td><td class="r">57.0</td><td class="r bold">71.6</td><td class="r"><span class="delta-up">↗ +26%</span></td></tr>
+        <tr><td>인당 체류 중앙값 (분, 보정)</td><td class="r col-pt8">24.8</td><td class="r">20.9</td><td class="r bold">28.6</td><td class="r"><span class="alert">↗ +37%</span></td></tr>
         <tr><td>피크 DAU (KST 자정 기준)</td><td class="r col-pt8">69</td><td class="r">57</td><td class="r bold">65</td><td class="r"><span class="delta-up">↗ 반등</span></td></tr>
         <tr><td>Tutorial 완료율 (tutorialEnd 기준)</td><td class="r col-pt8">56.5%</td><td class="r">63.6%</td><td class="r bold">91.9%</td><td class="r"><span class="alert">↗ +28.3%p</span></td></tr>
         <tr><td>Obby 클리어율 (obbyClear ÷ obbyStart)</td><td class="r col-pt8">8.5%</td><td class="r">14.2%</td><td class="r bold">9.2%</td><td class="r"><span class="alert">↘ -5.0%p</span></td></tr>
@@ -113,7 +113,7 @@
 
   <div class="obs">
     <div class="tag">관찰</div>
-    참여자·세션·체류 모두 PT9 대비 25~40% 증가했으며, <strong>인당 체류 중앙값이 24.7 → 41.9분(+70%)으로 폭증</strong>해 코어 유저들이 더 깊이 머문 패턴. <strong>Tutorial 완료율 91.9%(+28.3%p)</strong>는 Sprint 006 "온보딩·튜토리얼" 작업의 잠정 가설로 해석되나, 참여자 +25%·신규 +70% 증가에 따른 진입자 풀 변화 영향도 함께 작용했을 가능성 (재참여 유저의 튜토리얼 강제 재경험). 다만 <strong>Obby 클리어율 -5.0%p 후퇴</strong>.
+    참여자·세션·체류 모두 PT9 대비 25~40% 증가했으며, <strong>인당 체류 중앙값이 20.9 → 28.6분(+37%, 갭 보정 베이스)</strong>으로 상승해 코어 유저들이 더 깊이 머문 패턴. <strong>Tutorial 완료율 91.9%(+28.3%p)</strong>는 Sprint 006 "온보딩·튜토리얼" 작업의 잠정 가설로 해석되나, 참여자 +25%·신규 +70% 증가에 따른 진입자 풀 변화 영향도 함께 작용했을 가능성 (재참여 유저의 튜토리얼 강제 재경험). 다만 <strong>Obby 클리어율 -5.0%p 후퇴</strong>.
   </div>
 </div>
 
@@ -144,13 +144,13 @@
 <!-- ===== 3. 플레이타임 + 일별 추이 ===== -->
 <div class="section">
   <div class="section-heading">3. 플레이타임 + 일별 추이</div>
-  <div class="section-desc">roomDisconnect.elapsedTime 합산. 시트 기준 참여자(85) 중 BigQuery roomDisconnect 발생자(67명)만 집계. KST 자정 기준 GROUP BY (BigQuery <code>DATE(TIMESTAMP_ADD(EVENT_TIMESTAMP, INTERVAL 9 HOUR))</code>).</div>
+  <div class="section-desc">80명 보정 베이스 (정상 67명 roomDisconnect.elapsedTime 합산 + 갭 13명 추정: 마지막 이벤트 + 20초). 시트 기준 참여자 85명. 구간 분포 표는 정상 67명 기준. KST 자정 기준 GROUP BY (BigQuery <code>DATE(TIMESTAMP_ADD(EVENT_TIMESTAMP, INTERVAL 9 HOUR))</code>).</div>
 
   <div class="grid-2">
     <div>
       <div class="kpi-row" style="margin-bottom:8px">
-        <div class="kpi-box"><div class="label">평균</div><div class="value">62.6분</div><div class="sub">9차 60.5 / <span class="col-pt8">8차 43.2</span></div></div>
-        <div class="kpi-box"><div class="label">중앙값</div><div class="value alert">41.9분</div><div class="sub">9차 24.7 / <span class="col-pt8">8차 24.8</span></div></div>
+        <div class="kpi-box"><div class="label">평균 (보정)</div><div class="value">53.7분</div><div class="sub">정상 67명 62.6 / 9차 51.8 / <span class="col-pt8">8차 43.2</span></div></div>
+        <div class="kpi-box"><div class="label">중앙값 (보정)</div><div class="value alert">28.6분</div><div class="sub">정상 67명 41.9 / 9차 20.9 / <span class="col-pt8">8차 24.8</span></div></div>
       </div>
       <div class="table-wrap">
         <table>
@@ -162,8 +162,9 @@
             <tr><td>30~60분</td><td class="r bold">14 (21%)</td><td class="r">10 (18%)</td><td class="r col-pt8">16 (24%)</td></tr>
             <tr><td>60~120분</td><td class="r bold">12 (18%)</td><td class="r">6 (11%)</td><td class="r col-pt8">9 (13%)</td></tr>
             <tr class="highlight-row"><td>120분+</td><td class="r bold">13 (19%)</td><td class="r">8 (15%)</td><td class="r col-pt8">6 (9%)</td></tr>
-            <tr><td>총 체류 (h)</td><td class="r bold">69.9</td><td class="r">55.5</td><td class="r col-pt8">48.9</td></tr>
-            <tr><td>합계 (명)</td><td class="r">67</td><td class="r">55</td><td class="r col-pt8">68</td></tr>
+            <tr><td>총 체류 (h, 보정)</td><td class="r bold">71.6</td><td class="r">57.0</td><td class="r col-pt8">48.9</td></tr>
+            <tr><td>보정 베이스 (명)</td><td class="r">80</td><td class="r">66</td><td class="r col-pt8">68</td></tr>
+            <tr><td>정상 베이스 (명, 분포 표 기준)</td><td class="r">67</td><td class="r">55</td><td class="r col-pt8">68</td></tr>
           </tbody>
         </table>
       </div>
@@ -191,7 +192,7 @@
 
   <div class="obs">
     <div class="tag">관찰</div>
-    <strong>중앙값 +70%</strong> (24.7 → 41.9분): 9차에서 13명이던 15~30분 구간이 3명으로 축소되고, <strong>30분+ 구간이 24명 → 39명(+63%)으로 확대</strong>. 콘텐츠 깊이 효과로 코어 유저가 더 오래 머문 패턴. 120분+ 헤비 13명(19%)도 PT8(9%)·PT9(15%) 대비 증가.<br>
+    <strong>중앙값 +37%</strong> (20.9 → 28.6분, 갭 보정 베이스): 9차에서 13명이던 15~30분 구간이 3명으로 축소되고, <strong>30분+ 구간이 24명 → 39명(+63%)으로 확대</strong>(정상 67명 분포 기준). 콘텐츠 깊이 효과로 코어 유저가 더 오래 머문 패턴. 120분+ 헤비 13명(19%)도 PT8(9%)·PT9(15%) 대비 증가.<br>
     <strong>1일차(4/26 일)</strong>: DAU 65 / 16,531 events / 887 세션 — 18시간 동안 전체의 64.5% 차지.<br>
     <strong>2일차(4/27 월)</strong>: DAU 46명 (1일차와 26명 중복) / 9,079 events. 12시간 동안 마무리.
   </div>
@@ -657,7 +658,7 @@
     <div class="tag">긍정 변화</div>
     <ul style="margin:8px 0 0 16px;padding:0;line-height:2">
       <li><strong>참여자 반등</strong>: 8차 81 → 9차 68 → 10차 85 (+25%, 신규 17명 +70%)</li>
-      <li><strong>인당 체류 중앙값 +70%</strong> (24.7 → 41.9분), 30분+ 코어 39명(+63%)</li>
+      <li><strong>인당 체류 중앙값 +37%</strong> (20.9 → 28.6분, 갭 보정 베이스), 30분+ 코어 39명(+63%, 정상 분포)</li>
       <li><strong>Tutorial 완료율 +28.3%p</strong> (63.6% → 91.9%), Ultimate 단계 제거</li>
       <li><strong>Horror 모드 4.2배 폭증</strong> (2.1h → 8.8h, 11→34명)</li>
       <li><strong>Infection(태그) 지속 증가</strong> (9.7→14.6→18.8h)</li>
@@ -763,7 +764,7 @@
           <tr><td><strong>Peak DAU</strong></td><td class="r">65명</td><td class="r">57명</td><td>일별 unique 유저 max</td></tr>
           <tr><td><strong>D1 Retention</strong></td><td class="r alert">40.0%</td><td class="r">—</td><td>1일차 참여자 중 2일차 복귀 비율 (26/65)</td></tr>
           <tr><td><strong>Avg Session Length</strong> (분, roomDisconnect)</td><td class="r">3.1</td><td class="r">3.4</td><td>roomDisconnect.elapsedTime 평균</td></tr>
-          <tr><td><strong>Median Playtime per User</strong> (분)</td><td class="r">41.9</td><td class="r">24.7</td><td>인당 총 체류 중앙값</td></tr>
+          <tr><td><strong>Median Playtime per User</strong> (분, 보정)</td><td class="r">28.6</td><td class="r">20.9</td><td>인당 총 체류 중앙값 (PT10 80명 / PT9 66명 갭 보정 베이스)</td></tr>
           <tr><td><strong>Sessions per User</strong> (인당 세션)</td><td class="r">14.6</td><td class="r">14.2</td><td>총 세션 / 참여자</td></tr>
           <tr><td><strong>Tutorial Completion Rate</strong></td><td class="r alert">91.9%</td><td class="r">63.6%</td><td>tutorialEnd 이벤트 기준</td></tr>
           <tr><td><strong>Shop Conversion Rate</strong></td><td class="r">39.1%</td><td class="r">54.9%</td><td>shopEnter unique → purchaseItem unique</td></tr>
@@ -783,7 +784,7 @@
             <tr><td class="bold">게임 이벤트</td><td>BigQuery <code>runuts-analytics.runuts.events_with_users</code></td></tr>
             <tr><td class="bold">집계 시트</td><td>Game Users / Playtest Summary / Playtest Daily / Event Breakdown (UTC GROUP BY 원본)</td></tr>
             <tr><td class="bold">파이프라인</td><td>BigQuery → <code>sync_game_data.py</code> → Sheets → <code>generate_report_data.py</code> → JSON → 본 HTML (+ 보강 분석은 직접 BigQuery 쿼리)</td></tr>
-            <tr><td class="bold">체류시간</td><td><code>roomDisconnect</code> EVENT_JSON → <code>elapsedTime</code> (초)</td></tr>
+            <tr><td class="bold">체류시간</td><td><code>roomDisconnect</code> EVENT_JSON → <code>elapsedTime</code> (초) — 80명 보정 베이스 (정상 67명 + 갭 13명 추정: 마지막 이벤트 + 20초)</td></tr>
             <tr><td class="bold">모드별</td><td><code>roomDisconnect</code> EVENT_JSON → <code>gameplayType</code> + <code>roomName</code></td></tr>
             <tr><td class="bold">경제</td><td><code>purchaseItem</code> + <code>VIRTUAL_CURRENCY_JSON</code> (<code>C2</code>=GN, <code>C1</code>=Seeds)</td></tr>
             <tr><td class="bold">도전과제</td><td><code>achievementClaimed</code> + <code>game_config/Achievements.json</code> (track/reward)</td></tr>
@@ -807,7 +808,8 @@
     <summary>데이터 정합성 메모</summary>
     <ul style="margin:8px 0 0 16px;padding:0;line-height:2;font-size:13px;color:#555">
       <li>10차 1차 시도(v0.14.0, 4/20-21 KST, 31명/5,215 events)는 빌드 문제로 무효 처리. <code>playtest_config.py</code>에 <code>"10차 Playtest 시도1": is_regular=False</code>로 분리 등록.</li>
-      <li>참여자 수 출처 차이: 시트 기준 85명(Playtest Summary, 모든 이벤트 발생 유저) ↔ BigQuery 모드별 unique 67명(roomDisconnect 발생 유저). 본문은 시트 기준을 메인으로, 모드별·플레이타임 분석은 BigQuery 67명 기준 명시.</li>
+      <li>참여자 수 베이스 3종: ① 시트 Game Users 85명(모든 이벤트 발생 유저) ② BigQuery roomConnect 80명(게임 룸 진입자) ③ BigQuery roomDisconnect 67명(정상 세션 종료). 본문 KPI는 시트 85명, 체류·모드별은 80명 보정 베이스(정상 67명 + 갭 13명 추정: 마지막 이벤트 + 20초)로 통일.</li>
+      <li>갭 13명 보정 추정 1.67h: roomConnect 후 roomDisconnect 미발생 패턴은 PT9/PT10/PT11 모두 ~17% 만성. 클라이언트 측 비정상 종료(헤드셋 슬립·앱 강제 종료·크래시) 가능성 (Raya 측 Unity OnApplicationQuit/Pause emit 확인 필요).</li>
       <li>유저 3분할(리텐션 32 + 복귀 36 + 신규 17 = 85)은 Game Users 시트 played_playtests 시퀀스 기준.</li>
       <li>Tutorial 완료율 두 측정: <code>tutorialEnd</code> 91.9%(보편적 완료) ↔ Step 추적 77.4%(EndTutorial 단계 통과). 측정 기준이 다르므로 두 수치 모두 출처와 함께 명시.</li>
       <li>Discord 매칭 61/85 (71.7%) — User Master meta_id↔discord_id 매핑 기준. 24명 미달은 신규 유저 매칭 미완료로 추정.</li>
